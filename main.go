@@ -13,6 +13,8 @@ import (
 	"os"
 	"os/exec"
 	"os/signal"
+	"runtime"
+	"strings"
 	"time"
 
 	"github.com/creack/pty"
@@ -30,13 +32,26 @@ const (
 	secretKey      = "aipilot-secret-key-change-in-production"
 )
 
+// AgentType represents known AI agent types
+type AgentType string
+
+const (
+	AgentClaude  AgentType = "claude"
+	AgentAider   AgentType = "aider"
+	AgentGeneric AgentType = "generic"
+)
+
 // QRData is encoded in the QR code for mobile to scan
 type QRData struct {
-	Relay      string `json:"r"`
-	Session    string `json:"s"`
-	Token      string `json:"t"`
-	Command    string `json:"c,omitempty"`
-	WorkingDir string `json:"w,omitempty"`
+	Relay        string    `json:"r"`
+	Session      string    `json:"s"`
+	Token        string    `json:"t"`
+	Command      string    `json:"c,omitempty"`
+	WorkingDir   string    `json:"w,omitempty"`
+	AgentType    AgentType `json:"a,omitempty"`
+	AgentVersion string    `json:"av,omitempty"`
+	OS           string    `json:"os,omitempty"`
+	CLIVersion   string    `json:"cv,omitempty"`
 }
 
 // Message types for WebSocket communication
@@ -56,6 +71,51 @@ func generateToken(session string) string {
 	h.Write([]byte(session))
 	h.Write([]byte(fmt.Sprintf("%d", time.Now().Unix()/300))) // 5 min window
 	return hex.EncodeToString(h.Sum(nil))[:32]
+}
+
+// checkCommand verifies the command exists and returns its path
+func checkCommand(command string) (string, error) {
+	path, err := exec.LookPath(command)
+	if err != nil {
+		return "", fmt.Errorf("command '%s' not found in PATH", command)
+	}
+	return path, nil
+}
+
+// detectAgentType determines the agent type from command name
+func detectAgentType(command string) AgentType {
+	cmd := strings.ToLower(command)
+	switch {
+	case strings.Contains(cmd, "claude"):
+		return AgentClaude
+	case strings.Contains(cmd, "aider"):
+		return AgentAider
+	default:
+		return AgentGeneric
+	}
+}
+
+// getAgentVersion tries to get the version of the agent
+func getAgentVersion(command string, agentType AgentType) string {
+	var versionFlag string
+	switch agentType {
+	case AgentClaude:
+		versionFlag = "--version"
+	case AgentAider:
+		versionFlag = "--version"
+	default:
+		versionFlag = "--version"
+	}
+
+	cmd := exec.Command(command, versionFlag)
+	output, err := cmd.Output()
+	if err != nil {
+		return ""
+	}
+
+	// Extract first line and clean it
+	version := strings.TrimSpace(strings.Split(string(output), "\n")[0])
+	return version
 }
 
 func main() {
@@ -80,17 +140,35 @@ func main() {
 		*workDir = wd
 	}
 
+	// Verify command exists
+	cmdPath, err := checkCommand(*command)
+	if err != nil {
+		log.Fatalf("Error: %v\nPlease ensure '%s' is installed and in your PATH.", err, *command)
+	}
+	fmt.Printf("✓ Found %s at %s\n", *command, cmdPath)
+
+	// Detect agent type and version
+	agentType := detectAgentType(*command)
+	agentVersion := getAgentVersion(*command, agentType)
+	if agentVersion != "" {
+		fmt.Printf("✓ Agent version: %s\n", agentVersion)
+	}
+
 	// Generate session
 	session := uuid.New().String()
 	token := generateToken(session)
 
-	// Create QR data
+	// Create QR data with agent info
 	qrData := QRData{
-		Relay:      *relay,
-		Session:    session,
-		Token:      token,
-		Command:    *command,
-		WorkingDir: *workDir,
+		Relay:        *relay,
+		Session:      session,
+		Token:        token,
+		Command:      *command,
+		WorkingDir:   *workDir,
+		AgentType:    agentType,
+		AgentVersion: agentVersion,
+		OS:           runtime.GOOS,
+		CLIVersion:   Version,
 	}
 
 	qrJSON, _ := json.Marshal(qrData)
@@ -107,9 +185,10 @@ func main() {
 	}
 	fmt.Println(qr.ToSmallString(false))
 
-	fmt.Printf("Session: %s\n", session[:8]+"...")
-	fmt.Printf("Command: %s\n", *command)
-	fmt.Printf("WorkDir: %s\n", *workDir)
+	fmt.Printf("Session:  %s\n", session[:8]+"...")
+	fmt.Printf("Agent:    %s (%s)\n", *command, agentType)
+	fmt.Printf("WorkDir:  %s\n", *workDir)
+	fmt.Printf("Platform: %s/%s\n", runtime.GOOS, runtime.GOARCH)
 	fmt.Println("\nWaiting for mobile connection...")
 
 	// Connect to relay
