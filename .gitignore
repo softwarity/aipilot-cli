@@ -1,0 +1,28 @@
+# Binaries
+aipilot-cli
+aipilot-cli-*
+*.exe
+
+# Go build cache
+*.o
+*.a
+*.so
+
+# Test binary
+*.test
+
+# Output of go coverage
+*.out
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Release artifacts
+dist/
