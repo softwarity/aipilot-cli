@@ -13,7 +13,6 @@ import (
 	"os"
 	"os/exec"
 	"os/signal"
-	"syscall"
 	"time"
 
 	"github.com/creack/pty"
@@ -170,13 +169,12 @@ func main() {
 	}
 	defer ptmx.Close()
 
-	// Handle window resize
-	resizeChan := make(chan os.Signal, 1)
-	signal.Notify(resizeChan, syscall.SIGWINCH)
+	// Handle window resize (Unix only, no-op on Windows)
+	_ = setupResizeSignal()
 
 	// Handle termination
 	sigChan := make(chan os.Signal, 1)
-	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
+	signal.Notify(sigChan, os.Interrupt)
 
 	// PTY -> WebSocket (terminal output to mobile)
 	go func() {
