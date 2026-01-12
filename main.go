@@ -22,6 +22,9 @@ import (
 	"github.com/skip2/go-qrcode"
 )
 
+// Version is set at build time via -ldflags
+var Version = "dev"
+
 const (
 	defaultRelay   = "wss://aipilot-relay.francois-achache.workers.dev/ws"
 	defaultCommand = "claude"
@@ -61,7 +64,13 @@ func main() {
 	relay := flag.String("relay", defaultRelay, "WebSocket relay URL")
 	command := flag.String("command", defaultCommand, "Command to run (e.g., claude, bash)")
 	workDir := flag.String("workdir", "", "Working directory")
+	showVersion := flag.Bool("version", false, "Show version and exit")
 	flag.Parse()
+
+	if *showVersion {
+		fmt.Printf("aipilot-cli version %s\n", Version)
+		os.Exit(0)
+	}
 
 	// Use current directory if not specified
 	if *workDir == "" {
