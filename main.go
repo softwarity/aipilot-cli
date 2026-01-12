@@ -13,6 +13,7 @@ import (
 	"os"
 	"os/exec"
 	"os/signal"
+	"path/filepath"
 	"runtime"
 	"strings"
 	"time"
@@ -22,6 +23,20 @@ import (
 	"github.com/gorilla/websocket"
 	"github.com/skip2/go-qrcode"
 )
+
+// openURL opens a file or URL with the system's default application
+func openFile(path string) error {
+	var cmd *exec.Cmd
+	switch runtime.GOOS {
+	case "darwin":
+		cmd = exec.Command("open", path)
+	case "windows":
+		cmd = exec.Command("cmd", "/c", "start", "", path)
+	default: // linux, freebsd, etc.
+		cmd = exec.Command("xdg-open", path)
+	}
+	return cmd.Start()
+}
 
 // Version is set at build time via -ldflags
 var Version = "dev"
@@ -124,6 +139,7 @@ func main() {
 	command := flag.String("command", defaultCommand, "Command to run (e.g., claude, bash)")
 	workDir := flag.String("workdir", "", "Working directory")
 	showVersion := flag.Bool("version", false, "Show version and exit")
+	qrImage := flag.Bool("qr", false, "Open QR code as image (better for scanning)")
 	flag.Parse()
 
 	if *showVersion {
@@ -158,32 +174,48 @@ func main() {
 	session := uuid.New().String()
 	token := generateToken(session)
 
-	// Create QR data with agent info
+	// Create QR data (minimal for smaller QR code)
 	qrData := QRData{
-		Relay:        *relay,
-		Session:      session,
-		Token:        token,
-		Command:      *command,
-		WorkingDir:   *workDir,
-		AgentType:    agentType,
-		AgentVersion: agentVersion,
-		OS:           runtime.GOOS,
-		CLIVersion:   Version,
+		Relay:     *relay,
+		Session:   session,
+		Token:     token,
+		Command:   *command,
+		AgentType: agentType,
+		// WorkingDir, AgentVersion, OS, CLIVersion shown in terminal but not in QR
 	}
 
 	qrJSON, _ := json.Marshal(qrData)
 
 	// Display QR code
-	fmt.Println("\n╔════════════════════════════════════════════════════════════╗")
-	fmt.Println("║              AIPilot Bridge - Scan to Connect              ║")
-	fmt.Println("╚════════════════════════════════════════════════════════════╝")
+	fmt.Println("\n╔═══════════════════════════════════════╗")
+	fmt.Println("║   AIPilot - Scan to Connect           ║")
+	fmt.Println("╚═══════════════════════════════════════╝")
 	fmt.Println()
 
-	qr, err := qrcode.New(string(qrJSON), qrcode.Medium)
-	if err != nil {
-		log.Fatal("Failed to generate QR code:", err)
+	if *qrImage {
+		// Generate QR code as image file
+		tmpDir := os.TempDir()
+		qrFile := filepath.Join(tmpDir, fmt.Sprintf("aipilot-qr-%s.png", session[:8]))
+		if err := qrcode.WriteFile(string(qrJSON), qrcode.Medium, 300, qrFile); err != nil {
+			log.Fatal("Failed to generate QR code image:", err)
+		}
+		fmt.Printf("QR code saved to: %s\n", qrFile)
+		if err := openFile(qrFile); err != nil {
+			fmt.Println("Could not open QR image automatically.")
+			fmt.Println("Please open the file manually:", qrFile)
+		} else {
+			fmt.Println("QR code image opened in default viewer.")
+		}
+		fmt.Println()
+	} else {
+		qr, err := qrcode.New(string(qrJSON), qrcode.Medium)
+		if err != nil {
+			log.Fatal("Failed to generate QR code:", err)
+		}
+		fmt.Println(qr.ToSmallString(false))
+		fmt.Println("Tip: Use -qr flag to open QR code as image for easier scanning")
+		fmt.Println()
 	}
-	fmt.Println(qr.ToSmallString(false))
 
 	fmt.Printf("Session:  %s\n", session[:8]+"...")
 	fmt.Printf("Agent:    %s (%s)\n", *command, agentType)
@@ -219,9 +251,28 @@ func main() {
 
 	fmt.Println("✓ Registered with relay")
 
+	// Start ping keepalive goroutine
+	stopPing := make(chan struct{})
+	go func() {
+		ticker := time.NewTicker(20 * time.Second)
+		defer ticker.Stop()
+		for {
+			select {
+			case <-ticker.C:
+				pingMsg := Message{Type: "ping"}
+				if err := conn.WriteJSON(pingMsg); err != nil {
+					return
+				}
+			case <-stopPing:
+				return
+			}
+		}
+	}()
+
 	// Wait for mobile connection
 	for {
 		if err := conn.ReadJSON(&response); err != nil {
+			close(stopPing)
 			log.Fatal("Connection error:", err)
 		}
 
@@ -230,10 +281,17 @@ func main() {
 			break
 		}
 
+		if response.Type == "pong" {
+			// Keepalive response, ignore
+			continue
+		}
+
 		if response.Type == "error" {
+			close(stopPing)
 			log.Fatal("Error:", response.Error)
 		}
 	}
+	close(stopPing)
 
 	// Start PTY with command
 	fmt.Printf("\nStarting %s...\n\n", *command)
@@ -306,7 +364,27 @@ func main() {
 
 			case "disconnected":
 				fmt.Println("\n\nMobile disconnected.")
-				return
+				// Don't return - wait for reconnection
+
+			case "connected":
+				if msg.Role == "mobile" {
+					fmt.Println("\n✓ Mobile reconnected!")
+					// Trigger screen refresh by sending current size
+					// This makes Claude redraw its UI
+					size, err := pty.GetsizeFull(ptmx)
+					if err == nil && size.Cols > 0 && size.Rows > 0 {
+						// Send a slightly different size then back to trigger redraw
+						pty.Setsize(ptmx, &pty.Winsize{
+							Cols: size.Cols,
+							Rows: size.Rows - 1,
+						})
+						time.Sleep(50 * time.Millisecond)
+						pty.Setsize(ptmx, &pty.Winsize{
+							Cols: size.Cols,
+							Rows: size.Rows,
+						})
+					}
+				}
 			}
 		}
 	}()
