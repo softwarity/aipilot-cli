@@ -1,7 +1,7 @@
 package main
 
 import (
-	"crypto/hmac"
+	"crypto/rand"
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/hex"
@@ -16,6 +16,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/creack/pty"
@@ -24,7 +25,130 @@ import (
 	"github.com/skip2/go-qrcode"
 )
 
-// openURL opens a file or URL with the system's default application
+// ANSI escape codes for terminal control
+const (
+	clearLine  = "\033[K"
+	moveUp     = "\033[1A"
+	moveToCol0 = "\r"
+	dim        = "\033[2m"
+	reset      = "\033[0m"
+	green      = "\033[32m"
+	yellow     = "\033[33m"
+	red        = "\033[31m"
+)
+
+// Status manages the CLI status display
+type Status struct {
+	mu                 sync.Mutex
+	relayStatus        string
+	mobileStatus       string
+	agentStatus        string
+	mobileConnectCount int
+	statusLines        int  // number of status lines printed
+	frozen             bool // stop updating display once terminal is active
+}
+
+func (s *Status) update(agent, relay, mobile string) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	if agent != "" {
+		s.agentStatus = agent
+	}
+	if relay != "" {
+		s.relayStatus = relay
+	}
+	if mobile != "" {
+		s.mobileStatus = mobile
+	}
+
+	s.render()
+}
+
+func (s *Status) incrementConnect() {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.mobileConnectCount++
+}
+
+func (s *Status) freeze() {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.frozen = true
+}
+
+func (s *Status) render() {
+	// Skip rendering if frozen (terminal is active)
+	if s.frozen {
+		return
+	}
+
+	// Move up to overwrite previous status lines
+	if s.statusLines > 0 {
+		for i := 0; i < s.statusLines; i++ {
+			fmt.Print(moveUp)
+		}
+		fmt.Print(moveToCol0)
+		for i := 0; i < s.statusLines; i++ {
+			fmt.Print(clearLine + "\n")
+		}
+		for i := 0; i < s.statusLines; i++ {
+			fmt.Print(moveUp)
+		}
+		fmt.Print(moveToCol0)
+	}
+
+	// Print status lines (order: Agent, Relay, Mobile)
+	lines := []string{}
+
+	// Agent status
+	agentLine := fmt.Sprintf("  Agent:   %s", s.agentStatus)
+	lines = append(lines, agentLine)
+
+	// Relay status
+	relayLine := fmt.Sprintf("  Relay:   %s", s.relayStatus)
+	lines = append(lines, relayLine)
+
+	// Mobile status with connection count
+	mobileLine := fmt.Sprintf("  Mobile:  %s", s.mobileStatus)
+	if s.mobileConnectCount > 1 {
+		mobileLine += fmt.Sprintf(" %s(#%d)%s", dim, s.mobileConnectCount, reset)
+	}
+	lines = append(lines, mobileLine)
+
+	for _, line := range lines {
+		fmt.Println(line)
+	}
+
+	s.statusLines = len(lines)
+}
+
+func (s *Status) mobileConnected() {
+	s.mu.Lock()
+	s.mobileConnectCount++
+	count := s.mobileConnectCount
+	s.mu.Unlock()
+
+	if count > 1 {
+		// Reconnection - update status and refreeze (no extra line printed)
+		s.update("", "", green+"✓ Connected"+reset)
+		s.freeze()
+	} else {
+		// First connection, update status normally (will freeze after agent starts)
+		s.update("", "", green+"✓ Connected"+reset)
+	}
+}
+
+func (s *Status) mobileDisconnected() {
+	s.mu.Lock()
+	s.frozen = false // Unfreeze - mobile is gone, terminal output doesn't matter
+	s.mu.Unlock()
+
+	// Show full status since we're unfrozen
+	s.update("", "", yellow+"⋯ Disconnected"+reset)
+}
+
+// openFile opens a file or URL with the system's default application
 func openFile(path string) error {
 	var cmd *exec.Cmd
 	switch runtime.GOOS {
@@ -38,14 +162,89 @@ func openFile(path string) error {
 	return cmd.Start()
 }
 
-// Version is set at build time via -ldflags
-var Version = "dev"
+// Version and RelayURL are set at build time via -ldflags
+var (
+	Version  = "dev"
+	RelayURL = "wss://aipilot-relay.francois-achache.workers.dev" // Base URL without /ws path
+)
 
 const (
-	defaultRelay   = "wss://aipilot-relay.francois-achache.workers.dev/ws"
 	defaultCommand = "claude"
-	secretKey      = "aipilot-secret-key-change-in-production"
 )
+
+// SessionData represents a saved session for persistence
+type SessionData struct {
+	Session   string `json:"session"`
+	Token     string `json:"token"`
+	Relay     string `json:"relay"`
+	Command   string `json:"command"`
+	WorkDir   string `json:"workdir"`
+	CreatedAt string `json:"created_at"`
+}
+
+func getSessionFilePath(workDir string) string {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return ""
+	}
+	// Create a hash of the workdir for unique filename
+	h := sha256.Sum256([]byte(workDir))
+	hash := hex.EncodeToString(h[:8]) // Use first 8 bytes
+	return filepath.Join(home, ".aipilot", "sessions", fmt.Sprintf("%s.json", hash))
+}
+
+func loadSession(workDir string) (*SessionData, error) {
+	path := getSessionFilePath(workDir)
+	if path == "" {
+		return nil, fmt.Errorf("cannot determine home directory")
+	}
+
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return nil, err
+	}
+
+	var session SessionData
+	if err := json.Unmarshal(data, &session); err != nil {
+		return nil, err
+	}
+
+	return &session, nil
+}
+
+func saveSession(workDir string, session *SessionData) error {
+	path := getSessionFilePath(workDir)
+	if path == "" {
+		return fmt.Errorf("cannot determine home directory")
+	}
+
+	// Create directory if needed
+	dir := filepath.Dir(path)
+	if err := os.MkdirAll(dir, 0700); err != nil {
+		return err
+	}
+
+	data, err := json.MarshalIndent(session, "", "  ")
+	if err != nil {
+		return err
+	}
+
+	return os.WriteFile(path, data, 0600)
+}
+
+func clearSession(workDir string) error {
+	path := getSessionFilePath(workDir)
+	if path == "" {
+		return nil
+	}
+	return os.Remove(path)
+}
+
+func generateRandomToken() string {
+	b := make([]byte, 16)
+	rand.Read(b)
+	return hex.EncodeToString(b)
+}
 
 // AgentType represents known AI agent types
 type AgentType string
@@ -79,13 +278,6 @@ type Message struct {
 	Cols    int    `json:"cols,omitempty"`
 	Rows    int    `json:"rows,omitempty"`
 	Error   string `json:"error,omitempty"`
-}
-
-func generateToken(session string) string {
-	h := hmac.New(sha256.New, []byte(secretKey))
-	h.Write([]byte(session))
-	h.Write([]byte(fmt.Sprintf("%d", time.Now().Unix()/300))) // 5 min window
-	return hex.EncodeToString(h.Sum(nil))[:32]
 }
 
 // checkCommand verifies the command exists and returns its path
@@ -135,11 +327,12 @@ func getAgentVersion(command string, agentType AgentType) string {
 
 func main() {
 	// Parse flags
-	relay := flag.String("relay", defaultRelay, "WebSocket relay URL")
+	relay := flag.String("relay", RelayURL, "WebSocket relay base URL")
 	command := flag.String("command", defaultCommand, "Command to run (e.g., claude, bash)")
 	workDir := flag.String("workdir", "", "Working directory")
 	showVersion := flag.Bool("version", false, "Show version and exit")
 	qrImage := flag.Bool("qr", false, "Open QR code as image (better for scanning)")
+	newSession := flag.Bool("new", false, "Force create a new session (ignore saved session)")
 	flag.Parse()
 
 	if *showVersion {
@@ -157,38 +350,69 @@ func main() {
 	}
 
 	// Verify command exists
-	cmdPath, err := checkCommand(*command)
+	_, err := checkCommand(*command)
 	if err != nil {
 		log.Fatalf("Error: %v\nPlease ensure '%s' is installed and in your PATH.", err, *command)
 	}
-	fmt.Printf("✓ Found %s at %s\n", *command, cmdPath)
 
 	// Detect agent type and version
 	agentType := detectAgentType(*command)
 	agentVersion := getAgentVersion(*command, agentType)
-	if agentVersion != "" {
-		fmt.Printf("✓ Agent version: %s\n", agentVersion)
+
+	// Try to load existing session or create new one
+	var session, token string
+	var sessionResumed bool
+
+	if !*newSession {
+		if savedSession, err := loadSession(*workDir); err == nil {
+			// Use saved session if relay and command match
+			if savedSession.Relay == *relay && savedSession.Command == *command {
+				session = savedSession.Session
+				token = savedSession.Token
+				sessionResumed = true
+				fmt.Printf("%s[Resuming session %s...]%s\n", dim, session[:8], reset)
+			}
+		}
 	}
 
-	// Generate session
-	session := uuid.New().String()
-	token := generateToken(session)
+	if session == "" {
+		// Create new session
+		session = uuid.New().String()
+		token = generateRandomToken()
 
-	// Create QR data (minimal for smaller QR code)
+		// Save session for future use
+		sessionData := &SessionData{
+			Session:   session,
+			Token:     token,
+			Relay:     *relay,
+			Command:   *command,
+			WorkDir:   *workDir,
+			CreatedAt: time.Now().Format(time.RFC3339),
+		}
+		if err := saveSession(*workDir, sessionData); err != nil {
+			fmt.Printf("%s[Warning: Could not save session: %v]%s\n", dim, err, reset)
+		}
+	}
+
+	// Create QR data (always show for new connection or re-scan)
 	qrData := QRData{
 		Relay:     *relay,
 		Session:   session,
 		Token:     token,
 		Command:   *command,
 		AgentType: agentType,
-		// WorkingDir, AgentVersion, OS, CLIVersion shown in terminal but not in QR
 	}
 
 	qrJSON, _ := json.Marshal(qrData)
 
-	// Display QR code
-	fmt.Println("\n╔═══════════════════════════════════════╗")
-	fmt.Println("║   AIPilot - Scan to Connect           ║")
+	// Display header
+	fmt.Println()
+	fmt.Println("╔═══════════════════════════════════════╗")
+	if sessionResumed {
+		fmt.Println("║   AIPilot - Session Resumed           ║")
+	} else {
+		fmt.Println("║   AIPilot - New Session               ║")
+	}
 	fmt.Println("╚═══════════════════════════════════════╝")
 	fmt.Println()
 
@@ -213,98 +437,104 @@ func main() {
 			log.Fatal("Failed to generate QR code:", err)
 		}
 		fmt.Println(qr.ToSmallString(false))
-		fmt.Println("Tip: Use -qr flag to open QR code as image for easier scanning")
+		fmt.Printf("%sTip: Use -qr flag for easier scanning%s\n", dim, reset)
 		fmt.Println()
 	}
 
-	fmt.Printf("Session:  %s\n", session[:8]+"...")
-	fmt.Printf("Agent:    %s (%s)\n", *command, agentType)
-	fmt.Printf("WorkDir:  %s\n", *workDir)
-	fmt.Printf("Platform: %s/%s\n", runtime.GOOS, runtime.GOARCH)
-	fmt.Println("\nWaiting for mobile connection...")
+	// Display session info
+	fmt.Printf("  Session:  %s\n", session[:8]+"...")
+	fmt.Printf("  Command:  %s", *command)
+	if agentVersion != "" {
+		fmt.Printf(" %s(%s)%s", dim, agentVersion, reset)
+	}
+	fmt.Println()
+	fmt.Printf("  WorkDir:  %s\n", *workDir)
+	fmt.Printf("  Platform: %s/%s\n", runtime.GOOS, runtime.GOARCH)
+	fmt.Println()
 
-	// Connect to relay
-	conn, _, err := websocket.DefaultDialer.Dial(*relay, nil)
+	// Initialize status display (order: Agent, Relay, Mobile)
+	status := &Status{
+		agentStatus:  dim + "⋯ Waiting" + reset,
+		relayStatus:  dim + "⋯ Waiting" + reset,
+		mobileStatus: dim + "⋯ Waiting" + reset,
+	}
+	status.render()
+
+	// Connect to relay using new endpoint format: /ws/{sessionId}?role=bridge
+	status.update("", yellow+"⋯ Connecting..."+reset, "")
+	wsURL := fmt.Sprintf("%s/ws/%s?role=bridge", *relay, session)
+	conn, _, err := websocket.DefaultDialer.Dial(wsURL, nil)
 	if err != nil {
+		status.update("", red+"✗ Failed"+reset, "")
 		log.Fatal("Failed to connect to relay:", err)
 	}
 	defer conn.Close()
 
-	// Register session
-	registerMsg := Message{
-		Type:    "register",
-		Session: session,
-	}
-	if err := conn.WriteJSON(registerMsg); err != nil {
-		log.Fatal("Failed to register session:", err)
-	}
-
-	// Wait for registration confirmation
+	// Wait for registration confirmation (sent automatically by relay)
 	var response Message
 	if err := conn.ReadJSON(&response); err != nil {
+		status.update("", red+"✗ Failed"+reset, "")
 		log.Fatal("Failed to read registration response:", err)
 	}
 
 	if response.Type == "error" {
+		status.update("", red+"✗ Failed"+reset, "")
 		log.Fatal("Registration failed:", response.Error)
 	}
 
-	fmt.Println("✓ Registered with relay")
+	if response.Type != "registered" {
+		status.update("", red+"✗ Failed"+reset, "")
+		log.Fatal("Unexpected response:", response.Type)
+	}
 
-	// Start ping keepalive goroutine
-	stopPing := make(chan struct{})
+	status.update("", green+"✓ Registered"+reset, "")
+
+	// Start ping keepalive goroutine (10s to avoid Cloudflare timeout)
 	go func() {
-		ticker := time.NewTicker(20 * time.Second)
+		ticker := time.NewTicker(10 * time.Second)
 		defer ticker.Stop()
 		for {
-			select {
-			case <-ticker.C:
-				pingMsg := Message{Type: "ping"}
-				if err := conn.WriteJSON(pingMsg); err != nil {
-					return
-				}
-			case <-stopPing:
+			<-ticker.C
+			pingMsg := Message{Type: "ping"}
+			if err := conn.WriteJSON(pingMsg); err != nil {
 				return
 			}
 		}
 	}()
 
-	// Wait for mobile connection
+	// Wait for mobile to connect BEFORE starting agent
+	status.update("", "", yellow+"⋯ Waiting..."+reset)
 	for {
-		if err := conn.ReadJSON(&response); err != nil {
-			close(stopPing)
-			log.Fatal("Connection error:", err)
+		var msg Message
+		if err := conn.ReadJSON(&msg); err != nil {
+			log.Fatal("Connection lost while waiting for mobile:", err)
 		}
-
-		if response.Type == "connected" && response.Role == "mobile" {
-			fmt.Println("✓ Mobile connected!")
+		if msg.Type == "connected" && msg.Role == "mobile" {
+			status.mobileConnected()
 			break
 		}
-
-		if response.Type == "pong" {
-			// Keepalive response, ignore
-			continue
-		}
-
-		if response.Type == "error" {
-			close(stopPing)
-			log.Fatal("Error:", response.Error)
+		if msg.Type == "pong" {
+			continue // ignore keepalive
 		}
 	}
-	close(stopPing)
 
-	// Start PTY with command
-	fmt.Printf("\nStarting %s...\n\n", *command)
-
+	// NOW start PTY with command (after mobile is connected)
+	status.update(yellow+"⋯ Starting..."+reset, "", "")
 	cmd := exec.Command(*command)
 	cmd.Dir = *workDir
 	cmd.Env = append(os.Environ(), "TERM=xterm-256color")
 
 	ptmx, err := pty.Start(cmd)
 	if err != nil {
+		status.update(red+"✗ Failed"+reset, "", "")
 		log.Fatal("Failed to start PTY:", err)
 	}
 	defer ptmx.Close()
+
+	status.update(green+"✓ Running"+reset, "", "")
+
+	// NOW freeze - all status updates are done, terminal output goes via WebSocket
+	status.freeze()
 
 	// Handle window resize (Unix only, no-op on Windows)
 	_ = setupResizeSignal()
@@ -320,7 +550,7 @@ func main() {
 			n, err := ptmx.Read(buf)
 			if err != nil {
 				if err != io.EOF {
-					log.Println("PTY read error:", err)
+					// Silent error - don't pollute terminal
 				}
 				return
 			}
@@ -330,7 +560,6 @@ func main() {
 				Payload: base64.StdEncoding.EncodeToString(buf[:n]),
 			}
 			if err := conn.WriteJSON(msg); err != nil {
-				log.Println("WebSocket write error:", err)
 				return
 			}
 		}
@@ -341,7 +570,6 @@ func main() {
 		for {
 			var msg Message
 			if err := conn.ReadJSON(&msg); err != nil {
-				log.Println("WebSocket read error:", err)
 				return
 			}
 
@@ -349,7 +577,6 @@ func main() {
 			case "data":
 				data, err := base64.StdEncoding.DecodeString(msg.Payload)
 				if err != nil {
-					log.Println("Base64 decode error:", err)
 					continue
 				}
 				ptmx.Write(data)
@@ -363,17 +590,14 @@ func main() {
 				}
 
 			case "disconnected":
-				fmt.Println("\n\nMobile disconnected.")
-				// Don't return - wait for reconnection
+				status.mobileDisconnected()
 
 			case "connected":
 				if msg.Role == "mobile" {
-					fmt.Println("\n✓ Mobile reconnected!")
+					status.mobileConnected()
 					// Trigger screen refresh by sending current size
-					// This makes Claude redraw its UI
 					size, err := pty.GetsizeFull(ptmx)
 					if err == nil && size.Cols > 0 && size.Rows > 0 {
-						// Send a slightly different size then back to trigger redraw
 						pty.Setsize(ptmx, &pty.Winsize{
 							Cols: size.Cols,
 							Rows: size.Rows - 1,
@@ -385,6 +609,9 @@ func main() {
 						})
 					}
 				}
+
+			case "pong":
+				// Keepalive response, ignore
 			}
 		}
 	}()
@@ -395,7 +622,7 @@ func main() {
 		fmt.Println("\n\nShutting down...")
 	case err := <-waitForProcess(cmd):
 		if err != nil {
-			log.Println("Process exited with error:", err)
+			fmt.Println("\n\nProcess exited with error:", err)
 		} else {
 			fmt.Println("\n\nProcess exited.")
 		}

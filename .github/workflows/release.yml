@@ -49,7 +49,7 @@ jobs:
           GOOS: ${{ matrix.goos }}
           GOARCH: ${{ matrix.goarch }}
         run: |
-          go build -ldflags="-s -w -X main.Version=${{ steps.version.outputs.VERSION }}" -o aipilot-cli-${{ matrix.suffix }} .
+          go build -ldflags="-s -w -X main.Version=${{ steps.version.outputs.VERSION }} -X main.RelayURL=${{ vars.RELAY_URL }}" -o aipilot-cli-${{ matrix.suffix }} .
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4

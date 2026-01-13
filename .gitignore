@@ -26,3 +26,6 @@ Thumbs.db
 
 # Release artifacts
 dist/
+
+# Local environment (not committed)
+.env.local

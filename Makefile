@@ -1,7 +1,14 @@
 VERSION := $(shell cat VERSION)
-LDFLAGS := -ldflags="-s -w -X main.Version=v$(VERSION)"
 
-.PHONY: build run version patch minor major release
+# Default relay URL (can be overridden by .env.local or environment)
+RELAY_URL ?= wss://aipilot-relay.francois-achache.workers.dev
+
+# Load .env.local if it exists (for local dev)
+-include .env.local
+
+LDFLAGS := -ldflags="-s -w -X main.Version=v$(VERSION) -X main.RelayURL=$(RELAY_URL)"
+
+.PHONY: build run version patch minor major release clean
 
 # Build binary
 build:
@@ -10,6 +17,10 @@ build:
 # Run locally
 run:
 	go run $(LDFLAGS) .
+
+# Clean build artifacts
+clean:
+	rm -f aipilot-cli aipilot-cli-*
 
 # Show current version
 version:
