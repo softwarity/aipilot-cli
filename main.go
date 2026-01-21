@@ -1257,9 +1257,7 @@ func main() {
 
 	// Display header
 	fmt.Println()
-	fmt.Println("╔═══════════════════════════════════════╗")
-	fmt.Printf("║   AIPilot Daemon Mode    [build %-5s]║\n", Build)
-	fmt.Println("╚═══════════════════════════════════════╝")
+	fmt.Printf("%s%sAIPilot CLI%s %s[%s]%s\n", bold, cyan, reset, dim, Build, reset)
 	fmt.Println()
 
 	// Connect to relay early to check if mobile is already waiting
