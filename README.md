@@ -4,7 +4,44 @@
 [![License](https://img.shields.io/github/license/softwarity/aipilot-cli)](LICENSE)
 [![CI](https://github.com/softwarity/aipilot-cli/actions/workflows/ci.yml/badge.svg)](https://github.com/softwarity/aipilot-cli/actions/workflows/ci.yml)
 
-Bridge your terminal to the AIPilot mobile app via WebSocket relay. No SSH required, no ports to open.
+Bridge your terminal to the **AIPilot mobile app** via WebSocket relay. Control your AI coding agents (Claude Code, etc.) from your phone using voice input. No SSH required, no ports to open.
+
+<a href="https://play.google.com/store/apps/details?id=com.softwarity.aipilot">
+  <img alt="Get it on Google Play" src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" width="200"/>
+</a>
+
+## What is AIPilot?
+
+AIPilot transforms your smartphone into a **voice remote control** for AI coding agents like Claude Code.
+
+- **Voice Input**: Talk to your AI agent instead of typing
+- **Hands-free Coding**: Keep coding from your couch, standing desk, or anywhere in the room
+- **Real-time Output**: See AI responses on your phone as they stream
+
+## How it works
+
+```
+┌─────────────────┐       WebSocket        ┌─────────────────┐
+│                 │      via Relay         │                 │
+│   AIPilot CLI   │◄─────────────────────►│  AIPilot App    │
+│   (Your PC)     │                        │  (Your Phone)   │
+│                 │                        │                 │
+└────────┬────────┘                        └─────────────────┘
+         │                                   📱 Voice Input
+         │ Spawns                            📱 Commands
+         ▼                                   📱 File Sharing
+┌─────────────────┐
+│   AI Agent      │
+│  (Claude Code)  │
+└─────────────────┘
+```
+
+1. **Run the CLI** on your PC - it displays a QR code
+2. **Scan the QR code** with the AIPilot mobile app
+3. **Talk to your AI agent** using voice input
+4. **See responses** streaming in real-time on your phone
+
+All communication goes through a secure relay - no need to open ports or configure your firewall.
 
 ## Installation
 
@@ -52,19 +89,25 @@ aipilot-cli --workdir /path/to/project
 aipilot-cli --relay wss://your-relay.example.com/ws
 ```
 
-## How it works
+## Mobile App Features
 
-1. **Run the CLI** - It displays a QR code in your terminal
-2. **Scan with AIPilot app** - Open AIPilot on your phone and scan the QR code
-3. **Connected!** - Your phone is now a remote terminal to your AI agent
+The AIPilot mobile app provides:
 
-```
-┌─────────────┐      ┌─────────────┐      ┌─────────────┐
-│   Mobile    │◄────►│   Relay     │◄────►│    CLI      │
-│   AIPilot   │      │  (Cloud)    │      │   + PTY     │
-└─────────────┘      └─────────────┘      └─────────────┘
-     Phone            WebSocket            Your Computer
-```
+- **Voice Recognition**: Dictate commands instead of typing
+- **Multi-sessions**: Manage multiple projects simultaneously
+- **Full Terminal**: Access all Claude commands (`/compact`, `/resume`, `/clear`...)
+- **File Sharing**: Share photos and documents with your agent
+- **Session History**: Quickly reconnect to previous sessions
+- **SSH Mode**: Connect directly to remote servers (Pro feature)
+
+### Free vs Pro
+
+| Feature | Free | Pro |
+|---------|------|-----|
+| CLI connections | 1 | Unlimited |
+| SSH connections | - | Unlimited |
+| Agents | - | Unlimited |
+| File upload | - | ✓ |
 
 ## Build from source
 
@@ -74,6 +117,16 @@ cd aipilot-cli
 go build -o aipilot-cli .
 ```
 
+## Privacy & Security
+
+- All connections are encrypted (WSS/TLS)
+- No data stored on relay servers
+- See our [Privacy Policy](PRIVACY_POLICY.md)
+
 ## License
 
-MIT
+MIT - see [LICENSE](LICENSE)
+
+---
+
+Made with ❤️ by [Softwarity](https://softwarity.io)
