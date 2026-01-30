@@ -66,6 +66,10 @@ type Daemon struct {
 	workDir   string
 	agentType AgentType
 
+	// PC configuration (for pairing status)
+	pcConfig    *PCConfig
+	relayClient *RelayClient
+
 	// E2E Encryption
 	aesGCM cipher.AEAD
 
@@ -91,19 +95,6 @@ type Daemon struct {
 	// Chunked file uploads in progress
 	chunkedUploads map[string]*ChunkedUpload
 	uploadMu       sync.Mutex
-}
-
-// QRData is encoded in the QR code for mobile to scan
-type QRData struct {
-	Relay        string    `json:"r"`
-	Session      string    `json:"s"`
-	Token        string    `json:"t"`
-	Command      string    `json:"c,omitempty"`
-	WorkingDir   string    `json:"w,omitempty"`
-	AgentType    AgentType `json:"a,omitempty"`
-	AgentVersion string    `json:"av,omitempty"`
-	OS           string    `json:"os,omitempty"`
-	CLIVersion   string    `json:"cv,omitempty"`
 }
 
 // Message types for WebSocket communication

@@ -12,7 +12,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/skip2/go-qrcode"
+	"github.com/creack/pty"
 )
 
 // printStatus shows the current status
@@ -49,55 +49,20 @@ func (d *Daemon) printStatus() {
 	fmt.Println()
 }
 
-// printQRCode displays the QR code
-func (d *Daemon) printQRCode(asImage bool) {
-	qrData := QRData{
-		Relay:        d.relay,
-		Session:      d.session,
-		Token:        d.token,
-		Command:      d.command,
-		WorkingDir:   d.workDir,
-		AgentType:    d.agentType,
-		AgentVersion: getAgentVersion(d.command, d.agentType),
-		OS:           runtime.GOOS,
-		CLIVersion:   Version,
-	}
-	qrJSON, _ := json.Marshal(qrData)
-
-	if asImage {
-		tmpDir := os.TempDir()
-		qrFile := filepath.Join(tmpDir, fmt.Sprintf("aipilot-qr-%s.png", d.session[:8]))
-		if err := qrcode.WriteFile(string(qrJSON), qrcode.Medium, 300, qrFile); err != nil {
-			fmt.Printf("%sError generating QR code: %v%s\n", red, err, reset)
-			return
-		}
-		fmt.Printf("\nQR code saved to: %s\n", qrFile)
-		if err := openFile(qrFile); err != nil {
-			fmt.Println("Please open the file manually.")
-		} else {
-			fmt.Println("QR code image opened.")
-		}
-	} else {
-		qr, err := qrcode.New(string(qrJSON), qrcode.Medium)
-		if err != nil {
-			fmt.Printf("%sError generating QR code: %v%s\n", red, err, reset)
-			return
-		}
-		fmt.Println()
-		fmt.Println(qr.ToSmallString(false))
-	}
-}
-
-// getAIPilotCommand checks if a line is an AIPilot command
+// getAIPilotCommand checks if a line is an AIPilot command (prefixed with //)
 func (d *Daemon) getAIPilotCommand(line string) string {
 	switch line {
-	case "/qr":
+	case "//qr":
 		return "qr"
-	case "/cli-status":
+	case "//qr-image":
+		return "qr-image"
+	case "//status":
 		return "status"
-	case "/disconnect":
+	case "//disconnect":
 		return "disconnect"
-	case "/quit":
+	case "//purge":
+		return "purge"
+	case "//quit":
 		return "quit"
 	}
 	return ""
@@ -108,26 +73,144 @@ func (d *Daemon) executeAIPilotCommand(cmd string) {
 	fmt.Println()
 	switch cmd {
 	case "qr":
-		d.printQRCode(false)
+		d.showPairingQR(false)
 	case "qr-image":
-		d.printQRCode(true)
+		d.showPairingQR(true)
 	case "status":
 		d.printStatus()
 	case "disconnect":
 		d.disconnectMobile()
+	case "purge":
+		d.purgeAllSessions()
 	case "quit":
 		fmt.Printf("%sShutting down AIPilot...%s\n", yellow, reset)
 		os.Exit(0)
 	}
 }
 
+// showPairingQR displays a pairing QR code
+func (d *Daemon) showPairingQR(asImage bool) {
+	if d.relayClient == nil || d.pcConfig == nil {
+		fmt.Printf("%sError: Cannot create pairing QR%s\n", red, reset)
+		return
+	}
+
+	// Initialize pairing on relay
+	fmt.Printf("%sCreating pairing code...%s\n", dim, reset)
+	pairingResp, err := d.relayClient.InitPairing()
+	if err != nil {
+		fmt.Printf("%sError: %v%s\n", red, err, reset)
+		return
+	}
+
+	// Create QR data
+	qrData := PairingQRData{
+		Type:      "pairing",
+		Relay:     d.relay,
+		Token:     pairingResp.Token,
+		PCID:      d.pcConfig.PCID,
+		PCName:    d.pcConfig.PCName,
+		PublicKey: d.pcConfig.PublicKey,
+	}
+
+	qrJSON, err := json.Marshal(qrData)
+	if err != nil {
+		fmt.Printf("%sError creating QR: %v%s\n", red, err, reset)
+		return
+	}
+
+	fmt.Printf("\n%sScan to pair a new mobile device:%s\n\n", bold, reset)
+	printQRCodeString(string(qrJSON), asImage)
+	fmt.Printf("\n  PC: %s\n", d.pcConfig.PCName)
+	fmt.Printf("  Expires: %s\n\n", pairingResp.ExpiresAt)
+	fmt.Printf("%sAlready paired devices will see the session automatically.%s\n", dim, reset)
+	fmt.Printf("%sPairing happens in background - check /cli-status for updates.%s\n\n", dim, reset)
+
+	// Start background polling for pairing completion
+	go d.pollPairingCompletion(pairingResp.Token)
+}
+
+// pollPairingCompletion polls for pairing completion in background
+func (d *Daemon) pollPairingCompletion(token string) {
+	ticker := time.NewTicker(2 * time.Second)
+	defer ticker.Stop()
+	timeout := time.After(5 * time.Minute)
+
+	for {
+		select {
+		case <-timeout:
+			return // Silently timeout
+		case <-ticker.C:
+			status, err := d.relayClient.CheckPairingStatus(token)
+			if err != nil {
+				continue
+			}
+
+			switch status.Status {
+			case "completed":
+				mobile := PairedMobile{
+					ID:        status.MobileID,
+					Name:      status.MobileName,
+					PublicKey: status.PublicKey,
+					PairedAt:  time.Now().Format(time.RFC3339),
+				}
+				d.pcConfig.addPairedMobile(mobile)
+				if err := savePCConfig(d.pcConfig); err == nil {
+					fmt.Printf("\n%s✓ Device paired: %s%s\n", green, mobile.Name, reset)
+				}
+
+				// If there's an active session, send encrypted token for the mobile
+				d.mu.RLock()
+				sessionID := d.session
+				sessionToken := d.token
+				d.mu.RUnlock()
+
+				fmt.Printf("%s  Session ID: %s, Token: %s, Mobile PublicKey: %s%s\n",
+					dim,
+					func() string { if sessionID != "" { return sessionID[:8] + "..." } else { return "none" } }(),
+					func() string { if sessionToken != "" { return "present" } else { return "none" } }(),
+					func() string { if mobile.PublicKey != "" { return mobile.PublicKey[:16] + "..." } else { return "none" } }(),
+					reset)
+
+				if sessionID != "" && sessionToken != "" && mobile.PublicKey != "" {
+					// Encrypt session token for the mobile
+					pcPrivateKey, err := GetPrivateKeyFromHex(d.pcConfig.PrivateKey)
+					if err != nil {
+						fmt.Printf("%sWarning: Could not get private key: %v%s\n", yellow, err, reset)
+					} else {
+						encryptedToken, err := EncryptForMobile(sessionToken, mobile.PublicKey, pcPrivateKey)
+						if err != nil {
+							fmt.Printf("%sWarning: Could not encrypt token: %v%s\n", yellow, err, reset)
+						} else {
+							// Send to relay
+							fmt.Printf("%s  Sending encrypted token to relay...%s\n", dim, reset)
+							if err := d.relayClient.AddSessionTokenForMobile(sessionID, mobile.ID, encryptedToken); err != nil {
+								fmt.Printf("%sWarning: Could not send session token: %v%s\n", yellow, err, reset)
+							} else {
+								fmt.Printf("%s  ✓ Token sent to relay%s\n", green, reset)
+							}
+						}
+					}
+				} else {
+					fmt.Printf("%s  No active session or missing data, token not sent%s\n", dim, reset)
+				}
+				return
+
+			case "expired":
+				return
+			}
+		}
+	}
+}
+
 // showMenu displays the AIPilot interactive menu
 func (d *Daemon) showMenu() {
 	fmt.Printf("\n%s=== AIPilot Menu (Ctrl+A) ===%s\n", bold, reset)
-	fmt.Printf("  %s[1]%s Show QR code\n", cyan, reset)
+	fmt.Printf("  %s[1]%s Show pairing QR\n", cyan, reset)
 	fmt.Printf("  %s[2]%s Open QR as image\n", cyan, reset)
 	fmt.Printf("  %s[3]%s Connection status\n", cyan, reset)
 	fmt.Printf("  %s[4]%s Disconnect mobile\n", cyan, reset)
+	fmt.Printf("  %s[5]%s Purge all sessions\n", cyan, reset)
 	fmt.Printf("  %s[q]%s Quit AIPilot\n", cyan, reset)
 	fmt.Printf("  %s[Enter]%s Return to %s\n", cyan, reset, d.command)
 	fmt.Print("\nChoice: ")
@@ -137,13 +220,15 @@ func (d *Daemon) showMenu() {
 
 	switch strings.ToLower(strings.TrimSpace(input)) {
 	case "1":
-		d.printQRCode(false)
+		d.executeAIPilotCommand("qr")
 	case "2":
-		d.printQRCode(true)
+		d.executeAIPilotCommand("qr-image")
 	case "3":
 		d.printStatus()
 	case "4":
 		d.disconnectMobile()
+	case "5":
+		d.purgeAllSessions()
 	case "q":
 		fmt.Printf("%sShutting down AIPilot...%s\n", yellow, reset)
 		os.Exit(0)
@@ -169,6 +254,27 @@ func (d *Daemon) disconnectMobile() {
 		d.wsMu.Unlock()
 		d.mobileConnected = false
 		fmt.Printf("%sMobile disconnected.%s\n", green, reset)
+	}
+}
+
+// purgeAllSessions removes all sessions from the relay
+func (d *Daemon) purgeAllSessions() {
+	if d.relayClient == nil {
+		fmt.Printf("%sError: Not connected to relay%s\n", red, reset)
+		return
+	}
+
+	fmt.Printf("%sPurging all sessions from relay...%s\n", dim, reset)
+	count, err := d.relayClient.PurgeAllSessions()
+	if err != nil {
+		fmt.Printf("%sError: %v%s\n", red, err, reset)
+		return
+	}
+
+	if count == 0 {
+		fmt.Printf("%sNo sessions to purge.%s\n", yellow, reset)
+	} else {
+		fmt.Printf("%s✓ Purged %d session(s).%s\n", green, count, reset)
 	}
 }
 
@@ -236,13 +342,26 @@ func (d *Daemon) handleResizeCommand(args string) {
 			d.mu.Lock()
 			d.mobileCols = cols
 			d.mobileRows = rows
-			if d.ptmx != nil && d.currentClient != "mobile" {
-				d.mu.Unlock()
-				d.switchToClient("mobile")
-				go func() {
-					time.Sleep(50 * time.Millisecond)
-					d.sendToPTY([]byte{0x0C}) // Ctrl+L
-				}()
+
+			// Always apply resize to PTY when in mobile mode or switching to mobile
+			if d.ptmx != nil {
+				if d.currentClient == "mobile" {
+					// Already in mobile mode - just apply the new size
+					pty.Setsize(d.ptmx, &pty.Winsize{
+						Cols: uint16(cols),
+						Rows: uint16(rows),
+					})
+					d.mu.Unlock()
+					// Send Ctrl+L to refresh display
+					go func() {
+						time.Sleep(50 * time.Millisecond)
+						d.sendToPTY([]byte{0x0C})
+					}()
+				} else {
+					// Not in mobile mode - switch to mobile
+					d.mu.Unlock()
+					d.switchToClient("mobile")
+				}
 			} else {
 				d.mu.Unlock()
 			}
