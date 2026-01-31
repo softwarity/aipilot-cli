@@ -135,6 +135,11 @@ type CreateSessionRequest struct {
 	WorkingDir      string            `json:"working_dir"`
 	DisplayName     string            `json:"display_name"`      // Short name for display
 	EncryptedTokens map[string]string `json:"encrypted_tokens"`  // mobile_id -> encrypted token
+	// SSH info for auto-setup
+	SSHAvailable bool   `json:"ssh_available,omitempty"`
+	SSHPort      int    `json:"ssh_port,omitempty"`
+	Hostname     string `json:"hostname,omitempty"`
+	Username     string `json:"username,omitempty"`
 }
 
 // CreateSessionResponse is the response from POST /api/sessions
@@ -143,9 +148,17 @@ type CreateSessionResponse struct {
 	Token     string `json:"token"` // Session token for WebSocket auth
 }
 
+// SSHInfo contains SSH availability information for a session
+type SSHInfo struct {
+	Available bool
+	Port      int
+	Hostname  string
+	Username  string
+}
+
 // CreateSession registers a new session on the relay
 // It encrypts the session token for each paired mobile device
-func (c *RelayClient) CreateSession(agentType, workDir, displayName string) (*CreateSessionResponse, error) {
+func (c *RelayClient) CreateSession(agentType, workDir, displayName string, sshInfo *SSHInfo) (*CreateSessionResponse, error) {
 	// Get the PC's private key for encryption
 	pcPrivateKey, err := GetPrivateKeyFromHex(c.pcConfig.PrivateKey)
 	if err != nil {
@@ -179,6 +192,14 @@ func (c *RelayClient) CreateSession(agentType, workDir, displayName string) (*Cr
 		WorkingDir:      workDir,
 		DisplayName:     displayName,
 		EncryptedTokens: encryptedTokens,
+	}
+
+	// Add SSH info if available
+	if sshInfo != nil {
+		req.SSHAvailable = sshInfo.Available
+		req.SSHPort = sshInfo.Port
+		req.Hostname = sshInfo.Hostname
+		req.Username = sshInfo.Username
 	}
 
 	body, err := json.Marshal(req)

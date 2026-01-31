@@ -22,7 +22,7 @@ func showPCStatus(config *PCConfig) {
 
 	if len(config.PairedMobiles) == 0 {
 		fmt.Printf("  %sNo paired mobile devices%s\n", dim, reset)
-		fmt.Printf("\n  Run %saipilot-cli --pair%s to pair a mobile device.\n", cyan, reset)
+		fmt.Printf("\n  Run %saipilot-cli%s and use %s//qr%s to pair a mobile device.\n", cyan, reset, cyan, reset)
 	} else {
 		fmt.Printf("%s  Paired Mobiles:%s\n", bold, reset)
 		for _, mobile := range config.PairedMobiles {
@@ -73,7 +73,7 @@ func handleUnpair(config *PCConfig, client *RelayClient, mobileID string) error 
 }
 
 // handlePairing initiates the pairing flow with a new mobile device
-func handlePairing(config *PCConfig, client *RelayClient, relayURL string, qrAsImage bool) error {
+func handlePairing(config *PCConfig, client *RelayClient, relayURL string) error {
 	fmt.Printf("%s%s=== Mobile Device Pairing ===%s\n", bold, cyan, reset)
 	fmt.Println()
 
@@ -102,7 +102,7 @@ func handlePairing(config *PCConfig, client *RelayClient, relayURL string, qrAsI
 	// Display QR code
 	fmt.Println()
 	fmt.Printf("%sScan this QR code with the AIPilot mobile app:%s\n\n", bold, reset)
-	printQRCodeString(string(qrJSON), qrAsImage)
+	printQRToTerminal(string(qrJSON))
 	fmt.Println()
 	fmt.Printf("  PC Name: %s\n", config.PCName)
 	fmt.Printf("  Expires: %s\n", pairingResp.ExpiresAt)
@@ -117,7 +117,7 @@ func handlePairing(config *PCConfig, client *RelayClient, relayURL string, qrAsI
 	for {
 		select {
 		case <-timeout:
-			fmt.Printf("\n%sPairing timed out. Run --pair again to retry.%s\n", red, reset)
+			fmt.Printf("\n%sPairing timed out. Use //qr to retry.%s\n", red, reset)
 			return nil
 		case <-ticker.C:
 			status, err := client.CheckPairingStatus(pairingResp.Token)
@@ -144,7 +144,7 @@ func handlePairing(config *PCConfig, client *RelayClient, relayURL string, qrAsI
 				return nil
 
 			case "expired":
-				fmt.Printf("\n%sPairing token expired. Run --pair again to retry.%s\n", red, reset)
+				fmt.Printf("\n%sPairing token expired. Use //qr to retry.%s\n", red, reset)
 				return nil
 
 			case "pending":

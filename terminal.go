@@ -125,8 +125,9 @@ func (d *Daemon) writeToPTY(data []byte) (int, error) {
 	return n, err
 }
 
-// readFromPTY reads data from the PTY with proper synchronization.
-// Returns the number of bytes read and any error.
+// readFromPTY reads data from the PTY.
+// Note: No mutex here - Read() is blocking and would deadlock everything.
+// PTY reads are only done from one goroutine, so no sync needed.
 func (d *Daemon) readFromPTY(buf []byte) (int, error) {
 	d.mu.RLock()
 	ptmx := d.ptmx
@@ -136,10 +137,7 @@ func (d *Daemon) readFromPTY(buf []byte) (int, error) {
 		return 0, nil
 	}
 
-	d.ptyMu.Lock()
-	n, err := ptmx.Read(buf)
-	d.ptyMu.Unlock()
-	return n, err
+	return ptmx.Read(buf)
 }
 
 // resizePTY resizes the PTY with proper synchronization.

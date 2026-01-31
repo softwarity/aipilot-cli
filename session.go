@@ -76,3 +76,74 @@ func generateRandomToken() string {
 	}
 	return hex.EncodeToString(b)
 }
+
+// listSavedSessions lists all saved sessions
+func listSavedSessions() {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		fmt.Printf("%sError: cannot determine home directory%s\n", red, reset)
+		return
+	}
+
+	sessionsDir := filepath.Join(home, ".aipilot", "sessions")
+	entries, err := os.ReadDir(sessionsDir)
+	if err != nil {
+		fmt.Printf("%sNo saved sessions found.%s\n", dim, reset)
+		return
+	}
+
+	if len(entries) == 0 {
+		fmt.Printf("%sNo saved sessions found.%s\n", dim, reset)
+		return
+	}
+
+	fmt.Printf("%sSaved sessions:%s\n\n", bold, reset)
+	for _, entry := range entries {
+		if !entry.IsDir() && filepath.Ext(entry.Name()) == ".json" {
+			path := filepath.Join(sessionsDir, entry.Name())
+			data, err := os.ReadFile(path)
+			if err != nil {
+				continue
+			}
+			var session SessionData
+			if err := json.Unmarshal(data, &session); err != nil {
+				continue
+			}
+			fmt.Printf("  %s%s%s\n", cyan, session.WorkDir, reset)
+			fmt.Printf("    Session: %s...  Created: %s\n", session.Session[:8], session.CreatedAt)
+		}
+	}
+	fmt.Println()
+}
+
+// clearSavedSessions removes all saved sessions
+func clearSavedSessions() {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		fmt.Printf("%sError: cannot determine home directory%s\n", red, reset)
+		return
+	}
+
+	sessionsDir := filepath.Join(home, ".aipilot", "sessions")
+	entries, err := os.ReadDir(sessionsDir)
+	if err != nil {
+		fmt.Printf("%sNo saved sessions to clear.%s\n", dim, reset)
+		return
+	}
+
+	count := 0
+	for _, entry := range entries {
+		if !entry.IsDir() && filepath.Ext(entry.Name()) == ".json" {
+			path := filepath.Join(sessionsDir, entry.Name())
+			if err := os.Remove(path); err == nil {
+				count++
+			}
+		}
+	}
+
+	if count > 0 {
+		fmt.Printf("%s✓ Cleared %d saved session(s).%s\n", green, count, reset)
+	} else {
+		fmt.Printf("%sNo saved sessions to clear.%s\n", dim, reset)
+	}
+}

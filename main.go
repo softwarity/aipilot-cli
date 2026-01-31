@@ -20,37 +20,26 @@ import (
 
 // cliFlags holds all parsed command-line flags
 type cliFlags struct {
-	relay       string
-	command     string
-	workDir     string
-	qrImage     bool
-	newSession  bool
-	listAgents  bool
-	doPairing   bool
-	unpairMobile string
-	showStatus  bool
+	agent         string
+	workDir       string
+	listAgents    bool
+	listSessions  bool
+	clearSessions bool
+	unpairMobile  string
+	showStatus    bool
 }
 
 // parseFlags parses command-line arguments and returns the flags
 func parseFlags() *cliFlags {
-	relay := flag.String("relay", RelayURL, "WebSocket relay base URL")
-	command := flag.String("command", "", "Command to run (e.g., claude, aider). Auto-detects if not specified.")
-	agentFlag := flag.String("agent", "", "Alias for -command")
+	agent := flag.String("agent", "", "Agent to run (e.g., claude, aider). Auto-detects if not specified.")
 	workDir := flag.String("workdir", "", "Working directory")
 	showVersion := flag.Bool("version", false, "Show version and exit")
-	qrImage := flag.Bool("qr", false, "Open QR code as image (better for scanning)")
-	newSession := flag.Bool("new", false, "Force create a new session (ignore saved agent for this directory)")
 	listAgents := flag.Bool("list", false, "List available AI agents and exit")
-	doPairing := flag.Bool("pair", false, "Initiate pairing with a new mobile device")
+	listSessions := flag.Bool("sessions", false, "List saved sessions and exit")
+	clearSessions := flag.Bool("clear-sessions", false, "Clear all saved sessions and exit")
 	unpairMobile := flag.String("unpair", "", "Unpair a mobile device by ID")
 	showStatus := flag.Bool("status", false, "Show PC status, paired mobiles, and exit")
 	flag.Parse()
-
-	// Handle -agent as alias for -command
-	cmd := *command
-	if *agentFlag != "" && cmd == "" {
-		cmd = *agentFlag
-	}
 
 	if *showVersion {
 		fmt.Printf("aipilot-cli version %s\n", Version)
@@ -58,15 +47,13 @@ func parseFlags() *cliFlags {
 	}
 
 	return &cliFlags{
-		relay:        *relay,
-		command:      cmd,
-		workDir:      *workDir,
-		qrImage:      *qrImage,
-		newSession:   *newSession,
-		listAgents:   *listAgents,
-		doPairing:    *doPairing,
-		unpairMobile: *unpairMobile,
-		showStatus:   *showStatus,
+		agent:         *agent,
+		workDir:       *workDir,
+		listAgents:    *listAgents,
+		listSessions:  *listSessions,
+		clearSessions: *clearSessions,
+		unpairMobile:  *unpairMobile,
+		showStatus:    *showStatus,
 	}
 }
 
@@ -78,18 +65,22 @@ func handleSpecialModes(flags *cliFlags, pcConfig *PCConfig, relayClient *RelayC
 		return true
 	}
 
+	// List sessions mode
+	if flags.listSessions {
+		listSavedSessions()
+		return true
+	}
+
+	// Clear sessions mode
+	if flags.clearSessions {
+		clearSavedSessions()
+		return true
+	}
+
 	// Unpair mode
 	if flags.unpairMobile != "" {
 		if err := handleUnpair(pcConfig, relayClient, flags.unpairMobile); err != nil {
 			log.Fatal("Failed to unpair:", err)
-		}
-		return true
-	}
-
-	// Pairing mode (explicit --pair flag)
-	if flags.doPairing {
-		if err := handlePairing(pcConfig, relayClient, flags.relay, flags.qrImage); err != nil {
-			log.Fatal("Pairing failed:", err)
 		}
 		return true
 	}
@@ -99,13 +90,13 @@ func handleSpecialModes(flags *cliFlags, pcConfig *PCConfig, relayClient *RelayC
 
 // ensurePairedMobile checks if we have paired mobiles, initiates pairing if not.
 // Returns true if user chose to exit after pairing.
-func ensurePairedMobile(flags *cliFlags, pcConfig *PCConfig, relayClient *RelayClient) bool {
+func ensurePairedMobile(pcConfig *PCConfig, relayClient *RelayClient) bool {
 	if pcConfig.hasPairedMobiles() {
 		return false
 	}
 
 	fmt.Printf("%sNo mobile devices paired.%s\n\n", yellow, reset)
-	if err := handlePairing(pcConfig, relayClient, flags.relay, flags.qrImage); err != nil {
+	if err := handlePairing(pcConfig, relayClient, RelayURL); err != nil {
 		log.Fatal("Pairing failed:", err)
 	}
 	fmt.Println()
@@ -122,7 +113,7 @@ func ensurePairedMobile(flags *cliFlags, pcConfig *PCConfig, relayClient *RelayC
 
 	if input == "2" {
 		fmt.Printf("\n%sRun aipilot-cli again to start a session.%s\n", dim, reset)
-		fmt.Printf("%sUse --pair to add another mobile device.%s\n\n", dim, reset)
+		fmt.Printf("%sUse //qr to pair additional mobile devices.%s\n\n", dim, reset)
 		return true
 	}
 	// Default (1 or empty): continue to launch agent
@@ -173,22 +164,12 @@ func selectAgentCommand(flags *cliFlags, workDir string) string {
 	// 2. If --new: ignore saved config, detect/ask
 	// 3. Otherwise: use saved agent for this directory, or detect/ask
 
-	if flags.command != "" {
+	if flags.agent != "" {
 		// Explicit command specified
-		if _, err := checkCommand(flags.command); err != nil {
-			log.Fatalf("Error: %v\nPlease ensure '%s' is installed and in your PATH.", err, flags.command)
+		if _, err := checkCommand(flags.agent); err != nil {
+			log.Fatalf("Error: %v\nPlease ensure '%s' is installed and in your PATH.", err, flags.agent)
 		}
-		return flags.command
-	}
-
-	if flags.newSession {
-		// Force new selection
-		agents := detectAvailableAgents()
-		if len(agents) == 0 {
-			printNoAgentsError()
-			os.Exit(1)
-		}
-		return selectAgent(agents)
+		return flags.agent
 	}
 
 	// Try to use saved agent for this directory
@@ -219,9 +200,9 @@ func printNoAgentsError() {
 }
 
 // createSession creates a session on the relay server
-func createSession(relayClient *RelayClient, agentType AgentType, workDir, displayName string) (*CreateSessionResponse, error) {
+func createSession(relayClient *RelayClient, agentType AgentType, workDir, displayName string, sshInfo *SSHInfo) (*CreateSessionResponse, error) {
 	fmt.Printf("%sCreating session on relay...%s\n", dim, reset)
-	sessionResp, err := relayClient.CreateSession(string(agentType), workDir, displayName)
+	sessionResp, err := relayClient.CreateSession(string(agentType), workDir, displayName, sshInfo)
 	if err != nil {
 		// Fallback to local session if relay is unavailable
 		fmt.Printf("%sWarning: Could not create session on relay: %v%s\n", yellow, err, reset)
@@ -500,7 +481,7 @@ func main() {
 	}
 
 	// Create relay client
-	relayClient := NewRelayClient(flags.relay, pcConfig)
+	relayClient := NewRelayClient(RelayURL, pcConfig)
 
 	// Handle special modes (status, unpair, pairing)
 	if handleSpecialModes(flags, pcConfig, relayClient) {
@@ -508,7 +489,7 @@ func main() {
 	}
 
 	// Ensure we have paired mobiles
-	if ensurePairedMobile(flags, pcConfig, relayClient) {
+	if ensurePairedMobile(pcConfig, relayClient) {
 		os.Exit(0)
 	}
 
@@ -531,21 +512,39 @@ func main() {
 	agentVersion := getAgentVersion(selectedCommand, agentType)
 	displayName := filepath.Base(workDir)
 
-	// Create session on relay
-	sessionResp, _ := createSession(relayClient, agentType, workDir, displayName)
-	session := sessionResp.SessionID
-	token := sessionResp.Token
+	// Try to load existing session, or create new one
+	// Detect SSH availability for session info
+	sshInfo := DetectSSHInfo()
+	if sshInfo.Available {
+		fmt.Printf("%s✓ SSH detected on port %d%s\n", green, sshInfo.Port, reset)
+	}
 
-	// Cleanup session on exit
-	defer func() {
-		fmt.Printf("%sCleaning up session...%s\n", dim, reset)
-		if err := relayClient.DeleteSession(session); err != nil {
-			fmt.Printf("%sWarning: Could not cleanup session: %v%s\n", yellow, err, reset)
-		}
-	}()
+	var session, token string
+
+	if savedSession, err := loadSession(workDir); err == nil {
+		// Reuse existing session
+		session = savedSession.Session
+		token = savedSession.Token
+		fmt.Printf("%s✓ Resuming session%s\n", green, reset)
+	} else {
+		// Create new session with SSH info
+		sessionResp, _ := createSession(relayClient, agentType, workDir, displayName, sshInfo)
+		session = sessionResp.SessionID
+		token = sessionResp.Token
+
+		// Save for next time
+		saveSession(workDir, &SessionData{
+			Session:   session,
+			Token:     token,
+			Relay:     RelayURL,
+			Command:   selectedCommand,
+			WorkDir:   workDir,
+			CreatedAt: time.Now().Format(time.RFC3339),
+		})
+	}
 
 	// Create and initialize daemon
-	daemon := createDaemon(session, token, flags.relay, selectedCommand, workDir, agentType, pcConfig, relayClient)
+	daemon := createDaemon(session, token, RelayURL, selectedCommand, workDir, agentType, pcConfig, relayClient)
 
 	// Display header and session info
 	displayHeader(daemon, session, selectedCommand, workDir, agentVersion)

@@ -304,3 +304,38 @@ func (d *Daemon) installSSHKey(username, keyBase64 string) {
 
 	fmt.Printf("\n%s[AIPilot] SSH key installed for mobile access%s\n", green, reset)
 }
+
+// DetectSSHInfo detects SSH availability without requiring a Daemon instance
+// Returns SSHInfo that can be used when creating a session
+func DetectSSHInfo() *SSHInfo {
+	currentUser := "unknown"
+	if u, err := user.Current(); err == nil {
+		currentUser = u.Username
+	}
+
+	hostname, _ := os.Hostname()
+	if hostname == "" {
+		hostname = "unknown"
+	}
+
+	// Quick SSH check on common ports
+	sshPort := 0
+	sshRunning := false
+
+	if conn, err := net.DialTimeout("tcp", fmt.Sprintf("127.0.0.1:%d", DefaultSSHPort), SSHQuickCheckTimeout); err == nil {
+		conn.Close()
+		sshPort = DefaultSSHPort
+		sshRunning = true
+	} else if conn, err := net.DialTimeout("tcp", fmt.Sprintf("127.0.0.1:%d", AlternativeSSHPort), SSHQuickCheckTimeout); err == nil {
+		conn.Close()
+		sshPort = AlternativeSSHPort
+		sshRunning = true
+	}
+
+	return &SSHInfo{
+		Available: sshRunning,
+		Port:      sshPort,
+		Hostname:  hostname,
+		Username:  currentUser,
+	}
+}

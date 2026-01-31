@@ -253,4 +253,12 @@ type PairingQRData struct {
 	PCID      string `json:"pc"`
 	PCName    string `json:"n"`
 	PublicKey string `json:"k"`
+	// Optional: session info for immediate display (backup if notification fails)
+	SessionID    string `json:"s,omitempty"`
+	WorkingDir   string `json:"wd,omitempty"`
+	AgentType    string `json:"at,omitempty"`
+	SSHAvailable bool   `json:"sa,omitempty"`
+	SSHPort      int    `json:"sp,omitempty"`
+	Hostname     string `json:"h,omitempty"`
+	Username     string `json:"u,omitempty"`
 }

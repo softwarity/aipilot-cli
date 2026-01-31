@@ -31,6 +31,28 @@ func (d *Daemon) showPairingQR(asImage bool) {
 		PublicKey: d.pcConfig.PublicKey,
 	}
 
+	// Include session info if we have an active session
+	d.mu.RLock()
+	sessionID := d.session
+	workDir := d.workDir
+	agentType := d.agentType
+	d.mu.RUnlock()
+
+	if sessionID != "" {
+		qrData.SessionID = sessionID
+		qrData.WorkingDir = workDir
+		qrData.AgentType = string(agentType)
+
+		// Add SSH info
+		sshInfo := DetectSSHInfo()
+		if sshInfo != nil && sshInfo.Available {
+			qrData.SSHAvailable = true
+			qrData.SSHPort = sshInfo.Port
+			qrData.Hostname = sshInfo.Hostname
+			qrData.Username = sshInfo.Username
+		}
+	}
+
 	qrJSON, err := json.Marshal(qrData)
 	if err != nil {
 		fmt.Printf("%sError creating QR: %v%s\n", red, err, reset)
@@ -41,8 +63,6 @@ func (d *Daemon) showPairingQR(asImage bool) {
 	printQRCodeString(string(qrJSON), asImage)
 	fmt.Printf("\n  PC: %s\n", d.pcConfig.PCName)
 	fmt.Printf("  Expires: %s\n\n", pairingResp.ExpiresAt)
-	fmt.Printf("%sAlready paired devices will see the session automatically.%s\n", dim, reset)
-	fmt.Printf("%sPairing happens in background - check /cli-status for updates.%s\n\n", dim, reset)
 
 	// Start background polling for pairing completion
 	go d.pollPairingCompletion(pairingResp.Token)
@@ -73,9 +93,7 @@ func (d *Daemon) pollPairingCompletion(token string) {
 					PairedAt:  time.Now().Format(time.RFC3339),
 				}
 				d.pcConfig.addPairedMobile(mobile)
-				if err := savePCConfig(d.pcConfig); err == nil {
-					fmt.Printf("\n%s✓ Device paired: %s%s\n", green, mobile.Name, reset)
-				}
+				savePCConfig(d.pcConfig)
 
 				// If there's an active session, send encrypted token for the mobile
 				d.mu.RLock()
@@ -83,52 +101,26 @@ func (d *Daemon) pollPairingCompletion(token string) {
 				sessionToken := d.token
 				d.mu.RUnlock()
 
-				fmt.Printf("%s  Session ID: %s, Token: %s, Mobile PublicKey: %s%s\n",
-					dim,
-					func() string {
-						if sessionID != "" {
-							return sessionID[:8] + "..."
-						} else {
-							return "none"
-						}
-					}(),
-					func() string {
-						if sessionToken != "" {
-							return "present"
-						} else {
-							return "none"
-						}
-					}(),
-					func() string {
-						if mobile.PublicKey != "" {
-							return mobile.PublicKey[:16] + "..."
-						} else {
-							return "none"
-						}
-					}(),
-					reset)
-
+				tokenSent := false
 				if sessionID != "" && sessionToken != "" && mobile.PublicKey != "" {
 					// Encrypt session token for the mobile
 					pcPrivateKey, err := GetPrivateKeyFromHex(d.pcConfig.PrivateKey)
-					if err != nil {
-						fmt.Printf("%sWarning: Could not get private key: %v%s\n", yellow, err, reset)
-					} else {
+					if err == nil {
 						encryptedToken, err := EncryptForMobile(sessionToken, mobile.PublicKey, pcPrivateKey)
-						if err != nil {
-							fmt.Printf("%sWarning: Could not encrypt token: %v%s\n", yellow, err, reset)
-						} else {
-							// Send to relay
-							fmt.Printf("%s  Sending encrypted token to relay...%s\n", dim, reset)
-							if err := d.relayClient.AddSessionTokenForMobile(sessionID, mobile.ID, encryptedToken); err != nil {
-								fmt.Printf("%sWarning: Could not send session token: %v%s\n", yellow, err, reset)
-							} else {
-								fmt.Printf("%s  ✓ Token sent to relay%s\n", green, reset)
+						if err == nil {
+							// Send to relay silently
+							if err := d.relayClient.AddSessionTokenForMobile(sessionID, mobile.ID, encryptedToken); err == nil {
+								tokenSent = true
 							}
 						}
 					}
+				}
+
+				// Single line notification that doesn't disrupt the terminal
+				if tokenSent {
+					fmt.Printf("\n%s✓ Paired: %s (session shared)%s\n", green, mobile.Name, reset)
 				} else {
-					fmt.Printf("%s  No active session or missing data, token not sent%s\n", dim, reset)
+					fmt.Printf("\n%s✓ Paired: %s%s\n", green, mobile.Name, reset)
 				}
 				return
 
