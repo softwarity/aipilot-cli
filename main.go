@@ -11,6 +11,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
+	"syscall"
 	"time"
 
 	"github.com/creack/pty"
@@ -565,9 +566,9 @@ func main() {
 	// Setup terminal
 	setupTerminalSize(daemon)
 
-	// Handle termination signals
+	// Handle termination signals (SIGINT, SIGTERM, SIGHUP)
 	sigChan := make(chan os.Signal, 1)
-	signal.Notify(sigChan, os.Interrupt)
+	signal.Notify(sigChan, os.Interrupt, syscall.SIGTERM, syscall.SIGHUP)
 
 	// Handle window resize
 	resizeChan := setupResizeSignal()
