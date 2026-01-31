@@ -38,9 +38,6 @@ func (d *Daemon) handleControlMessage(msg string) {
 			go d.installSSHKey(username, mobileId, keyBase64)
 		}
 
-	case "ssh-detect":
-		go d.detectSSHServer()
-
 	case "file-upload":
 		fileParts := strings.SplitN(args, ":", 2)
 		if len(fileParts) == 2 {
