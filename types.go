@@ -30,7 +30,7 @@ const (
 var (
 	Version  = "dev"
 	Build    = "20260120-1"
-	RelayURL = "wss://aipilot-relay.francois-achache.workers.dev"
+	RelayURL = "wss://aipilot-relay.softwarity.io"
 )
 
 const defaultCommand = "claude"

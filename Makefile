@@ -1,7 +1,7 @@
 VERSION := $(shell cat VERSION)
 
 # Default relay URL (can be overridden by .env.local or environment)
-RELAY_URL ?= wss://aipilot-relay.francois-achache.workers.dev
+RELAY_URL ?= wss://aipilot-relay.softwarity.io
 
 # Load .env.local if it exists (for local dev)
 -include .env.local
