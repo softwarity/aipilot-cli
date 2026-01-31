@@ -7,7 +7,6 @@ import (
 	"io"
 	"net/http"
 	"strings"
-	"time"
 )
 
 // RelayClient handles API calls to the relay server
@@ -27,7 +26,7 @@ func NewRelayClient(relayURL string, pcConfig *PCConfig) *RelayClient {
 	return &RelayClient{
 		baseURL: baseURL,
 		httpClient: &http.Client{
-			Timeout: 30 * time.Second,
+			Timeout: HTTPClientTimeout,
 		},
 		pcConfig: pcConfig,
 	}
@@ -72,7 +71,10 @@ func (c *RelayClient) InitPairing() (*PairingInitResponse, error) {
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		respBody, _ := io.ReadAll(resp.Body)
+		respBody, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return nil, fmt.Errorf("pairing init failed: %s (failed to read response: %v)", resp.Status, err)
+		}
 		return nil, fmt.Errorf("pairing init failed: %s - %s", resp.Status, string(respBody))
 	}
 
@@ -109,7 +111,10 @@ func (c *RelayClient) CheckPairingStatus(token string) (*PairingStatusResponse, 
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		respBody, _ := io.ReadAll(resp.Body)
+		respBody, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return nil, fmt.Errorf("pairing status check failed: %s (failed to read response: %v)", resp.Status, err)
+		}
 		return nil, fmt.Errorf("pairing status check failed: %s - %s", resp.Status, string(respBody))
 	}
 
@@ -195,7 +200,10 @@ func (c *RelayClient) CreateSession(agentType, workDir, displayName string) (*Cr
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusCreated {
-		respBody, _ := io.ReadAll(resp.Body)
+		respBody, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return nil, fmt.Errorf("session creation failed: %s (failed to read response: %v)", resp.Status, err)
+		}
 		return nil, fmt.Errorf("session creation failed: %s - %s", resp.Status, string(respBody))
 	}
 
@@ -234,7 +242,10 @@ func (c *RelayClient) AddSessionTokenForMobile(sessionID, mobileID, encryptedTok
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusCreated {
-		respBody, _ := io.ReadAll(resp.Body)
+		respBody, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return fmt.Errorf("add session token failed: %s (failed to read response: %v)", resp.Status, err)
+		}
 		return fmt.Errorf("add session token failed: %s - %s", resp.Status, string(respBody))
 	}
 
@@ -257,7 +268,10 @@ func (c *RelayClient) DeleteSession(sessionID string) error {
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusNoContent {
-		respBody, _ := io.ReadAll(resp.Body)
+		respBody, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return fmt.Errorf("session deletion failed: %s (failed to read response: %v)", resp.Status, err)
+		}
 		return fmt.Errorf("session deletion failed: %s - %s", resp.Status, string(respBody))
 	}
 
@@ -279,7 +293,10 @@ func (c *RelayClient) PurgeAllSessions() (int, error) {
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		respBody, _ := io.ReadAll(resp.Body)
+		respBody, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return 0, fmt.Errorf("session purge failed: %s (failed to read response: %v)", resp.Status, err)
+		}
 		return 0, fmt.Errorf("session purge failed: %s - %s", resp.Status, string(respBody))
 	}
 
@@ -311,7 +328,10 @@ func (c *RelayClient) ListPairedMobiles() ([]PairedMobile, error) {
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		respBody, _ := io.ReadAll(resp.Body)
+		respBody, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return nil, fmt.Errorf("failed to list mobiles: %s (failed to read response: %v)", resp.Status, err)
+		}
 		return nil, fmt.Errorf("failed to list mobiles: %s - %s", resp.Status, string(respBody))
 	}
 
@@ -338,7 +358,10 @@ func (c *RelayClient) UnpairMobile(mobileID string) error {
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusNoContent {
-		respBody, _ := io.ReadAll(resp.Body)
+		respBody, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return fmt.Errorf("failed to unpair mobile: %s (failed to read response: %v)", resp.Status, err)
+		}
 		return fmt.Errorf("failed to unpair mobile: %s - %s", resp.Status, string(respBody))
 	}
 

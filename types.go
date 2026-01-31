@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"crypto/cipher"
 	"os"
 	"os/exec"
@@ -45,8 +46,9 @@ type ChunkedUpload struct {
 
 // Daemon manages the multiplexer state
 type Daemon struct {
-	mu   sync.RWMutex
-	wsMu sync.Mutex // Mutex for WebSocket writes
+	mu    sync.RWMutex
+	wsMu  sync.Mutex // Mutex for WebSocket writes
+	ptyMu sync.Mutex // Mutex for PTY I/O operations
 
 	// Connection state
 	wsConn          *websocket.Conn
@@ -95,6 +97,10 @@ type Daemon struct {
 	// Chunked file uploads in progress
 	chunkedUploads map[string]*ChunkedUpload
 	uploadMu       sync.Mutex
+
+	// Context for cancelling ping goroutine
+	pingCtx    context.Context
+	pingCancel context.CancelFunc
 }
 
 // Message types for WebSocket communication

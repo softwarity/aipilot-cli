@@ -18,8 +18,21 @@ import (
 	"golang.org/x/term"
 )
 
-func main() {
-	// Parse flags
+// cliFlags holds all parsed command-line flags
+type cliFlags struct {
+	relay       string
+	command     string
+	workDir     string
+	qrImage     bool
+	newSession  bool
+	listAgents  bool
+	doPairing   bool
+	unpairMobile string
+	showStatus  bool
+}
+
+// parseFlags parses command-line arguments and returns the flags
+func parseFlags() *cliFlags {
 	relay := flag.String("relay", RelayURL, "WebSocket relay base URL")
 	command := flag.String("command", "", "Command to run (e.g., claude, aider). Auto-detects if not specified.")
 	agentFlag := flag.String("agent", "", "Alias for -command")
@@ -34,8 +47,9 @@ func main() {
 	flag.Parse()
 
 	// Handle -agent as alias for -command
-	if *agentFlag != "" && *command == "" {
-		*command = *agentFlag
+	cmd := *command
+	if *agentFlag != "" && cmd == "" {
+		cmd = *agentFlag
 	}
 
 	if *showVersion {
@@ -43,188 +57,191 @@ func main() {
 		os.Exit(0)
 	}
 
-	// Load or create PC configuration
-	pcConfig, err := getOrCreatePCConfig()
-	if err != nil {
-		log.Fatal("Failed to load PC configuration:", err)
+	return &cliFlags{
+		relay:        *relay,
+		command:      cmd,
+		workDir:      *workDir,
+		qrImage:      *qrImage,
+		newSession:   *newSession,
+		listAgents:   *listAgents,
+		doPairing:    *doPairing,
+		unpairMobile: *unpairMobile,
+		showStatus:   *showStatus,
 	}
+}
 
-	// Create relay client
-	relayClient := NewRelayClient(*relay, pcConfig)
-
+// handleSpecialModes handles status, unpair, and pairing modes. Returns true if program should exit.
+func handleSpecialModes(flags *cliFlags, pcConfig *PCConfig, relayClient *RelayClient) bool {
 	// Status mode
-	if *showStatus {
+	if flags.showStatus {
 		showPCStatus(pcConfig)
-		os.Exit(0)
+		return true
 	}
 
 	// Unpair mode
-	if *unpairMobile != "" {
-		if err := handleUnpair(pcConfig, relayClient, *unpairMobile); err != nil {
+	if flags.unpairMobile != "" {
+		if err := handleUnpair(pcConfig, relayClient, flags.unpairMobile); err != nil {
 			log.Fatal("Failed to unpair:", err)
 		}
-		os.Exit(0)
+		return true
 	}
 
 	// Pairing mode (explicit --pair flag)
-	if *doPairing {
-		if err := handlePairing(pcConfig, relayClient, *relay, *qrImage); err != nil {
+	if flags.doPairing {
+		if err := handlePairing(pcConfig, relayClient, flags.relay, flags.qrImage); err != nil {
 			log.Fatal("Pairing failed:", err)
 		}
-		os.Exit(0)
+		return true
 	}
 
-	// Check if we have paired mobiles, if not, show pairing QR and ask what to do
-	if !pcConfig.hasPairedMobiles() {
-		fmt.Printf("%sNo mobile devices paired.%s\n\n", yellow, reset)
-		if err := handlePairing(pcConfig, relayClient, *relay, *qrImage); err != nil {
-			log.Fatal("Pairing failed:", err)
-		}
-		fmt.Println()
+	return false
+}
 
-		// Ask user what to do next
-		fmt.Printf("%s✓ Pairing complete!%s\n\n", green, reset)
-		fmt.Printf("  %s[1]%s Launch agent now\n", cyan, reset)
-		fmt.Printf("  %s[2]%s Exit (run aipilot-cli later)\n", cyan, reset)
-		fmt.Print("\nChoice [1]: ")
-
-		var input string
-		fmt.Scanln(&input)
-		input = strings.TrimSpace(input)
-
-		if input == "2" {
-			fmt.Printf("\n%sRun aipilot-cli again to start a session.%s\n", dim, reset)
-			fmt.Printf("%sUse --pair to add another mobile device.%s\n\n", dim, reset)
-			os.Exit(0)
-		}
-		// Default (1 or empty): continue to launch agent
-		fmt.Println()
+// ensurePairedMobile checks if we have paired mobiles, initiates pairing if not.
+// Returns true if user chose to exit after pairing.
+func ensurePairedMobile(flags *cliFlags, pcConfig *PCConfig, relayClient *RelayClient) bool {
+	if pcConfig.hasPairedMobiles() {
+		return false
 	}
 
-	// List agents mode
-	if *listAgents {
-		agents := detectAvailableAgents()
-		if len(agents) == 0 {
-			fmt.Println("No AI agents found in PATH.")
-			fmt.Println("Supported agents: claude, aider, codex, copilot, cursor")
-			os.Exit(1)
-		}
-		fmt.Printf("\n%s=== Available AI Agents ===%s\n", bold, reset)
-		for _, agent := range agents {
-			versionStr := ""
-			if agent.Version != "" {
-				versionStr = fmt.Sprintf(" (%s)", agent.Version)
-			}
-			fmt.Printf("  %s✓%s %s%s\n", green, reset, agent.Command, versionStr)
-		}
-		fmt.Println()
-		os.Exit(0)
+	fmt.Printf("%sNo mobile devices paired.%s\n\n", yellow, reset)
+	if err := handlePairing(pcConfig, relayClient, flags.relay, flags.qrImage); err != nil {
+		log.Fatal("Pairing failed:", err)
+	}
+	fmt.Println()
+
+	// Ask user what to do next
+	fmt.Printf("%s✓ Pairing complete!%s\n\n", green, reset)
+	fmt.Printf("  %s[1]%s Launch agent now\n", cyan, reset)
+	fmt.Printf("  %s[2]%s Exit (run aipilot-cli later)\n", cyan, reset)
+	fmt.Print("\nChoice [1]: ")
+
+	var input string
+	fmt.Scanln(&input)
+	input = strings.TrimSpace(input)
+
+	if input == "2" {
+		fmt.Printf("\n%sRun aipilot-cli again to start a session.%s\n", dim, reset)
+		fmt.Printf("%sUse --pair to add another mobile device.%s\n\n", dim, reset)
+		return true
+	}
+	// Default (1 or empty): continue to launch agent
+	fmt.Println()
+	return false
+}
+
+// handleListAgents displays available agents and exits if --list was specified
+func handleListAgents(listAgents bool) {
+	if !listAgents {
+		return
 	}
 
-	// Use current directory if not specified
-	if *workDir == "" {
-		wd, err := os.Getwd()
-		if err != nil {
-			log.Fatal("Failed to get working directory:", err)
-		}
-		*workDir = wd
+	agents := detectAvailableAgents()
+	if len(agents) == 0 {
+		fmt.Println("No AI agents found in PATH.")
+		fmt.Println("Supported agents: claude, aider, codex, copilot, cursor")
+		os.Exit(1)
 	}
+	fmt.Printf("\n%s=== Available AI Agents ===%s\n", bold, reset)
+	for _, agent := range agents {
+		versionStr := ""
+		if agent.Version != "" {
+			versionStr = fmt.Sprintf(" (%s)", agent.Version)
+		}
+		fmt.Printf("  %s✓%s %s%s\n", green, reset, agent.Command, versionStr)
+	}
+	fmt.Println()
+	os.Exit(0)
+}
 
+// resolveWorkDir returns the working directory, using current dir if not specified
+func resolveWorkDir(workDir string) string {
+	if workDir != "" {
+		return workDir
+	}
+	wd, err := os.Getwd()
+	if err != nil {
+		log.Fatal("Failed to get working directory:", err)
+	}
+	return wd
+}
+
+// selectAgentCommand selects the agent command based on flags and saved preferences
+func selectAgentCommand(flags *cliFlags, workDir string) string {
 	// Agent selection logic:
 	// 1. If --agent or --command specified: use that
 	// 2. If --new: ignore saved config, detect/ask
 	// 3. Otherwise: use saved agent for this directory, or detect/ask
-	var selectedCommand string
 
-	if *command != "" {
+	if flags.command != "" {
 		// Explicit command specified
-		selectedCommand = *command
-		if _, err := checkCommand(selectedCommand); err != nil {
-			log.Fatalf("Error: %v\nPlease ensure '%s' is installed and in your PATH.", err, selectedCommand)
+		if _, err := checkCommand(flags.command); err != nil {
+			log.Fatalf("Error: %v\nPlease ensure '%s' is installed and in your PATH.", err, flags.command)
 		}
-	} else if *newSession {
+		return flags.command
+	}
+
+	if flags.newSession {
 		// Force new selection
 		agents := detectAvailableAgents()
 		if len(agents) == 0 {
-			fmt.Printf("%sNo AI agents found in PATH.%s\n", red, reset)
-			fmt.Println("Supported agents: claude, aider, codex, copilot, cursor")
-			fmt.Println("Install one of these agents or specify with --agent flag.")
+			printNoAgentsError()
 			os.Exit(1)
 		}
-		selectedCommand = selectAgent(agents)
-	} else {
-		// Try to use saved agent for this directory
-		savedAgent := getDirectoryAgent(*workDir)
-		if savedAgent != "" {
-			// Verify agent still exists
-			if _, err := checkCommand(savedAgent); err == nil {
-				selectedCommand = savedAgent
-				fmt.Printf("%sUsing saved agent for this directory: %s%s\n", dim, savedAgent, reset)
-			} else {
-				fmt.Printf("%sSaved agent '%s' not found, detecting...%s\n", yellow, savedAgent, reset)
-			}
-		}
-
-		// Detect if no saved agent or saved agent not found
-		if selectedCommand == "" {
-			agents := detectAvailableAgents()
-			if len(agents) == 0 {
-				fmt.Printf("%sNo AI agents found in PATH.%s\n", red, reset)
-				fmt.Println("Supported agents: claude, aider, codex, copilot, cursor")
-				fmt.Println("Install one of these agents or specify with --agent flag.")
-				os.Exit(1)
-			}
-			selectedCommand = selectAgent(agents)
-		}
+		return selectAgent(agents)
 	}
 
-	// Save agent choice for this directory
-	if err := setDirectoryAgent(*workDir, selectedCommand); err != nil {
-		fmt.Printf("%sWarning: Could not save agent preference: %v%s\n", yellow, err, reset)
+	// Try to use saved agent for this directory
+	savedAgent := getDirectoryAgent(workDir)
+	if savedAgent != "" {
+		// Verify agent still exists
+		if _, err := checkCommand(savedAgent); err == nil {
+			fmt.Printf("%sUsing saved agent for this directory: %s%s\n", dim, savedAgent, reset)
+			return savedAgent
+		}
+		fmt.Printf("%sSaved agent '%s' not found, detecting...%s\n", yellow, savedAgent, reset)
 	}
 
-	// Detect agent type and version
-	agentType := detectAgentType(selectedCommand)
-	agentVersion := getAgentVersion(selectedCommand, agentType)
+	// Detect if no saved agent or saved agent not found
+	agents := detectAvailableAgents()
+	if len(agents) == 0 {
+		printNoAgentsError()
+		os.Exit(1)
+	}
+	return selectAgent(agents)
+}
 
-	// Create display name for the session (directory basename)
-	displayName := filepath.Base(*workDir)
+// printNoAgentsError prints the error message when no agents are found
+func printNoAgentsError() {
+	fmt.Printf("%sNo AI agents found in PATH.%s\n", red, reset)
+	fmt.Println("Supported agents: claude, aider, codex, copilot, cursor")
+	fmt.Println("Install one of these agents or specify with --agent flag.")
+}
 
-	// Don't purge sessions automatically - user can use //purge manually if needed
-	// Multiple sessions from the same PC should coexist
-
-	// Create session on relay
+// createSession creates a session on the relay server
+func createSession(relayClient *RelayClient, agentType AgentType, workDir, displayName string) (*CreateSessionResponse, error) {
 	fmt.Printf("%sCreating session on relay...%s\n", dim, reset)
-	sessionResp, err := relayClient.CreateSession(string(agentType), *workDir, displayName)
+	sessionResp, err := relayClient.CreateSession(string(agentType), workDir, displayName)
 	if err != nil {
 		// Fallback to local session if relay is unavailable
 		fmt.Printf("%sWarning: Could not create session on relay: %v%s\n", yellow, err, reset)
 		fmt.Printf("%sFalling back to local session...%s\n", dim, reset)
-		sessionResp = &CreateSessionResponse{
+		return &CreateSessionResponse{
 			SessionID: uuid.New().String(),
 			Token:     generateRandomToken(),
-		}
+		}, nil
 	}
+	return sessionResp, nil
+}
 
-	session := sessionResp.SessionID
-	token := sessionResp.Token
-
-	// Cleanup session on exit
-	defer func() {
-		fmt.Printf("%sCleaning up session...%s\n", dim, reset)
-		if err := relayClient.DeleteSession(session); err != nil {
-			// Silently ignore errors on cleanup
-			fmt.Printf("%sWarning: Could not cleanup session: %v%s\n", yellow, err, reset)
-		}
-	}()
-
-	// Create daemon
+// createDaemon creates and initializes the daemon
+func createDaemon(session, token, relay, command, workDir string, agentType AgentType, pcConfig *PCConfig, relayClient *RelayClient) *Daemon {
 	daemon := &Daemon{
 		session:     session,
 		token:       token,
-		relay:       *relay,
-		command:     selectedCommand,
-		workDir:     *workDir,
+		relay:       relay,
+		command:     command,
+		workDir:     workDir,
 		agentType:   agentType,
 		stdinFd:     int(os.Stdin.Fd()),
 		pcConfig:    pcConfig,
@@ -236,7 +253,11 @@ func main() {
 		log.Fatal("Failed to initialize encryption:", err)
 	}
 
-	// Display header
+	return daemon
+}
+
+// displayHeader displays the application header and session info
+func displayHeader(daemon *Daemon, session, command, workDir, agentVersion string) {
 	fmt.Println()
 	fmt.Printf("%s%sAIPilot CLI%s %s[%s]%s\n", bold, cyan, reset, dim, Build, reset)
 	fmt.Println()
@@ -258,65 +279,64 @@ func main() {
 
 	// Display session info
 	fmt.Printf("  Session:  %s\n", session[:8]+"...")
-	fmt.Printf("  Command:  %s", selectedCommand)
+	fmt.Printf("  Command:  %s", command)
 	if agentVersion != "" {
 		fmt.Printf(" %s(%s)%s", dim, agentVersion, reset)
 	}
 	fmt.Println()
-	fmt.Printf("  WorkDir:  %s\n", *workDir)
+	fmt.Printf("  WorkDir:  %s\n", workDir)
 	fmt.Printf("  Platform: %s/%s\n", runtime.GOOS, runtime.GOARCH)
 	fmt.Println()
 	fmt.Printf("%sAIPilot: //qr //status //purge //disconnect //quit (Ctrl+A for menu)%s\n", dim, reset)
 	fmt.Println()
+}
 
-	// Start PTY
-	fmt.Printf("Starting %s...\n", selectedCommand)
-	cmd := exec.Command(selectedCommand)
-	cmd.Dir = *workDir
+// startPTY starts the PTY and returns the pty master and command
+func startPTY(command, workDir string) (*os.File, *exec.Cmd) {
+	fmt.Printf("Starting %s...\n", command)
+	cmd := exec.Command(command)
+	cmd.Dir = workDir
 	cmd.Env = append(os.Environ(), "TERM=xterm-256color")
 
 	ptmx, err := pty.Start(cmd)
 	if err != nil {
 		log.Fatal("Failed to start PTY:", err)
 	}
-	defer ptmx.Close()
+	return ptmx, cmd
+}
 
-	daemon.mu.Lock()
-	daemon.ptmx = ptmx
-	daemon.cmd = cmd
-	daemon.running = true
-	daemon.mu.Unlock()
-
-	// Set initial terminal size
+// setupTerminalSize sets the initial terminal size
+func setupTerminalSize(daemon *Daemon) {
 	if term.IsTerminal(daemon.stdinFd) {
 		width, height, err := term.GetSize(daemon.stdinFd)
 		if err == nil && width > 0 && height > 0 {
-			pty.Setsize(ptmx, &pty.Winsize{
-				Cols: uint16(width),
-				Rows: uint16(height),
-			})
+			daemon.resizePTY(uint16(height), uint16(width))
+			daemon.mu.Lock()
 			daemon.pcCols = width
 			daemon.pcRows = height
 			daemon.currentClient = "pc"
+			daemon.mu.Unlock()
 		}
 	}
+}
 
-	// Handle termination
-	sigChan := make(chan os.Signal, 1)
-	signal.Notify(sigChan, os.Interrupt)
-
-	// Handle window resize
-	resizeChan := setupResizeSignal()
-
-	// PTY -> stdout AND mobile
+// startPTYReader starts a goroutine that reads from PTY and writes to stdout and mobile
+func startPTYReader(daemon *Daemon) {
 	go func() {
-		buf := make([]byte, 4096)
+		buf := make([]byte, BufferSize)
 		for {
-			n, err := ptmx.Read(buf)
+			n, err := daemon.readFromPTY(buf)
 			if err != nil {
 				if err != io.EOF {
 					// Silent
 				}
+				daemon.mu.Lock()
+				daemon.running = false
+				daemon.mu.Unlock()
+				return
+			}
+			if n == 0 {
+				// PTY not available
 				daemon.mu.Lock()
 				daemon.running = false
 				daemon.mu.Unlock()
@@ -327,21 +347,25 @@ func main() {
 			daemon.sendToMobile(buf[:n])
 		}
 	}()
+}
 
-	// Setup raw terminal for local input
-	var oldState *term.State
-	if term.IsTerminal(daemon.stdinFd) {
-		var err error
-		oldState, err = term.MakeRaw(daemon.stdinFd)
-		if err != nil {
-			fmt.Printf("%sWarning: Could not set raw mode: %v%s\n", yellow, err, reset)
-		} else {
-			daemon.oldState = oldState
-			defer term.Restore(daemon.stdinFd, oldState)
-		}
+// setupRawTerminal sets up the terminal in raw mode and returns the old state
+func setupRawTerminal(daemon *Daemon) *term.State {
+	if !term.IsTerminal(daemon.stdinFd) {
+		return nil
 	}
 
-	// stdin -> PTY with command detection
+	oldState, err := term.MakeRaw(daemon.stdinFd)
+	if err != nil {
+		fmt.Printf("%sWarning: Could not set raw mode: %v%s\n", yellow, err, reset)
+		return nil
+	}
+	daemon.oldState = oldState
+	return oldState
+}
+
+// startStdinReader starts a goroutine that reads from stdin and writes to PTY
+func startStdinReader(daemon *Daemon, oldState *term.State) {
 	go func() {
 		lineBuf := ""
 		inEscapeSeq := false
@@ -378,24 +402,7 @@ func main() {
 
 			// Enter key
 			if char == '\r' || char == '\n' {
-				cmd := strings.TrimSpace(strings.ToLower(lineBuf))
-				if aipilotCmd := daemon.getAIPilotCommand(cmd); aipilotCmd != "" {
-					daemon.sendToPTY([]byte{0x15}) // Ctrl+U
-
-					if oldState != nil {
-						term.Restore(daemon.stdinFd, oldState)
-					}
-
-					daemon.executeAIPilotCommand(aipilotCmd)
-
-					if oldState != nil {
-						oldState, _ = term.MakeRaw(daemon.stdinFd)
-						daemon.oldState = oldState
-					}
-				} else {
-					daemon.sendToPTY(b)
-				}
-				lineBuf = ""
+				lineBuf = handleEnterKey(daemon, lineBuf, b, oldState)
 				continue
 			}
 
@@ -408,15 +415,8 @@ func main() {
 				continue
 			}
 
-			// Ctrl+C - reset buffer
-			if char == 3 {
-				lineBuf = ""
-				daemon.sendToPTY(b)
-				continue
-			}
-
-			// Ctrl+U - reset buffer
-			if char == 0x15 {
+			// Ctrl+C or Ctrl+U - reset buffer
+			if char == 3 || char == 0x15 {
 				lineBuf = ""
 				daemon.sendToPTY(b)
 				continue
@@ -426,8 +426,32 @@ func main() {
 			daemon.sendToPTY(b)
 		}
 	}()
+}
 
-	// Handle resize signals
+// handleEnterKey processes the enter key and returns the new line buffer
+func handleEnterKey(daemon *Daemon, lineBuf string, b []byte, oldState *term.State) string {
+	cmd := strings.TrimSpace(strings.ToLower(lineBuf))
+	if aipilotCmd := daemon.getAIPilotCommand(cmd); aipilotCmd != "" {
+		daemon.sendToPTY([]byte{0x15}) // Ctrl+U
+
+		if oldState != nil {
+			term.Restore(daemon.stdinFd, oldState)
+		}
+
+		daemon.executeAIPilotCommand(aipilotCmd)
+
+		if oldState != nil {
+			newState, _ := term.MakeRaw(daemon.stdinFd)
+			daemon.oldState = newState
+		}
+	} else {
+		daemon.sendToPTY(b)
+	}
+	return ""
+}
+
+// startResizeHandler starts a goroutine that handles terminal resize signals
+func startResizeHandler(daemon *Daemon, resizeChan <-chan os.Signal) {
 	go func() {
 		for range resizeChan {
 			if term.IsTerminal(daemon.stdinFd) {
@@ -436,22 +460,23 @@ func main() {
 					daemon.mu.Lock()
 					daemon.pcCols = width
 					daemon.pcRows = height
-					if daemon.currentClient == "pc" || daemon.currentClient == "" {
-						if daemon.ptmx != nil {
-							pty.Setsize(daemon.ptmx, &pty.Winsize{
-								Cols: uint16(width),
-								Rows: uint16(height),
-							})
-						}
-						daemon.currentClient = "pc"
-					}
+					shouldResize := daemon.currentClient == "pc" || daemon.currentClient == ""
 					daemon.mu.Unlock()
+
+					if shouldResize {
+						daemon.resizePTY(uint16(height), uint16(width))
+						daemon.mu.Lock()
+						daemon.currentClient = "pc"
+						daemon.mu.Unlock()
+					}
 				}
 			}
 		}
 	}()
+}
 
-	// Wait for termination
+// waitForTermination waits for either a signal or process exit
+func waitForTermination(sigChan <-chan os.Signal, cmd *exec.Cmd) {
 	select {
 	case <-sigChan:
 		fmt.Println("\n\nShutting down AIPilot...")
@@ -462,6 +487,106 @@ func main() {
 			fmt.Println("\n\nProcess exited.")
 		}
 	}
+}
+
+func main() {
+	// Parse flags
+	flags := parseFlags()
+
+	// Load or create PC configuration
+	pcConfig, err := getOrCreatePCConfig()
+	if err != nil {
+		log.Fatal("Failed to load PC configuration:", err)
+	}
+
+	// Create relay client
+	relayClient := NewRelayClient(flags.relay, pcConfig)
+
+	// Handle special modes (status, unpair, pairing)
+	if handleSpecialModes(flags, pcConfig, relayClient) {
+		os.Exit(0)
+	}
+
+	// Ensure we have paired mobiles
+	if ensurePairedMobile(flags, pcConfig, relayClient) {
+		os.Exit(0)
+	}
+
+	// Handle --list flag
+	handleListAgents(flags.listAgents)
+
+	// Resolve working directory
+	workDir := resolveWorkDir(flags.workDir)
+
+	// Select agent command
+	selectedCommand := selectAgentCommand(flags, workDir)
+
+	// Save agent choice for this directory
+	if err := setDirectoryAgent(workDir, selectedCommand); err != nil {
+		fmt.Printf("%sWarning: Could not save agent preference: %v%s\n", yellow, err, reset)
+	}
+
+	// Detect agent type and version
+	agentType := detectAgentType(selectedCommand)
+	agentVersion := getAgentVersion(selectedCommand, agentType)
+	displayName := filepath.Base(workDir)
+
+	// Create session on relay
+	sessionResp, _ := createSession(relayClient, agentType, workDir, displayName)
+	session := sessionResp.SessionID
+	token := sessionResp.Token
+
+	// Cleanup session on exit
+	defer func() {
+		fmt.Printf("%sCleaning up session...%s\n", dim, reset)
+		if err := relayClient.DeleteSession(session); err != nil {
+			fmt.Printf("%sWarning: Could not cleanup session: %v%s\n", yellow, err, reset)
+		}
+	}()
+
+	// Create and initialize daemon
+	daemon := createDaemon(session, token, flags.relay, selectedCommand, workDir, agentType, pcConfig, relayClient)
+
+	// Display header and session info
+	displayHeader(daemon, session, selectedCommand, workDir, agentVersion)
+
+	// Start PTY
+	ptmx, cmd := startPTY(selectedCommand, workDir)
+	defer ptmx.Close()
+
+	daemon.mu.Lock()
+	daemon.ptmx = ptmx
+	daemon.cmd = cmd
+	daemon.running = true
+	daemon.mu.Unlock()
+
+	// Setup terminal
+	setupTerminalSize(daemon)
+
+	// Handle termination signals
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, os.Interrupt)
+
+	// Handle window resize
+	resizeChan := setupResizeSignal()
+
+	// Start PTY reader goroutine
+	startPTYReader(daemon)
+
+	// Setup raw terminal
+	oldState := setupRawTerminal(daemon)
+	if oldState != nil {
+		defer term.Restore(daemon.stdinFd, oldState)
+	}
+
+	// Start stdin reader goroutine
+	startStdinReader(daemon, oldState)
+
+	// Start resize handler goroutine
+	startResizeHandler(daemon, resizeChan)
+
+	// Wait for termination
+	waitForTermination(sigChan, cmd)
 }
 
 func waitForProcess(cmd *exec.Cmd) <-chan error {

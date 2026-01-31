@@ -110,8 +110,8 @@ func handlePairing(config *PCConfig, client *RelayClient, relayURL string, qrAsI
 	fmt.Printf("%sWaiting for mobile to scan...%s\n", dim, reset)
 
 	// Poll for pairing completion
-	timeout := time.After(5 * time.Minute)
-	ticker := time.NewTicker(2 * time.Second)
+	timeout := time.After(PairingTimeout)
+	ticker := time.NewTicker(PairingPollInterval)
 	defer ticker.Stop()
 
 	for {

@@ -1,11 +1,11 @@
 package main
 
 import (
+	"context"
 	"encoding/base64"
 	"strings"
 	"time"
 
-	"github.com/creack/pty"
 	"github.com/gorilla/websocket"
 )
 
@@ -16,7 +16,7 @@ func (d *Daemon) connectToRelay() {
 		conn, _, err := websocket.DefaultDialer.Dial(wsURL, nil)
 		if err != nil {
 			d.setRelayConnected(false)
-			time.Sleep(5 * time.Second)
+			time.Sleep(RelayConnectDelay)
 			continue
 		}
 
@@ -24,54 +24,68 @@ func (d *Daemon) connectToRelay() {
 		var response Message
 		if err := conn.ReadJSON(&response); err != nil {
 			conn.Close()
-			time.Sleep(5 * time.Second)
+			time.Sleep(RelayConnectDelay)
 			continue
 		}
 
 		if response.Type != "registered" {
 			conn.Close()
-			time.Sleep(5 * time.Second)
+			time.Sleep(RelayConnectDelay)
 			continue
 		}
 
+		// Cancel any previous ping goroutine
 		d.mu.Lock()
+		if d.pingCancel != nil {
+			d.pingCancel()
+		}
+		d.pingCtx, d.pingCancel = context.WithCancel(context.Background())
+		pingCtx := d.pingCtx
 		d.wsConn = conn
 		d.relayConnected = true
 		d.mu.Unlock()
 
-		// Start ping keepalive
-		go func() {
-			ticker := time.NewTicker(10 * time.Second)
+		// Start ping keepalive with context cancellation
+		go func(ctx context.Context) {
+			ticker := time.NewTicker(PingInterval)
 			defer ticker.Stop()
 			for {
-				d.mu.RLock()
-				c := d.wsConn
-				connected := d.relayConnected
-				d.mu.RUnlock()
-				if !connected || c == nil {
+				select {
+				case <-ctx.Done():
 					return
+				case <-ticker.C:
+					d.mu.RLock()
+					c := d.wsConn
+					connected := d.relayConnected
+					d.mu.RUnlock()
+					if !connected || c == nil {
+						return
+					}
+					d.wsMu.Lock()
+					err := c.WriteJSON(Message{Type: "ping"})
+					d.wsMu.Unlock()
+					if err != nil {
+						return
+					}
 				}
-				d.wsMu.Lock()
-				err := c.WriteJSON(Message{Type: "ping"})
-				d.wsMu.Unlock()
-				if err != nil {
-					return
-				}
-				<-ticker.C
 			}
-		}()
+		}(pingCtx)
 
 		// Handle incoming messages
 		d.handleWebSocketMessages(conn)
 
-		// Connection lost, retry
+		// Connection lost, cancel ping goroutine and retry
 		d.mu.Lock()
+		if d.pingCancel != nil {
+			d.pingCancel()
+			d.pingCancel = nil
+		}
 		d.wsConn = nil
 		d.relayConnected = false
 		d.mobileConnected = false
 		d.mu.Unlock()
 
-		time.Sleep(2 * time.Second)
+		time.Sleep(ReconnectDelay)
 	}
 }
 
@@ -145,23 +159,12 @@ func (d *Daemon) handleWebSocketMessages(conn *websocket.Conn) {
 		case "connected":
 			if msg.Role == "mobile" {
 				d.setMobileConnected(true)
-				// Trigger screen refresh
-				d.mu.RLock()
-				ptmx := d.ptmx
-				d.mu.RUnlock()
-				if ptmx != nil {
-					size, err := pty.GetsizeFull(ptmx)
-					if err == nil && size.Cols > 0 && size.Rows > 0 {
-						pty.Setsize(ptmx, &pty.Winsize{
-							Cols: size.Cols,
-							Rows: size.Rows - 1,
-						})
-						time.Sleep(50 * time.Millisecond)
-						pty.Setsize(ptmx, &pty.Winsize{
-							Cols: size.Cols,
-							Rows: size.Rows,
-						})
-					}
+				// Trigger screen refresh by resizing PTY slightly
+				cols, rows, err := d.getPTYSize()
+				if err == nil && cols > 0 && rows > 0 {
+					d.resizePTY(rows-1, cols)
+					time.Sleep(50 * time.Millisecond)
+					d.resizePTY(rows, cols)
 				}
 			}
 

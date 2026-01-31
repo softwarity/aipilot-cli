@@ -12,7 +12,6 @@ import (
 	"runtime"
 	"strconv"
 	"strings"
-	"time"
 )
 
 // detectSSHServer detects if SSH server is running and returns connection info
@@ -24,7 +23,11 @@ func (d *Daemon) detectSSHServer() {
 		currentUser = u.Username
 	}
 
-	hostname, _ := os.Hostname()
+	hostname, err := os.Hostname()
+	if err != nil {
+		fmt.Printf("%s[AIPilot] Warning: Could not get hostname: %v%s\n", yellow, err, reset)
+		hostname = "unknown"
+	}
 
 	var ips []string
 	if addrs, err := net.InterfaceAddrs(); err == nil {
@@ -50,7 +53,7 @@ func (d *Daemon) detectSSHServer() {
 	// Method 2: Read from sshd_config if not found
 	if !sshRunning {
 		if port := d.detectSSHPortFromConfig(); port > 0 {
-			if conn, err := net.DialTimeout("tcp", fmt.Sprintf("127.0.0.1:%d", port), time.Second); err == nil {
+			if conn, err := net.DialTimeout("tcp", fmt.Sprintf("127.0.0.1:%d", port), SSHConnectTimeout); err == nil {
 				conn.Close()
 				sshPort = port
 				sshRunning = true
@@ -60,9 +63,9 @@ func (d *Daemon) detectSSHServer() {
 
 	// Method 3: Check common ports as fallback
 	if !sshRunning {
-		commonPorts := []int{22, 2222, 22222, 222}
+		commonPorts := []int{DefaultSSHPort, AlternativeSSHPort, 22222, 222}
 		for _, port := range commonPorts {
-			if conn, err := net.DialTimeout("tcp", fmt.Sprintf("127.0.0.1:%d", port), time.Second); err == nil {
+			if conn, err := net.DialTimeout("tcp", fmt.Sprintf("127.0.0.1:%d", port), SSHConnectTimeout); err == nil {
 				conn.Close()
 				sshPort = port
 				sshRunning = true
@@ -79,7 +82,11 @@ func (d *Daemon) detectSSHServer() {
 		"ips":      ips,
 	}
 
-	resultJSON, _ := json.Marshal(result)
+	resultJSON, err := json.Marshal(result)
+	if err != nil {
+		fmt.Printf("%s[AIPilot] Warning: Could not marshal SSH detection result: %v%s\n", yellow, err, reset)
+		return
+	}
 	d.sendControlMessage("ssh-detect-result:" + string(resultJSON))
 
 	if sshRunning {
@@ -253,20 +260,23 @@ func (d *Daemon) installSSHKey(username, keyBase64 string) {
 	}
 
 	sshDir := filepath.Join(home, ".ssh")
-	if err := os.MkdirAll(sshDir, 0700); err != nil {
+	if err := os.MkdirAll(sshDir, DirPermissions); err != nil {
 		d.sendControlMessage("ssh-setup-result:error:Cannot create .ssh directory")
 		return
 	}
 
 	authKeysPath := filepath.Join(sshDir, "authorized_keys")
 
-	existingKeys, _ := os.ReadFile(authKeysPath)
+	existingKeys, readErr := os.ReadFile(authKeysPath)
+	if readErr != nil && !os.IsNotExist(readErr) {
+		fmt.Printf("%s[AIPilot] Warning: Could not read authorized_keys: %v%s\n", yellow, readErr, reset)
+	}
 	if strings.Contains(string(existingKeys), publicKey) {
 		d.sendControlMessage("ssh-setup-result:success:Key already installed")
 		return
 	}
 
-	f, err := os.OpenFile(authKeysPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0600)
+	f, err := os.OpenFile(authKeysPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, FilePermissions)
 	if err != nil {
 		d.sendControlMessage("ssh-setup-result:error:Cannot open authorized_keys")
 		return
@@ -274,10 +284,16 @@ func (d *Daemon) installSSHKey(username, keyBase64 string) {
 	defer f.Close()
 
 	if len(existingKeys) > 0 && existingKeys[len(existingKeys)-1] != '\n' {
-		f.WriteString("\n")
+		if _, err := f.WriteString("\n"); err != nil {
+			fmt.Printf("%s[AIPilot] Warning: Could not write newline: %v%s\n", yellow, err, reset)
+		}
 	}
 
-	hostname, _ := os.Hostname()
+	hostname, hostnameErr := os.Hostname()
+	if hostnameErr != nil {
+		fmt.Printf("%s[AIPilot] Warning: Could not get hostname: %v%s\n", yellow, hostnameErr, reset)
+		hostname = "unknown"
+	}
 	keyLine := fmt.Sprintf("%s aipilot-mobile@%s\n", publicKey, hostname)
 	if _, err := f.WriteString(keyLine); err != nil {
 		d.sendControlMessage("ssh-setup-result:error:Cannot write key")

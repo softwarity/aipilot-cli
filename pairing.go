@@ -58,7 +58,7 @@ func ensureConfigDir() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	if err := os.MkdirAll(dir, 0700); err != nil {
+	if err := os.MkdirAll(dir, DirPermissions); err != nil {
 		return "", fmt.Errorf("failed to create config directory: %w", err)
 	}
 	return dir, nil
@@ -101,7 +101,7 @@ func savePCConfig(config *PCConfig) error {
 		return err
 	}
 
-	return os.WriteFile(path, data, 0600)
+	return os.WriteFile(path, data, FilePermissions)
 }
 
 // createPCConfig creates a new PC configuration with generated keys
@@ -214,7 +214,7 @@ func saveDirectoriesConfig(config DirectoriesConfig) error {
 		return err
 	}
 
-	return os.WriteFile(path, data, 0600)
+	return os.WriteFile(path, data, FilePermissions)
 }
 
 // getDirectoryAgent returns the default agent for a directory

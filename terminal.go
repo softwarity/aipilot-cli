@@ -16,15 +16,7 @@ func (d *Daemon) forceResize() {
 		return
 	}
 
-	d.mu.RLock()
-	ptmx := d.ptmx
-	d.mu.RUnlock()
-
-	if ptmx != nil {
-		pty.Setsize(ptmx, &pty.Winsize{
-			Cols: uint16(width),
-			Rows: uint16(height),
-		})
+	if err := d.resizePTY(uint16(height), uint16(width)); err == nil {
 		fmt.Printf("%sResized to %dx%d%s\n", green, width, height, reset)
 	}
 }
@@ -53,10 +45,10 @@ func (d *Daemon) schedulePCSwitch() {
 // switchToClient switches the PTY to the specified client's dimensions
 func (d *Daemon) switchToClient(client string) {
 	d.mu.Lock()
-	defer d.mu.Unlock()
 
 	// Already on this client
 	if d.currentClient == client {
+		d.mu.Unlock()
 		return
 	}
 
@@ -69,16 +61,23 @@ func (d *Daemon) switchToClient(client string) {
 
 	// Don't switch if we don't have dimensions for target client
 	if cols <= 0 || rows <= 0 {
+		d.mu.Unlock()
 		return
 	}
 
-	// Apply resize
-	if d.ptmx != nil {
-		pty.Setsize(d.ptmx, &pty.Winsize{
-			Cols: uint16(cols),
-			Rows: uint16(rows),
-		})
+	// Check if PTY exists
+	hasPTY := d.ptmx != nil
+	d.mu.Unlock()
+
+	if !hasPTY {
+		return
+	}
+
+	// Apply resize using thread-safe method
+	if err := d.resizePTY(uint16(rows), uint16(cols)); err == nil {
+		d.mu.Lock()
 		d.currentClient = client
+		d.mu.Unlock()
 
 		// Send Ctrl+L to force screen redraw only when switching TO mobile
 		if client == "mobile" {
@@ -96,12 +95,90 @@ func (d *Daemon) switchToClient(client string) {
 }
 
 // sendToPTY sends data to the PTY (and thus to Claude)
+// This method is thread-safe.
 func (d *Daemon) sendToPTY(data []byte) {
 	d.mu.RLock()
 	ptmx := d.ptmx
 	d.mu.RUnlock()
 
 	if ptmx != nil {
+		d.ptyMu.Lock()
 		ptmx.Write(data)
+		d.ptyMu.Unlock()
 	}
+}
+
+// writeToPTY writes data to the PTY with proper synchronization.
+// Returns the number of bytes written and any error.
+func (d *Daemon) writeToPTY(data []byte) (int, error) {
+	d.mu.RLock()
+	ptmx := d.ptmx
+	d.mu.RUnlock()
+
+	if ptmx == nil {
+		return 0, nil
+	}
+
+	d.ptyMu.Lock()
+	n, err := ptmx.Write(data)
+	d.ptyMu.Unlock()
+	return n, err
+}
+
+// readFromPTY reads data from the PTY with proper synchronization.
+// Returns the number of bytes read and any error.
+func (d *Daemon) readFromPTY(buf []byte) (int, error) {
+	d.mu.RLock()
+	ptmx := d.ptmx
+	d.mu.RUnlock()
+
+	if ptmx == nil {
+		return 0, nil
+	}
+
+	d.ptyMu.Lock()
+	n, err := ptmx.Read(buf)
+	d.ptyMu.Unlock()
+	return n, err
+}
+
+// resizePTY resizes the PTY with proper synchronization.
+// Returns any error from the resize operation.
+func (d *Daemon) resizePTY(rows, cols uint16) error {
+	d.mu.RLock()
+	ptmx := d.ptmx
+	d.mu.RUnlock()
+
+	if ptmx == nil {
+		return nil
+	}
+
+	d.ptyMu.Lock()
+	err := pty.Setsize(ptmx, &pty.Winsize{
+		Cols: cols,
+		Rows: rows,
+	})
+	d.ptyMu.Unlock()
+	return err
+}
+
+// getPTYSize returns the current PTY size with proper synchronization.
+// Returns cols, rows, and any error.
+func (d *Daemon) getPTYSize() (cols uint16, rows uint16, err error) {
+	d.mu.RLock()
+	ptmx := d.ptmx
+	d.mu.RUnlock()
+
+	if ptmx == nil {
+		return 0, 0, nil
+	}
+
+	d.ptyMu.Lock()
+	size, err := pty.GetsizeFull(ptmx)
+	d.ptyMu.Unlock()
+
+	if err != nil {
+		return 0, 0, err
+	}
+	return size.Cols, size.Rows, nil
 }

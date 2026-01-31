@@ -56,7 +56,7 @@ func saveSession(workDir string, session *SessionData) error {
 	}
 
 	dir := filepath.Dir(path)
-	if err := os.MkdirAll(dir, 0700); err != nil {
+	if err := os.MkdirAll(dir, DirPermissions); err != nil {
 		return err
 	}
 
@@ -65,11 +65,14 @@ func saveSession(workDir string, session *SessionData) error {
 		return err
 	}
 
-	return os.WriteFile(path, data, 0600)
+	return os.WriteFile(path, data, FilePermissions)
 }
 
 func generateRandomToken() string {
 	b := make([]byte, 16)
-	rand.Read(b)
+	if _, err := rand.Read(b); err != nil {
+		// Critical: cannot generate secure random token
+		panic(fmt.Sprintf("crypto/rand failed: %v", err))
+	}
 	return hex.EncodeToString(b)
 }
