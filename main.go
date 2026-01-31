@@ -73,7 +73,7 @@ func handleSpecialModes(flags *cliFlags, pcConfig *PCConfig, relayClient *RelayC
 
 	// Clear sessions mode
 	if flags.clearSessions {
-		clearSavedSessions()
+		clearSavedSessions(relayClient)
 		return true
 	}
 
@@ -268,7 +268,7 @@ func displayHeader(daemon *Daemon, session, command, workDir, agentVersion strin
 	fmt.Printf("  WorkDir:  %s\n", workDir)
 	fmt.Printf("  Platform: %s/%s\n", runtime.GOOS, runtime.GOARCH)
 	fmt.Println()
-	fmt.Printf("%sAIPilot: //qr //status //purge //disconnect //quit (Ctrl+A for menu)%s\n", dim, reset)
+	fmt.Printf("%sAIPilot: //qr //status //quit%s\n", dim, reset)
 	fmt.Println()
 }
 
@@ -456,8 +456,8 @@ func startResizeHandler(daemon *Daemon, resizeChan <-chan os.Signal) {
 	}()
 }
 
-// waitForTermination waits for either a signal or process exit
-func waitForTermination(sigChan <-chan os.Signal, cmd *exec.Cmd) {
+// waitForTermination waits for either a signal or process exit, then cleans up
+func waitForTermination(sigChan <-chan os.Signal, cmd *exec.Cmd, daemon *Daemon) {
 	select {
 	case <-sigChan:
 		fmt.Println("\n\nShutting down AIPilot...")
@@ -468,6 +468,9 @@ func waitForTermination(sigChan <-chan os.Signal, cmd *exec.Cmd) {
 			fmt.Println("\n\nProcess exited.")
 		}
 	}
+
+	// Cleanup: delete session from relay and local file
+	daemon.cleanup()
 }
 
 func main() {
@@ -585,7 +588,7 @@ func main() {
 	startResizeHandler(daemon, resizeChan)
 
 	// Wait for termination
-	waitForTermination(sigChan, cmd)
+	waitForTermination(sigChan, cmd, daemon)
 }
 
 func waitForProcess(cmd *exec.Cmd) <-chan error {

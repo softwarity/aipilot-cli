@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"crypto/cipher"
+	"fmt"
 	"os"
 	"os/exec"
 	"sync"
@@ -144,4 +145,22 @@ func (d *Daemon) isRunning() bool {
 	d.mu.RLock()
 	defer d.mu.RUnlock()
 	return d.running
+}
+
+// cleanup deletes session from relay and removes local session file
+func (d *Daemon) cleanup() {
+	// Delete session from relay
+	if d.relayClient != nil && d.session != "" {
+		if err := d.relayClient.DeleteSession(d.session); err != nil {
+			fmt.Printf("%sWarning: Could not delete session from relay: %v%s\n", yellow, err, reset)
+		} else {
+			fmt.Printf("%s✓ Session cleaned up%s\n", dim, reset)
+		}
+	}
+
+	// Delete local session file
+	sessionPath := getSessionFilePath(d.workDir)
+	if sessionPath != "" {
+		os.Remove(sessionPath) // Ignore error if file doesn't exist
+	}
 }

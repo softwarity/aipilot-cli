@@ -116,8 +116,9 @@ func listSavedSessions() {
 	fmt.Println()
 }
 
-// clearSavedSessions removes all saved sessions
-func clearSavedSessions() {
+// clearSavedSessions removes all saved sessions (local and relay)
+func clearSavedSessions(relayClient *RelayClient) {
+	// Clear local sessions
 	home, err := os.UserHomeDir()
 	if err != nil {
 		fmt.Printf("%sError: cannot determine home directory%s\n", red, reset)
@@ -126,24 +127,30 @@ func clearSavedSessions() {
 
 	sessionsDir := filepath.Join(home, ".aipilot", "sessions")
 	entries, err := os.ReadDir(sessionsDir)
-	if err != nil {
-		fmt.Printf("%sNo saved sessions to clear.%s\n", dim, reset)
-		return
-	}
-
-	count := 0
-	for _, entry := range entries {
-		if !entry.IsDir() && filepath.Ext(entry.Name()) == ".json" {
-			path := filepath.Join(sessionsDir, entry.Name())
-			if err := os.Remove(path); err == nil {
-				count++
+	localCount := 0
+	if err == nil {
+		for _, entry := range entries {
+			if !entry.IsDir() && filepath.Ext(entry.Name()) == ".json" {
+				path := filepath.Join(sessionsDir, entry.Name())
+				if err := os.Remove(path); err == nil {
+					localCount++
+				}
 			}
 		}
 	}
 
-	if count > 0 {
-		fmt.Printf("%s✓ Cleared %d saved session(s).%s\n", green, count, reset)
+	// Clear relay sessions
+	relayCount := 0
+	if relayClient != nil {
+		count, err := relayClient.PurgeAllSessions()
+		if err == nil {
+			relayCount = count
+		}
+	}
+
+	if localCount > 0 || relayCount > 0 {
+		fmt.Printf("%s✓ Cleared %d local + %d relay session(s).%s\n", green, localCount, relayCount, reset)
 	} else {
-		fmt.Printf("%sNo saved sessions to clear.%s\n", dim, reset)
+		fmt.Printf("%sNo sessions to clear.%s\n", dim, reset)
 	}
 }

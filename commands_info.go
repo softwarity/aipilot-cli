@@ -7,7 +7,6 @@ import (
 	"os"
 	"os/user"
 	"runtime"
-	"strings"
 )
 
 // printStatus shows the current status
@@ -102,36 +101,3 @@ func (d *Daemon) sendCLIInfo() {
 	d.sendControlMessage("cli-info:" + string(infoJSON))
 }
 
-// showMenu displays the AIPilot interactive menu
-func (d *Daemon) showMenu() {
-	fmt.Printf("\n%s=== AIPilot Menu (Ctrl+A) ===%s\n", bold, reset)
-	fmt.Printf("  %s[1]%s Show pairing QR\n", cyan, reset)
-	fmt.Printf("  %s[2]%s Open QR as image\n", cyan, reset)
-	fmt.Printf("  %s[3]%s Connection status\n", cyan, reset)
-	fmt.Printf("  %s[4]%s Disconnect mobile\n", cyan, reset)
-	fmt.Printf("  %s[5]%s Purge all sessions\n", cyan, reset)
-	fmt.Printf("  %s[q]%s Quit AIPilot\n", cyan, reset)
-	fmt.Printf("  %s[Enter]%s Return to %s\n", cyan, reset, d.command)
-	fmt.Print("\nChoice: ")
-
-	var input string
-	fmt.Scanln(&input)
-
-	switch strings.ToLower(strings.TrimSpace(input)) {
-	case "1":
-		d.executeAIPilotCommand("qr")
-	case "2":
-		d.executeAIPilotCommand("qr-image")
-	case "3":
-		d.printStatus()
-	case "4":
-		d.disconnectMobile()
-	case "5":
-		d.purgeAllSessions()
-	case "q":
-		fmt.Printf("%sShutting down AIPilot...%s\n", yellow, reset)
-		os.Exit(0)
-	default:
-		fmt.Println("Returning to", d.command)
-	}
-}
