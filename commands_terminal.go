@@ -30,11 +30,12 @@ func (d *Daemon) handleControlMessage(msg string) {
 		// Mobile sent its info (we could log/display it)
 
 	case "ssh-setup-key":
-		keyParts := strings.SplitN(args, ":", 2)
-		if len(keyParts) == 2 {
+		keyParts := strings.SplitN(args, ":", 3)
+		if len(keyParts) == 3 {
 			username := keyParts[0]
-			keyBase64 := keyParts[1]
-			go d.installSSHKey(username, keyBase64)
+			mobileId := keyParts[1]
+			keyBase64 := keyParts[2]
+			go d.installSSHKey(username, mobileId, keyBase64)
 		}
 
 	case "ssh-detect":

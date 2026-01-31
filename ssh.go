@@ -245,7 +245,8 @@ func (d *Daemon) detectSSHPortFromConfig() int {
 }
 
 // installSSHKey installs an SSH public key to authorized_keys
-func (d *Daemon) installSSHKey(username, keyBase64 string) {
+// It removes any existing key for this mobileId before adding the new one
+func (d *Daemon) installSSHKey(username, mobileId, keyBase64 string) {
 	keyBytes, err := base64.StdEncoding.DecodeString(keyBase64)
 	if err != nil {
 		d.sendControlMessage("ssh-setup-result:error:Invalid key encoding")
@@ -267,42 +268,57 @@ func (d *Daemon) installSSHKey(username, keyBase64 string) {
 
 	authKeysPath := filepath.Join(sshDir, "authorized_keys")
 
+	// Build the comment for this mobile (used to identify keys)
+	keyComment := fmt.Sprintf("aipilot-%s", mobileId)
+
 	existingKeys, readErr := os.ReadFile(authKeysPath)
 	if readErr != nil && !os.IsNotExist(readErr) {
 		fmt.Printf("%s[AIPilot] Warning: Could not read authorized_keys: %v%s\n", yellow, readErr, reset)
 	}
+
+	// Check if exact key already installed
 	if strings.Contains(string(existingKeys), publicKey) {
 		d.sendControlMessage("ssh-setup-result:success:Key already installed")
 		return
 	}
 
-	f, err := os.OpenFile(authKeysPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, FilePermissions)
-	if err != nil {
-		d.sendControlMessage("ssh-setup-result:error:Cannot open authorized_keys")
-		return
-	}
-	defer f.Close()
-
-	if len(existingKeys) > 0 && existingKeys[len(existingKeys)-1] != '\n' {
-		if _, err := f.WriteString("\n"); err != nil {
-			fmt.Printf("%s[AIPilot] Warning: Could not write newline: %v%s\n", yellow, err, reset)
+	// Remove existing key for this mobileId (if any)
+	var newLines []string
+	removedOld := false
+	if len(existingKeys) > 0 {
+		lines := strings.Split(string(existingKeys), "\n")
+		for _, line := range lines {
+			line = strings.TrimSpace(line)
+			if line == "" {
+				continue
+			}
+			// Check if this line contains the mobileId comment
+			if strings.Contains(line, keyComment) {
+				removedOld = true
+				continue // Skip this line (remove old key)
+			}
+			newLines = append(newLines, line)
 		}
 	}
 
-	hostname, hostnameErr := os.Hostname()
-	if hostnameErr != nil {
-		fmt.Printf("%s[AIPilot] Warning: Could not get hostname: %v%s\n", yellow, hostnameErr, reset)
-		hostname = "unknown"
-	}
-	keyLine := fmt.Sprintf("%s aipilot-mobile@%s\n", publicKey, hostname)
-	if _, err := f.WriteString(keyLine); err != nil {
-		d.sendControlMessage("ssh-setup-result:error:Cannot write key")
+	// Add the new key
+	keyLine := fmt.Sprintf("%s %s", publicKey, keyComment)
+	newLines = append(newLines, keyLine)
+
+	// Write back the file
+	content := strings.Join(newLines, "\n") + "\n"
+	if err := os.WriteFile(authKeysPath, []byte(content), FilePermissions); err != nil {
+		d.sendControlMessage("ssh-setup-result:error:Cannot write authorized_keys")
 		return
 	}
 
-	d.sendControlMessage("ssh-setup-result:success:Key installed successfully")
-
-	fmt.Printf("\n%s[AIPilot] SSH key installed for mobile access%s\n", green, reset)
+	if removedOld {
+		d.sendControlMessage("ssh-setup-result:success:Key updated (replaced old key)")
+		fmt.Printf("\n%s[AIPilot] SSH key updated for mobile %s%s\n", green, mobileId[:8], reset)
+	} else {
+		d.sendControlMessage("ssh-setup-result:success:Key installed successfully")
+		fmt.Printf("\n%s[AIPilot] SSH key installed for mobile %s%s\n", green, mobileId[:8], reset)
+	}
 }
 
 // DetectSSHInfo detects SSH availability without requiring a Daemon instance
