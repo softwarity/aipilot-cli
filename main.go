@@ -199,8 +199,7 @@ func selectAgentCommand(flags *cliFlags, workDir string) string {
 // printNoAgentsError prints the error message when no agents are found
 func printNoAgentsError() {
 	fmt.Printf("%sNo AI agents found in PATH.%s\n", red, reset)
-	fmt.Println("Supported agent: claude")
-	fmt.Println("Install Claude Code: https://claude.ai/download")
+	fmt.Println("Supported agents: claude, gemini")
 }
 
 // createSession creates a session on the relay server
