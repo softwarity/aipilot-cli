@@ -103,36 +103,16 @@ func handleSpecialModes(flags *cliFlags, pcConfig *PCConfig, relayClient *RelayC
 }
 
 // ensurePairedMobile checks if we have paired mobiles, initiates pairing if not.
-// Returns true if user chose to exit after pairing.
-func ensurePairedMobile(pcConfig *PCConfig, relayClient *RelayClient) bool {
+func ensurePairedMobile(pcConfig *PCConfig, relayClient *RelayClient) {
 	if pcConfig.hasPairedMobiles() {
-		return false
+		return
 	}
 
 	fmt.Printf("%sNo mobile devices paired.%s\n\n", yellow, reset)
 	if err := handlePairing(pcConfig, relayClient, RelayURL); err != nil {
 		log.Fatal("Pairing failed:", err)
 	}
-	fmt.Println()
-
-	// Ask user what to do next
-	fmt.Printf("%s✓ Pairing complete!%s\n\n", green, reset)
-	fmt.Printf("  %s[1]%s Launch agent now\n", cyan, reset)
-	fmt.Printf("  %s[2]%s Exit (run aipilot-cli later)\n", cyan, reset)
-	fmt.Print("\nChoice [1]: ")
-
-	var input string
-	fmt.Scanln(&input)
-	input = strings.TrimSpace(input)
-
-	if input == "2" {
-		fmt.Printf("\n%sRun aipilot-cli again to start a session.%s\n", dim, reset)
-		fmt.Printf("%sUse //qr to pair additional mobile devices.%s\n\n", dim, reset)
-		return true
-	}
-	// Default (1 or empty): continue to launch agent
-	fmt.Println()
-	return false
+	fmt.Printf("\n%s✓ Pairing complete!%s\n\n", green, reset)
 }
 
 // handleListAgents displays available agents and exits if --list was specified
@@ -219,8 +199,8 @@ func selectAgentCommand(flags *cliFlags, workDir string) string {
 // printNoAgentsError prints the error message when no agents are found
 func printNoAgentsError() {
 	fmt.Printf("%sNo AI agents found in PATH.%s\n", red, reset)
-	fmt.Println("Supported agents: claude, aider, codex, copilot, cursor")
-	fmt.Println("Install one of these agents or specify with --agent flag.")
+	fmt.Println("Supported agent: claude")
+	fmt.Println("Install Claude Code: https://claude.ai/download")
 }
 
 // createSession creates a session on the relay server
@@ -516,9 +496,7 @@ func main() {
 	}
 
 	// Ensure we have paired mobiles
-	if ensurePairedMobile(pcConfig, relayClient) {
-		os.Exit(0)
-	}
+	ensurePairedMobile(pcConfig, relayClient)
 
 	// Handle --list flag
 	handleListAgents(flags.listAgents)

@@ -13,6 +13,36 @@ import (
 	"strings"
 )
 
+// isPrivateIP checks if an IP is a private LAN address (RFC1918)
+func isPrivateIP(ip net.IP) bool {
+	// 10.0.0.0/8
+	if ip[0] == 10 {
+		return true
+	}
+	// 172.16.0.0/12 (172.16.x.x - 172.31.x.x)
+	if ip[0] == 172 && ip[1] >= 16 && ip[1] <= 31 {
+		return true
+	}
+	// 192.168.0.0/16
+	if ip[0] == 192 && ip[1] == 168 {
+		return true
+	}
+	return false
+}
+
+// getDefaultRouteIP returns the local IP used for the default route (main network interface)
+func getDefaultRouteIP() string {
+	// Connect to a public IP to find which local IP would be used
+	conn, err := net.Dial("udp", "8.8.8.8:80")
+	if err != nil {
+		return ""
+	}
+	defer conn.Close()
+
+	localAddr := conn.LocalAddr().(*net.UDPAddr)
+	return localAddr.IP.String()
+}
+
 // installSSHKey installs an SSH public key to authorized_keys
 // It removes any existing key for this mobileId before adding the new one
 func (d *Daemon) installSSHKey(username, mobileId, keyBase64 string) {
@@ -138,14 +168,13 @@ func DetectSSHInfo() *SSHInfo {
 		}
 	}
 
-	// Collect local IPs
+	// Get the main LAN IP (from default route)
 	var ips []string
-	if addrs, err := net.InterfaceAddrs(); err == nil {
-		for _, addr := range addrs {
-			if ipnet, ok := addr.(*net.IPNet); ok && !ipnet.IP.IsLoopback() {
-				if ipnet.IP.To4() != nil {
-					ips = append(ips, ipnet.IP.String())
-				}
+	if defaultIP := getDefaultRouteIP(); defaultIP != "" {
+		// Verify it's a private IP
+		if ip := net.ParseIP(defaultIP); ip != nil {
+			if ip4 := ip.To4(); ip4 != nil && isPrivateIP(ip4) {
+				ips = append(ips, defaultIP)
 			}
 		}
 	}
