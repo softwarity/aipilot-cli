@@ -122,6 +122,10 @@ func (d *Daemon) pollPairingCompletion(token string) {
 				} else {
 					fmt.Printf("\n%s✓ Paired: %s%s\n", green, mobile.Name, reset)
 				}
+				// Send a newline to refresh the prompt
+				if d.ptmx != nil {
+					d.ptmx.Write([]byte("\n"))
+				}
 				return
 
 			case "expired":

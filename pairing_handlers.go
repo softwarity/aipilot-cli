@@ -140,7 +140,7 @@ func handlePairing(config *PCConfig, client *RelayClient, relayURL string) error
 					return fmt.Errorf("failed to save config: %w", err)
 				}
 
-				fmt.Printf("\n%s✓ Successfully paired with %s!%s\n", green, mobile.Name, reset)
+				fmt.Printf("\n%s✓ Paired: %s%s\n\n", green, mobile.Name, reset)
 				return nil
 
 			case "expired":
@@ -149,6 +149,10 @@ func handlePairing(config *PCConfig, client *RelayClient, relayURL string) error
 
 			case "pending":
 				// Still waiting, continue polling
+
+			default:
+				// Unknown status, log and continue
+				fmt.Printf("%sUnknown pairing status: %s%s\n", yellow, status.Status, reset)
 			}
 		}
 	}
