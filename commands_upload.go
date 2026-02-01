@@ -124,6 +124,20 @@ func (d *Daemon) handleChunkedUploadChunk(args string) {
 	}
 }
 
+// handleChunkedUploadCancel handles cancellation of a chunked upload
+func (d *Daemon) handleChunkedUploadCancel(uploadId string) {
+	d.uploadMu.Lock()
+	_, exists := d.chunkedUploads[uploadId]
+	if exists {
+		delete(d.chunkedUploads, uploadId)
+	}
+	d.uploadMu.Unlock()
+
+	if exists {
+		d.sendControlMessage(fmt.Sprintf("file-upload-ack:%s:cancelled", uploadId))
+	}
+}
+
 // saveUploadedFile saves a base64-encoded file to /tmp
 func (d *Daemon) saveUploadedFile(fileName, fileBase64 string) {
 	fileData, err := base64.StdEncoding.DecodeString(fileBase64)

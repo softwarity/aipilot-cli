@@ -116,6 +116,31 @@ func listSavedSessions() {
 	fmt.Println()
 }
 
+// clearCurrentSession removes the saved session for the current directory
+func clearCurrentSession(workDir string, relayClient *RelayClient) {
+	session, err := loadSession(workDir)
+	if err != nil {
+		fmt.Printf("%sNo saved session for this directory.%s\n", dim, reset)
+		return
+	}
+
+	// Delete from relay first
+	if relayClient != nil && session.Session != "" {
+		if err := relayClient.DeleteSession(session.Session); err != nil {
+			fmt.Printf("%sWarning: could not delete relay session: %v%s\n", yellow, err, reset)
+		}
+	}
+
+	// Delete local file
+	path := getSessionFilePath(workDir)
+	if err := os.Remove(path); err != nil {
+		fmt.Printf("%sError: could not delete local session: %v%s\n", red, err, reset)
+		return
+	}
+
+	fmt.Printf("%s✓ Cleared session for: %s%s\n", green, workDir, reset)
+}
+
 // clearSavedSessions removes all saved sessions (local and relay)
 func clearSavedSessions(relayClient *RelayClient) {
 	// Clear local sessions

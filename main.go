@@ -25,6 +25,7 @@ type cliFlags struct {
 	workDir       string
 	listAgents    bool
 	listSessions  bool
+	clearSession  bool
 	clearSessions bool
 	unpairMobile  string
 	showStatus    bool
@@ -32,11 +33,12 @@ type cliFlags struct {
 
 // parseFlags parses command-line arguments and returns the flags
 func parseFlags() *cliFlags {
-	agent := flag.String("agent", "", "Agent to run (e.g., claude, aider). Auto-detects if not specified.")
+	agent := flag.String("agent", "", "Agent to run (claude, aider, gemini). Use '?' to force re-selection.")
 	workDir := flag.String("workdir", "", "Working directory")
 	showVersion := flag.Bool("version", false, "Show version and exit")
-	listAgents := flag.Bool("list", false, "List available AI agents and exit")
+	listAgents := flag.Bool("agents", false, "List available AI agents and exit")
 	listSessions := flag.Bool("sessions", false, "List saved sessions and exit")
+	clearSession := flag.Bool("clear-session", false, "Clear saved session for current directory and exit")
 	clearSessions := flag.Bool("clear-sessions", false, "Clear all saved sessions and exit")
 	unpairMobile := flag.String("unpair", "", "Unpair a mobile device by ID")
 	showStatus := flag.Bool("status", false, "Show PC status, paired mobiles, and exit")
@@ -52,6 +54,7 @@ func parseFlags() *cliFlags {
 		workDir:       *workDir,
 		listAgents:    *listAgents,
 		listSessions:  *listSessions,
+		clearSession:  *clearSession,
 		clearSessions: *clearSessions,
 		unpairMobile:  *unpairMobile,
 		showStatus:    *showStatus,
@@ -72,7 +75,17 @@ func handleSpecialModes(flags *cliFlags, pcConfig *PCConfig, relayClient *RelayC
 		return true
 	}
 
-	// Clear sessions mode
+	// Clear current session mode
+	if flags.clearSession {
+		workDir := flags.workDir
+		if workDir == "" {
+			workDir, _ = os.Getwd()
+		}
+		clearCurrentSession(workDir, relayClient)
+		return true
+	}
+
+	// Clear all sessions mode
 	if flags.clearSessions {
 		clearSavedSessions(relayClient)
 		return true
@@ -161,9 +174,19 @@ func resolveWorkDir(workDir string) string {
 // selectAgentCommand selects the agent command based on flags and saved preferences
 func selectAgentCommand(flags *cliFlags, workDir string) string {
 	// Agent selection logic:
-	// 1. If --agent or --command specified: use that
-	// 2. If --new: ignore saved config, detect/ask
+	// 1. If --agent ?: force re-selection
+	// 2. If --agent <name> specified: use that agent
 	// 3. Otherwise: use saved agent for this directory, or detect/ask
+
+	if flags.agent == "?" {
+		// Force re-selection
+		agents := detectAvailableAgents()
+		if len(agents) == 0 {
+			printNoAgentsError()
+			os.Exit(1)
+		}
+		return selectAgent(agents)
+	}
 
 	if flags.agent != "" {
 		// Explicit command specified
@@ -519,9 +542,6 @@ func main() {
 	// Try to load existing session, or create new one
 	// Detect SSH availability for session info
 	sshInfo := DetectSSHInfo()
-	if sshInfo.Available {
-		fmt.Printf("%s✓ SSH detected on port %d%s\n", green, sshInfo.Port, reset)
-	}
 
 	var session, token string
 

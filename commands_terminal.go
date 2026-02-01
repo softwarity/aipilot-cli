@@ -26,9 +26,6 @@ func (d *Daemon) handleControlMessage(msg string) {
 	case "info-request":
 		d.sendCLIInfo()
 
-	case "mobile-info":
-		// Mobile sent its info (we could log/display it)
-
 	case "ssh-setup-key":
 		keyParts := strings.SplitN(args, ":", 3)
 		if len(keyParts) == 3 {
@@ -53,6 +50,9 @@ func (d *Daemon) handleControlMessage(msg string) {
 
 	case "file-upload-chunk":
 		d.handleChunkedUploadChunk(args)
+
+	case "file-upload-cancel":
+		d.handleChunkedUploadCancel(args)
 	}
 }
 
