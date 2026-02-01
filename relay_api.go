@@ -244,10 +244,11 @@ func (c *RelayClient) CreateSession(agentType, workDir, displayName string, sshI
 
 // AddSessionTokenForMobile adds an encrypted token for a newly paired mobile
 func (c *RelayClient) AddSessionTokenForMobile(sessionID, mobileID, encryptedToken string) error {
-	body, err := json.Marshal(map[string]string{
+	payload := map[string]string{
 		"mobile_id":       mobileID,
 		"encrypted_token": encryptedToken,
-	})
+	}
+	body, err := json.Marshal(payload)
 	if err != nil {
 		return err
 	}

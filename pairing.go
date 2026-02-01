@@ -153,6 +153,16 @@ func (c *PCConfig) hasPairedMobiles() bool {
 	return len(c.PairedMobiles) > 0
 }
 
+// getPairedMobile returns a paired mobile by ID, or nil if not found
+func (c *PCConfig) getPairedMobile(mobileID string) *PairedMobile {
+	for i := range c.PairedMobiles {
+		if c.PairedMobiles[i].ID == mobileID {
+			return &c.PairedMobiles[i]
+		}
+	}
+	return nil
+}
+
 // addPairedMobile adds a new paired mobile
 func (c *PCConfig) addPairedMobile(mobile PairedMobile) {
 	// Check if already exists
