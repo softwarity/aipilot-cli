@@ -166,4 +166,29 @@ func (d *Daemon) saveUploadedFileBytes(fileName string, fileData []byte) {
 	}
 
 	d.sendControlMessage(fmt.Sprintf("file-upload-result:success:%s", remotePath))
+
+	// Auto-insert file reference based on agent type
+	d.insertFileReference(remotePath)
+}
+
+// insertFileReference inserts a file reference into the PTY based on agent type
+func (d *Daemon) insertFileReference(filePath string) {
+	var insertCmd string
+
+	switch d.agentType {
+	case AgentAider:
+		// Aider: use /add command
+		insertCmd = fmt.Sprintf("/add %s\n", filePath)
+	case AgentGemini:
+		// Gemini: use @ prefix
+		insertCmd = fmt.Sprintf("@%s ", filePath)
+	case AgentClaude:
+		// Claude: just output the path, user decides
+		insertCmd = filePath + " "
+	default:
+		// Unknown agent: just output the path
+		insertCmd = filePath + " "
+	}
+
+	d.sendToPTY([]byte(insertCmd))
 }
