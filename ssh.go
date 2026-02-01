@@ -138,11 +138,24 @@ func DetectSSHInfo() *SSHInfo {
 		}
 	}
 
+	// Collect local IPs
+	var ips []string
+	if addrs, err := net.InterfaceAddrs(); err == nil {
+		for _, addr := range addrs {
+			if ipnet, ok := addr.(*net.IPNet); ok && !ipnet.IP.IsLoopback() {
+				if ipnet.IP.To4() != nil {
+					ips = append(ips, ipnet.IP.String())
+				}
+			}
+		}
+	}
+
 	return &SSHInfo{
 		Available: sshRunning,
 		Port:      sshPort,
 		Hostname:  hostname,
 		Username:  currentUser,
+		IPs:       ips,
 	}
 }
 

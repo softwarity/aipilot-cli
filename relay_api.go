@@ -136,10 +136,11 @@ type CreateSessionRequest struct {
 	DisplayName     string            `json:"display_name"`      // Short name for display
 	EncryptedTokens map[string]string `json:"encrypted_tokens"`  // mobile_id -> encrypted token
 	// SSH info for auto-setup
-	SSHAvailable bool   `json:"ssh_available,omitempty"`
-	SSHPort      int    `json:"ssh_port,omitempty"`
-	Hostname     string `json:"hostname,omitempty"`
-	Username     string `json:"username,omitempty"`
+	SSHAvailable bool     `json:"ssh_available,omitempty"`
+	SSHPort      int      `json:"ssh_port,omitempty"`
+	Hostname     string   `json:"hostname,omitempty"`
+	Username     string   `json:"username,omitempty"`
+	IPs          []string `json:"ips,omitempty"` // Local network IPs
 }
 
 // CreateSessionResponse is the response from POST /api/sessions
@@ -154,6 +155,7 @@ type SSHInfo struct {
 	Port      int
 	Hostname  string
 	Username  string
+	IPs       []string
 }
 
 // CreateSession registers a new session on the relay
@@ -200,6 +202,7 @@ func (c *RelayClient) CreateSession(agentType, workDir, displayName string, sshI
 		req.SSHPort = sshInfo.Port
 		req.Hostname = sshInfo.Hostname
 		req.Username = sshInfo.Username
+		req.IPs = sshInfo.IPs
 	}
 
 	body, err := json.Marshal(req)
@@ -323,7 +326,7 @@ func (c *RelayClient) PurgeAllSessions() (int, error) {
 
 	var result struct {
 		Success      bool `json:"success"`
-		DeletedCount int  `json:"deletedCount"`
+		DeletedCount int  `json:"deleted_count"`
 	}
 	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
 		return 0, err
