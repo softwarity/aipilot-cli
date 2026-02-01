@@ -1,7 +1,6 @@
 # AIPilot CLI
 
 [![Release](https://img.shields.io/github/v/release/softwarity/aipilot-cli)](https://github.com/softwarity/aipilot-cli/releases/latest)
-[![License](https://img.shields.io/github/license/softwarity/aipilot-cli)](LICENSE)
 [![CI](https://github.com/softwarity/aipilot-cli/actions/workflows/ci.yml/badge.svg)](https://github.com/softwarity/aipilot-cli/actions/workflows/ci.yml)
 
 Bridge your terminal to the **AIPilot mobile app** via WebSocket relay. Control your AI coding agents (Claude Code, etc.) from your phone using voice input. No SSH required, no ports to open.
@@ -9,6 +8,19 @@ Bridge your terminal to the **AIPilot mobile app** via WebSocket relay. Control 
 <a href="https://play.google.com/store/apps/details?id=com.softwarity.aipilot">
   <img alt="Get it on Google Play" src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" width="200"/>
 </a>
+
+## Open Source & Privacy
+
+**This CLI is fully open source.** You can inspect, audit, and build it yourself.
+
+- **Source code**: Available right here on GitHub
+- **No telemetry**: We don't collect any usage data or analytics
+- **No tracking**: No user behavior tracking whatsoever
+- **No accounts**: No registration or sign-up required
+- **Encrypted**: All communications use TLS/WSS encryption
+- **Ephemeral relay**: The relay server only forwards encrypted messages in real-time, no data is stored
+
+The relay simply acts as a bridge between your PC and phone. Your terminal data passes through encrypted and is never logged or stored.
 
 ## What is AIPilot?
 
@@ -45,23 +57,27 @@ All communication goes through a secure relay - no need to open ports or configu
 
 ## Installation
 
-### Quick install (Linux/macOS)
+### Quick install (recommended)
 
+The installer downloads the latest release and installs it to your user directory. **No sudo or admin rights required.**
+
+**Linux / macOS:**
 ```bash
-# Linux amd64
-curl -L https://github.com/softwarity/aipilot-cli/releases/latest/download/aipilot-cli-linux-amd64 -o aipilot-cli && chmod +x aipilot-cli
-
-# Linux arm64
-curl -L https://github.com/softwarity/aipilot-cli/releases/latest/download/aipilot-cli-linux-arm64 -o aipilot-cli && chmod +x aipilot-cli
-
-# macOS Intel
-curl -L https://github.com/softwarity/aipilot-cli/releases/latest/download/aipilot-cli-macos-amd64 -o aipilot-cli && chmod +x aipilot-cli
-
-# macOS Apple Silicon
-curl -L https://github.com/softwarity/aipilot-cli/releases/latest/download/aipilot-cli-macos-arm64 -o aipilot-cli && chmod +x aipilot-cli
+curl -fsSL https://raw.githubusercontent.com/softwarity/aipilot-cli/main/install.sh | bash
 ```
 
-### Download binaries
+**Windows (PowerShell):**
+```powershell
+irm https://raw.githubusercontent.com/softwarity/aipilot-cli/main/install.ps1 | iex
+```
+
+The installer:
+- Detects your OS and architecture automatically
+- Downloads the latest release from GitHub
+- Installs to `~/.local/bin` (Linux/macOS) or `%LOCALAPPDATA%\Programs\aipilot` (Windows)
+- Adds to PATH if needed
+
+### Manual download
 
 | Platform | Architecture | Download |
 |----------|--------------|----------|
@@ -71,7 +87,19 @@ curl -L https://github.com/softwarity/aipilot-cli/releases/latest/download/aipil
 | macOS    | Apple Silicon| [aipilot-cli-macos-arm64](https://github.com/softwarity/aipilot-cli/releases/latest/download/aipilot-cli-macos-arm64) |
 | Windows  | amd64        | [aipilot-cli-windows-amd64.exe](https://github.com/softwarity/aipilot-cli/releases/latest/download/aipilot-cli-windows-amd64.exe) |
 
-Or browse all releases: [GitHub Releases](https://github.com/softwarity/aipilot-cli/releases)
+After downloading, make it executable (Linux/macOS):
+```bash
+chmod +x aipilot-cli-*
+mv aipilot-cli-* ~/.local/bin/aipilot-cli
+```
+
+### Build from source
+
+```bash
+git clone https://github.com/softwarity/aipilot-cli.git
+cd aipilot-cli
+go build -o aipilot-cli .
+```
 
 ## Usage
 
@@ -79,11 +107,11 @@ Or browse all releases: [GitHub Releases](https://github.com/softwarity/aipilot-
 # Default: runs 'claude' in current directory
 aipilot-cli
 
-# Custom command
-aipilot-cli --command bash
-
 # Specify working directory
 aipilot-cli --workdir /path/to/project
+
+# Custom command
+aipilot-cli --command bash
 
 # Custom relay (self-hosted)
 aipilot-cli --relay wss://your-relay.example.com/ws
@@ -108,20 +136,6 @@ The AIPilot mobile app provides:
 | SSH connections | - | Unlimited |
 | Agents | - | Unlimited |
 | File upload | - | ✓ |
-
-## Build from source
-
-```bash
-git clone https://github.com/softwarity/aipilot-cli.git
-cd aipilot-cli
-go build -o aipilot-cli .
-```
-
-## Privacy & Security
-
-- All connections are encrypted (WSS/TLS)
-- No data stored on relay servers
-- See our [Privacy Policy](PRIVACY_POLICY.md)
 
 ## License
 
