@@ -132,9 +132,9 @@ Commandes tapees dans le terminal (prefixe `//`):
 
 | Commande | Action |
 |----------|--------|
-| `//qr` | Affiche QR pairing en terminal |
-| `//status` | Affiche etat connexion (relay, mobile, agent) |
-| `//quit` | Nettoie session et quitte le daemon |
+| `//qr` | Affiche QR pairing (alternate screen, press any key to return) |
+
+Note: Le cleanup de session est automatique quand l'agent se termine (`/exit`, Ctrl+C, etc.)
 
 ### Flags CLI
 

@@ -9,40 +9,6 @@ import (
 	"runtime"
 )
 
-// printStatus shows the current status
-func (d *Daemon) printStatus() {
-	d.mu.RLock()
-	defer d.mu.RUnlock()
-
-	fmt.Printf("\n%s=== AIPilot Status ===%s\n", bold, reset)
-	fmt.Printf("  Session:  %s\n", d.session[:8]+"...")
-	fmt.Printf("  Command:  %s\n", d.command)
-	fmt.Printf("  WorkDir:  %s\n", d.workDir)
-	fmt.Printf("  Platform: %s/%s\n", runtime.GOOS, runtime.GOARCH)
-
-	// Relay status
-	if d.relayConnected {
-		fmt.Printf("  Relay:    %s✓ Connected%s\n", green, reset)
-	} else {
-		fmt.Printf("  Relay:    %s✗ Disconnected%s\n", red, reset)
-	}
-
-	// Mobile status
-	if d.mobileConnected {
-		fmt.Printf("  Mobile:   %s✓ Connected%s\n", green, reset)
-	} else {
-		fmt.Printf("  Mobile:   %s⋯ Waiting%s\n", yellow, reset)
-	}
-
-	// Agent status
-	if d.running {
-		fmt.Printf("  Agent:    %s✓ Running%s\n", green, reset)
-	} else {
-		fmt.Printf("  Agent:    %s✗ Stopped%s\n", red, reset)
-	}
-	fmt.Println()
-}
-
 // sendCLIInfo sends CLI information to mobile
 func (d *Daemon) sendCLIInfo() {
 	hostname, err := os.Hostname()

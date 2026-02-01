@@ -8,6 +8,11 @@ import (
 
 // showPairingQR displays a pairing QR code
 func (d *Daemon) showPairingQR(asImage bool) {
+	d.showPairingQRWithCallback(asImage, nil)
+}
+
+// showPairingQRWithCallback displays a pairing QR code with optional completion callback
+func (d *Daemon) showPairingQRWithCallback(asImage bool, onComplete func()) {
 	if d.relayClient == nil || d.pcConfig == nil {
 		fmt.Printf("%sError: Cannot create pairing QR%s\n", red, reset)
 		return
@@ -62,14 +67,20 @@ func (d *Daemon) showPairingQR(asImage bool) {
 	fmt.Printf("\n%sScan to pair a new mobile device:%s\n\n", bold, reset)
 	printQRCodeString(string(qrJSON), asImage)
 	fmt.Printf("\n  PC: %s\n", d.pcConfig.PCName)
-	fmt.Printf("  Expires: %s\n\n", pairingResp.ExpiresAt)
+	fmt.Printf("  Expires: %s\n", pairingResp.ExpiresAt)
+	fmt.Printf("\n%sPress any key to cancel...%s", dim, reset)
 
 	// Start background polling for pairing completion
-	go d.pollPairingCompletion(pairingResp.Token)
+	go d.pollPairingCompletionWithCallback(pairingResp.Token, onComplete)
 }
 
 // pollPairingCompletion polls for pairing completion in background
 func (d *Daemon) pollPairingCompletion(token string) {
+	d.pollPairingCompletionWithCallback(token, nil)
+}
+
+// pollPairingCompletionWithCallback polls for pairing completion with optional callback
+func (d *Daemon) pollPairingCompletionWithCallback(token string, onComplete func()) {
 	ticker := time.NewTicker(PairingPollInterval)
 	defer ticker.Stop()
 	timeout := time.After(PairingTimeout)
@@ -110,7 +121,7 @@ func (d *Daemon) pollPairingCompletion(token string) {
 					tokenShared = d.addTokenForMobile(mobile)
 				}
 
-				// Single line notification that doesn't disrupt the terminal
+				// Single line notification
 				if samePublicKey {
 					fmt.Printf("\n%s✓ Paired: %s (session unchanged)%s\n", green, mobile.Name, reset)
 				} else if tokenShared {
@@ -118,9 +129,15 @@ func (d *Daemon) pollPairingCompletion(token string) {
 				} else {
 					fmt.Printf("\n%s✓ Paired: %s%s\n", green, mobile.Name, reset)
 				}
-				// Send a newline to refresh the prompt
-				if d.ptmx != nil {
-					d.ptmx.Write([]byte("\n"))
+
+				// Call callback if provided (for alt screen auto-close)
+				if onComplete != nil {
+					onComplete()
+				} else {
+					// Only send newline if not in alt screen mode
+					if d.ptmx != nil {
+						d.ptmx.Write([]byte("\n"))
+					}
 				}
 				return
 

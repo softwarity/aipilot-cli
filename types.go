@@ -22,6 +22,12 @@ const (
 	red    = "\033[31m"
 	cyan   = "\033[36m"
 	bold   = "\033[1m"
+
+	// Alternate screen buffer (like vim, less, htop)
+	altScreenOn  = "\033[?1049h" // Switch to alternate screen
+	altScreenOff = "\033[?1049l" // Restore main screen
+	clearScreen  = "\033[2J"     // Clear entire screen
+	cursorHome   = "\033[H"      // Move cursor to top-left
 )
 
 // Version and RelayURL are set at build time via -ldflags

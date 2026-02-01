@@ -271,7 +271,7 @@ func displayHeader(daemon *Daemon, session, command, workDir, agentVersion strin
 	fmt.Printf("  WorkDir:  %s\n", workDir)
 	fmt.Printf("  Platform: %s/%s\n", runtime.GOOS, runtime.GOARCH)
 	fmt.Println()
-	fmt.Printf("%sAIPilot: //qr //status //quit%s\n", dim, reset)
+	fmt.Printf("%sAIPilot: //qr%s\n", dim, reset)
 	fmt.Println()
 }
 
@@ -461,15 +461,26 @@ func startResizeHandler(daemon *Daemon, resizeChan <-chan os.Signal) {
 
 // waitForTermination waits for either a signal or process exit, then cleans up
 func waitForTermination(sigChan <-chan os.Signal, cmd *exec.Cmd, daemon *Daemon) {
+	var exitMsg string
+
 	select {
 	case <-sigChan:
-		fmt.Println("\n\nShutting down AIPilot...")
+		exitMsg = "Shutting down AIPilot..."
 	case err := <-waitForProcess(cmd):
 		if err != nil {
-			fmt.Println("\n\nProcess exited with error:", err)
+			exitMsg = fmt.Sprintf("Process exited with error: %v", err)
 		} else {
-			fmt.Println("\n\nProcess exited.")
+			exitMsg = "" // Silent exit
 		}
+	}
+
+	// Restore terminal before printing (fixes raw mode line breaks)
+	if daemon.oldState != nil {
+		term.Restore(daemon.stdinFd, daemon.oldState)
+	}
+
+	if exitMsg != "" {
+		fmt.Printf("\n%s\n", exitMsg)
 	}
 
 	// Cleanup: delete session from relay and local file
