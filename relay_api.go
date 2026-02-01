@@ -86,14 +86,6 @@ func (c *RelayClient) InitPairing() (*PairingInitResponse, error) {
 	return &result, nil
 }
 
-// PairingCompleteRequest is sent by the mobile to complete pairing
-type PairingCompleteRequest struct {
-	Token      string `json:"token"`
-	MobileID   string `json:"mobile_id"`
-	MobileName string `json:"mobile_name"`
-	PublicKey  string `json:"public_key"`
-}
-
 // PairingStatusResponse is the response when checking pairing status
 type PairingStatusResponse struct {
 	Status     string `json:"status"` // "pending", "completed", "expired"
@@ -284,7 +276,11 @@ func (c *RelayClient) DeleteSession(sessionID string) error {
 		return err
 	}
 	httpReq.Header.Set("X-PC-ID", c.pcConfig.PCID)
-	// TODO: Add signature header for auth
+	// NOTE: No signature auth implemented. Could sign requests with PC's X25519 private key
+	// and verify on relay with stored public key. Not critical because:
+	// - PC-ID is a random UUID, hard to guess
+	// - Sessions are ephemeral
+	// - Session tokens are E2E encrypted
 
 	resp, err := c.httpClient.Do(httpReq)
 	if err != nil {
@@ -337,36 +333,6 @@ func (c *RelayClient) PurgeAllSessions() (int, error) {
 }
 
 // --- Mobile Management API ---
-
-// ListPairedMobiles returns the list of mobiles paired with this PC
-func (c *RelayClient) ListPairedMobiles() ([]PairedMobile, error) {
-	httpReq, err := http.NewRequest("GET", c.baseURL+"/api/pairing/mobiles", nil)
-	if err != nil {
-		return nil, err
-	}
-	httpReq.Header.Set("X-PC-ID", c.pcConfig.PCID)
-
-	resp, err := c.httpClient.Do(httpReq)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		respBody, err := io.ReadAll(resp.Body)
-		if err != nil {
-			return nil, fmt.Errorf("failed to list mobiles: %s (failed to read response: %v)", resp.Status, err)
-		}
-		return nil, fmt.Errorf("failed to list mobiles: %s - %s", resp.Status, string(respBody))
-	}
-
-	var result []PairedMobile
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, err
-	}
-
-	return result, nil
-}
 
 // UnpairMobile removes a paired mobile
 func (c *RelayClient) UnpairMobile(mobileID string) error {

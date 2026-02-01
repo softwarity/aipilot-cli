@@ -15,16 +15,13 @@ import (
 
 // ANSI escape codes for terminal control
 const (
-	clearLine  = "\033[K"
-	moveUp     = "\033[1A"
-	moveToCol0 = "\r"
-	dim        = "\033[2m"
-	reset      = "\033[0m"
-	green      = "\033[32m"
-	yellow     = "\033[33m"
-	red        = "\033[31m"
-	cyan       = "\033[36m"
-	bold       = "\033[1m"
+	dim    = "\033[2m"
+	reset  = "\033[0m"
+	green  = "\033[32m"
+	yellow = "\033[33m"
+	red    = "\033[31m"
+	cyan   = "\033[36m"
+	bold   = "\033[1m"
 )
 
 // Version and RelayURL are set at build time via -ldflags
@@ -33,8 +30,6 @@ var (
 	Build    = "20260120-1"
 	RelayURL = "wss://aipilot-relay.softwarity.io"
 )
-
-const defaultCommand = "claude"
 
 // ChunkedUpload tracks a file being uploaded in chunks
 type ChunkedUpload struct {
@@ -129,22 +124,10 @@ func (d *Daemon) setMobileConnected(connected bool) {
 	d.mu.Unlock()
 }
 
-func (d *Daemon) isRelayConnected() bool {
-	d.mu.RLock()
-	defer d.mu.RUnlock()
-	return d.relayConnected
-}
-
 func (d *Daemon) setRelayConnected(connected bool) {
 	d.mu.Lock()
 	d.relayConnected = connected
 	d.mu.Unlock()
-}
-
-func (d *Daemon) isRunning() bool {
-	d.mu.RLock()
-	defer d.mu.RUnlock()
-	return d.running
 }
 
 // cleanup deletes session from relay and removes local session file

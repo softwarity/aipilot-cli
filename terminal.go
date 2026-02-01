@@ -1,25 +1,10 @@
 package main
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/creack/pty"
-	"golang.org/x/term"
 )
-
-// forceResize forces PTY to match the local terminal size
-func (d *Daemon) forceResize() {
-	width, height, err := term.GetSize(d.stdinFd)
-	if err != nil {
-		fmt.Printf("%sError getting terminal size: %v%s\n", red, err, reset)
-		return
-	}
-
-	if err := d.resizePTY(uint16(height), uint16(width)); err == nil {
-		fmt.Printf("%sResized to %dx%d%s\n", green, width, height, reset)
-	}
-}
 
 // schedulePCSwitch schedules a debounced switch to PC mode
 func (d *Daemon) schedulePCSwitch() {
@@ -108,23 +93,6 @@ func (d *Daemon) sendToPTY(data []byte) {
 	}
 }
 
-// writeToPTY writes data to the PTY with proper synchronization.
-// Returns the number of bytes written and any error.
-func (d *Daemon) writeToPTY(data []byte) (int, error) {
-	d.mu.RLock()
-	ptmx := d.ptmx
-	d.mu.RUnlock()
-
-	if ptmx == nil {
-		return 0, nil
-	}
-
-	d.ptyMu.Lock()
-	n, err := ptmx.Write(data)
-	d.ptyMu.Unlock()
-	return n, err
-}
-
 // readFromPTY reads data from the PTY.
 // Note: No mutex here - Read() is blocking and would deadlock everything.
 // PTY reads are only done from one goroutine, so no sync needed.
@@ -158,25 +126,4 @@ func (d *Daemon) resizePTY(rows, cols uint16) error {
 	})
 	d.ptyMu.Unlock()
 	return err
-}
-
-// getPTYSize returns the current PTY size with proper synchronization.
-// Returns cols, rows, and any error.
-func (d *Daemon) getPTYSize() (cols uint16, rows uint16, err error) {
-	d.mu.RLock()
-	ptmx := d.ptmx
-	d.mu.RUnlock()
-
-	if ptmx == nil {
-		return 0, 0, nil
-	}
-
-	d.ptyMu.Lock()
-	size, err := pty.GetsizeFull(ptmx)
-	d.ptyMu.Unlock()
-
-	if err != nil {
-		return 0, 0, err
-	}
-	return size.Cols, size.Rows, nil
 }

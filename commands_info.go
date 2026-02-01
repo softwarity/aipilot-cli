@@ -80,17 +80,17 @@ func (d *Daemon) sendCLIInfo() {
 	}
 
 	info := map[string]interface{}{
-		"os":         runtime.GOOS,
-		"arch":       runtime.GOARCH,
-		"hostname":   hostname,
-		"user":       currentUser,
-		"cliVersion": Version,
-		"workingDir": d.workDir,
-		"agent":      d.command,
-		"agentType":  string(d.agentType),
-		"sshRunning": sshRunning,
-		"sshPort":    sshPort,
-		"ips":        ips,
+		"os":          runtime.GOOS,
+		"arch":        runtime.GOARCH,
+		"hostname":    hostname,
+		"user":        currentUser,
+		"cli_version": Version,
+		"working_dir": d.workDir,
+		"agent":       d.command,
+		"agent_type":  string(d.agentType),
+		"ssh_running": sshRunning,
+		"ssh_port":    sshPort,
+		"ips":         ips,
 	}
 
 	infoJSON, err := json.Marshal(info)

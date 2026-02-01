@@ -11,10 +11,8 @@ import (
 )
 
 const (
-	// Key sizes
-	X25519PrivateKeySize = 32
-	X25519PublicKeySize  = 32
-	NonceSize            = 24
+	X25519PublicKeySize = 32
+	NonceSize           = 24
 )
 
 // GenerateX25519KeyPair generates a new X25519 key pair
