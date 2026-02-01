@@ -159,13 +159,8 @@ func (d *Daemon) handleWebSocketMessages(conn *websocket.Conn) {
 		case "connected":
 			if msg.Role == "mobile" {
 				d.setMobileConnected(true)
-				// Trigger screen refresh by resizing PTY slightly
-				cols, rows, err := d.getPTYSize()
-				if err == nil && cols > 0 && rows > 0 {
-					d.resizePTY(rows-1, cols)
-					time.Sleep(50 * time.Millisecond)
-					d.resizePTY(rows, cols)
-				}
+				// Don't trigger refresh here - wait for mobile's resize message
+				// which arrives after mobile has set up its output listener
 			}
 
 		case "disconnected":
