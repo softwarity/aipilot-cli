@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"path/filepath"
 	"time"
 )
 
@@ -95,30 +96,20 @@ func (d *Daemon) pollPairingCompletion(token string) {
 				d.pcConfig.addPairedMobile(mobile)
 				savePCConfig(d.pcConfig)
 
-				// If there's an active session, send encrypted token for the mobile
+				// If there's an active session, recreate it with tokens for all mobiles
+				// This uses the same approach as initial session creation
 				d.mu.RLock()
-				sessionID := d.session
-				sessionToken := d.token
+				oldSessionID := d.session
 				d.mu.RUnlock()
 
-				tokenSent := false
-				if sessionID != "" && sessionToken != "" && mobile.PublicKey != "" {
-					// Encrypt session token for the mobile
-					pcPrivateKey, err := GetPrivateKeyFromHex(d.pcConfig.PrivateKey)
-					if err == nil {
-						encryptedToken, err := EncryptForMobile(sessionToken, mobile.PublicKey, pcPrivateKey)
-						if err == nil {
-							// Send to relay silently
-							if err := d.relayClient.AddSessionTokenForMobile(sessionID, mobile.ID, encryptedToken); err == nil {
-								tokenSent = true
-							}
-						}
-					}
+				sessionRecreated := false
+				if oldSessionID != "" {
+					sessionRecreated = d.recreateSession()
 				}
 
 				// Single line notification that doesn't disrupt the terminal
-				if tokenSent {
-					fmt.Printf("\n%s✓ Paired: %s (session shared)%s\n", green, mobile.Name, reset)
+				if sessionRecreated {
+					fmt.Printf("\n%s✓ Paired: %s (session ready)%s\n", green, mobile.Name, reset)
 				} else {
 					fmt.Printf("\n%s✓ Paired: %s%s\n", green, mobile.Name, reset)
 				}
@@ -133,4 +124,64 @@ func (d *Daemon) pollPairingCompletion(token string) {
 			}
 		}
 	}
+}
+
+// recreateSession deletes the current session and creates a new one with tokens for all mobiles
+// This ensures the same flow as initial session creation after pairing
+func (d *Daemon) recreateSession() bool {
+	d.mu.Lock()
+	oldSession := d.session
+	workDir := d.workDir
+	agentType := d.agentType
+	d.mu.Unlock()
+
+	if oldSession == "" {
+		return false
+	}
+
+	// Delete old session on relay
+	if err := d.relayClient.DeleteSession(oldSession); err != nil {
+		fmt.Printf("%sWarning: could not delete old session: %v%s\n", yellow, err, reset)
+		// Continue anyway - create new session
+	}
+
+	// Create new session with tokens for all paired mobiles (same as initial creation)
+	displayName := filepath.Base(workDir)
+	sshInfo := DetectSSHInfo()
+	sessionResp, err := d.relayClient.CreateSession(string(agentType), workDir, displayName, sshInfo)
+	if err != nil {
+		fmt.Printf("%sWarning: could not create new session: %v%s\n", yellow, err, reset)
+		return false
+	}
+
+	// Update daemon state
+	d.mu.Lock()
+	d.session = sessionResp.SessionID
+	d.token = sessionResp.Token
+	d.mu.Unlock()
+
+	// Reinitialize encryption with new token
+	if err := d.initEncryption(); err != nil {
+		fmt.Printf("%sWarning: could not reinit encryption: %v%s\n", yellow, err, reset)
+		return false
+	}
+
+	// Save new session locally
+	saveSession(workDir, &SessionData{
+		Session:   sessionResp.SessionID,
+		Token:     sessionResp.Token,
+		Relay:     d.relay,
+		Command:   d.command,
+		WorkDir:   workDir,
+		CreatedAt: time.Now().Format(time.RFC3339),
+	})
+
+	// Close WebSocket to force reconnect with new session ID
+	d.mu.Lock()
+	if d.wsConn != nil {
+		d.wsConn.Close()
+	}
+	d.mu.Unlock()
+
+	return true
 }
