@@ -35,7 +35,7 @@ AIPilot transforms your smartphone into a **voice remote control** for AI coding
 ```
 ┌─────────────────┐       WebSocket        ┌─────────────────┐
 │                 │      via Relay         │                 │
-│   AIPilot CLI   │◄─────────────────────►│  AIPilot App    │
+│   AIPilot CLI   │◄──────────────────────►│  AIPilot App    │
 │   (Your PC)     │                        │  (Your Phone)   │
 │                 │                        │                 │
 └────────┬────────┘                        └─────────────────┘
