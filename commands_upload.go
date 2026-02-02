@@ -179,12 +179,9 @@ func (d *Daemon) insertFileReference(filePath string) {
 	case AgentAider:
 		// Aider: use /add command
 		insertCmd = fmt.Sprintf("/add %s\n", filePath)
-	case AgentGemini:
-		// Gemini: use @ prefix
+	case AgentGemini, AgentClaude:
+		// Gemini and Claude: use @ prefix to reference files
 		insertCmd = fmt.Sprintf("@%s ", filePath)
-	case AgentClaude:
-		// Claude: just output the path, user decides
-		insertCmd = filePath + " "
 	default:
 		// Unknown agent: just output the path
 		insertCmd = filePath + " "
