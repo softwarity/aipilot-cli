@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"sync/atomic"
 	"time"
 
 	"github.com/skip2/go-qrcode"
@@ -57,6 +58,8 @@ func (d *Daemon) showPairingQRInAltScreen() {
 	printRaw("\n%sPress ESC or Ctrl+C to close%s\n", dim, reset)
 
 	// Read keys in a goroutine, only exit on ESC or Ctrl+C
+	// Use atomic flag to signal goroutine to stop
+	var shouldExit int32
 	exitRequested := make(chan bool, 1)
 	go func() {
 		b := make([]byte, 1)
@@ -65,12 +68,20 @@ func (d *Daemon) showPairingQRInAltScreen() {
 			if err != nil || n == 0 {
 				return
 			}
+
+			// Check if we should exit (pairing completed or screen closed)
+			if atomic.LoadInt32(&shouldExit) != 0 {
+				// Forward this key to PTY instead of discarding
+				d.sendToPTY(b[:n])
+				return
+			}
+
 			// ESC (0x1b) or Ctrl+C (0x03) to exit
 			if b[0] == 0x1b || b[0] == 0x03 {
 				exitRequested <- true
 				return
 			}
-			// Ignore all other keys (don't echo, don't exit)
+			// Ignore all other keys while in QR screen
 		}
 	}()
 
@@ -82,6 +93,9 @@ func (d *Daemon) showPairingQRInAltScreen() {
 		// Pairing completed, auto-exit
 		time.Sleep(500 * time.Millisecond) // Brief pause to show success message
 	}
+
+	// Signal goroutine to stop intercepting keys
+	atomic.StoreInt32(&shouldExit, 1)
 
 	// Restore main screen and show cursor
 	fmt.Print(showCursor + altScreenOff)
