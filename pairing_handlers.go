@@ -22,7 +22,7 @@ func showPCStatus(config *PCConfig) {
 
 	if len(config.PairedMobiles) == 0 {
 		fmt.Printf("  %sNo paired mobile devices%s\n", dim, reset)
-		fmt.Printf("\n  Run %saipilot-cli%s and use %s//qr%s to pair a mobile device.\n", cyan, reset, cyan, reset)
+		fmt.Printf("\n  Run %saipilot-cli%s and type %s/qr%s to pair a mobile device.\n", cyan, reset, cyan, reset)
 	} else {
 		fmt.Printf("%s  Paired Mobiles:%s\n", bold, reset)
 		for _, mobile := range config.PairedMobiles {
@@ -117,7 +117,7 @@ func handlePairing(config *PCConfig, client *RelayClient, relayURL string) error
 	for {
 		select {
 		case <-timeout:
-			fmt.Printf("\n%sPairing timed out. Use //qr to retry.%s\n", red, reset)
+			fmt.Printf("\n%sPairing timed out. Type /qr to retry.%s\n", red, reset)
 			return nil
 		case <-ticker.C:
 			status, err := client.CheckPairingStatus(pairingResp.Token)
@@ -144,7 +144,7 @@ func handlePairing(config *PCConfig, client *RelayClient, relayURL string) error
 				return nil
 
 			case "expired":
-				fmt.Printf("\n%sPairing token expired. Use //qr to retry.%s\n", red, reset)
+				fmt.Printf("\n%sPairing token expired. Type /qr to retry.%s\n", red, reset)
 				return nil
 
 			case "pending":

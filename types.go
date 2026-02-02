@@ -28,6 +28,8 @@ const (
 	altScreenOff = "\033[?1049l" // Restore main screen
 	clearScreen  = "\033[2J"     // Clear entire screen
 	cursorHome   = "\033[H"      // Move cursor to top-left
+	hideCursor   = "\033[?25l"   // Hide cursor
+	showCursor   = "\033[?25h"   // Show cursor
 )
 
 // Version and RelayURL are set at build time via -ldflags

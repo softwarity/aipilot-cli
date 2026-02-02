@@ -1,15 +1,26 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
+	"strings"
 	"time"
+
+	"github.com/skip2/go-qrcode"
 )
 
-// getAIPilotCommand checks if a line is an AIPilot command (prefixed with //)
+// printRaw prints text with \n converted to \r\n for raw terminal mode
+func printRaw(format string, args ...interface{}) {
+	text := fmt.Sprintf(format, args...)
+	text = strings.ReplaceAll(text, "\n", "\r\n")
+	fmt.Print(text)
+}
+
+// getAIPilotCommand checks if a line is an AIPilot command
 func (d *Daemon) getAIPilotCommand(line string) string {
 	switch line {
-	case "//qr":
+	case "/qr":
 		return "qr"
 	}
 	return ""
@@ -23,7 +34,7 @@ func (d *Daemon) executeAIPilotCommand(cmd string) {
 	}
 }
 
-// showPairingQRInAltScreen shows QR in alt screen, exits on keypress OR pairing completion
+// showPairingQRInAltScreen shows QR in alt screen, exits on ESC/Ctrl+C or pairing completion
 func (d *Daemon) showPairingQRInAltScreen() {
 	// Clear agent screen BEFORE switching to alt screen
 	d.sendToPTY([]byte{0x03}) // Ctrl+C to cancel any input
@@ -31,35 +42,179 @@ func (d *Daemon) showPairingQRInAltScreen() {
 	d.sendToPTY([]byte{0x0c}) // Ctrl+L to clear/redraw
 	time.Sleep(50 * time.Millisecond)
 
-	// Switch to alternate screen and clear
-	fmt.Print(altScreenOn + clearScreen + cursorHome)
+	// Switch to alternate screen, clear, and hide cursor
+	fmt.Print(altScreenOn + clearScreen + cursorHome + hideCursor)
 
 	// Channel to signal pairing completion
 	pairingDone := make(chan bool, 1)
 
-	// Show QR and start polling (passing the channel)
-	d.showPairingQRWithCallback(false, func() {
+	// Show QR in raw mode (using \r\n)
+	d.showPairingQRRaw(func() {
 		pairingDone <- true
 	})
 
-	// Wait for any key in a goroutine
-	keyPressed := make(chan bool, 1)
+	// Show exit hint
+	printRaw("\n%sPress ESC or Ctrl+C to close%s\n", dim, reset)
+
+	// Read keys in a goroutine, only exit on ESC or Ctrl+C
+	exitRequested := make(chan bool, 1)
 	go func() {
 		b := make([]byte, 1)
-		os.Stdin.Read(b)
-		keyPressed <- true
+		for {
+			n, err := os.Stdin.Read(b)
+			if err != nil || n == 0 {
+				return
+			}
+			// ESC (0x1b) or Ctrl+C (0x03) to exit
+			if b[0] == 0x1b || b[0] == 0x03 {
+				exitRequested <- true
+				return
+			}
+			// Ignore all other keys (don't echo, don't exit)
+		}
 	}()
 
-	// Wait for either keypress or pairing completion
+	// Wait for exit key or pairing completion
 	select {
-	case <-keyPressed:
-		// User pressed a key, exit
+	case <-exitRequested:
+		// User pressed ESC or Ctrl+C
 	case <-pairingDone:
 		// Pairing completed, auto-exit
 		time.Sleep(500 * time.Millisecond) // Brief pause to show success message
 	}
 
-	// Restore main screen
-	fmt.Print(altScreenOff)
+	// Restore main screen and show cursor
+	fmt.Print(showCursor + altScreenOff)
+}
+
+// showPairingQRRaw displays pairing QR in raw terminal mode (uses \r\n)
+func (d *Daemon) showPairingQRRaw(onComplete func()) {
+	if d.relayClient == nil || d.pcConfig == nil {
+		printRaw("%sError: Cannot create pairing QR%s\n", red, reset)
+		return
+	}
+
+	// Initialize pairing on relay
+	printRaw("%sCreating pairing code...%s\n", dim, reset)
+	pairingResp, err := d.relayClient.InitPairing()
+	if err != nil {
+		printRaw("%sError: %v%s\n", red, err)
+		return
+	}
+
+	// Create QR data
+	qrData := PairingQRData{
+		Type:      "pairing",
+		Relay:     d.relay,
+		Token:     pairingResp.Token,
+		PCID:      d.pcConfig.PCID,
+		PCName:    d.pcConfig.PCName,
+		PublicKey: d.pcConfig.PublicKey,
+	}
+
+	// Include session info if we have an active session
+	d.mu.RLock()
+	sessionID := d.session
+	workDir := d.workDir
+	agentType := d.agentType
+	d.mu.RUnlock()
+
+	if sessionID != "" {
+		qrData.SessionID = sessionID
+		qrData.WorkingDir = workDir
+		qrData.AgentType = string(agentType)
+
+		// Add SSH info
+		sshInfo := DetectSSHInfo()
+		if sshInfo != nil && sshInfo.Available {
+			qrData.SSHAvailable = true
+			qrData.SSHPort = sshInfo.Port
+			qrData.Hostname = sshInfo.Hostname
+			qrData.Username = sshInfo.Username
+		}
+	}
+
+	qrJSON, err := json.Marshal(qrData)
+	if err != nil {
+		printRaw("%sError creating QR: %v%s\n", red, err)
+		return
+	}
+
+	printRaw("\n%sScan to pair a new mobile device:%s\n\n", bold, reset)
+
+	// Generate and print QR code with \r\n
+	qr, err := qrcode.New(string(qrJSON), qrcode.Medium)
+	if err != nil {
+		printRaw("%sError generating QR code: %v%s\n", red, err)
+		return
+	}
+	qrStr := qr.ToSmallString(false)
+	printRaw("%s", qrStr)
+
+	printRaw("\n  PC: %s\n", d.pcConfig.PCName)
+	printRaw("  Expires: %s\n", pairingResp.ExpiresAt)
+
+	// Start background polling for pairing completion
+	go d.pollPairingCompletionRaw(pairingResp.Token, onComplete)
+}
+
+// pollPairingCompletionRaw polls for pairing completion with raw mode output
+func (d *Daemon) pollPairingCompletionRaw(token string, onComplete func()) {
+	ticker := time.NewTicker(PairingPollInterval)
+	defer ticker.Stop()
+	timeout := time.After(PairingTimeout)
+
+	for {
+		select {
+		case <-timeout:
+			return // Silently timeout
+		case <-ticker.C:
+			status, err := d.relayClient.CheckPairingStatus(token)
+			if err != nil {
+				continue
+			}
+
+			switch status.Status {
+			case "completed":
+				existingMobile := d.pcConfig.getPairedMobile(status.MobileID)
+				samePublicKey := existingMobile != nil && existingMobile.PublicKey == status.PublicKey
+
+				mobile := PairedMobile{
+					ID:        status.MobileID,
+					Name:      status.MobileName,
+					PublicKey: status.PublicKey,
+					PairedAt:  time.Now().Format(time.RFC3339),
+				}
+				d.pcConfig.addPairedMobile(mobile)
+				savePCConfig(d.pcConfig)
+
+				d.mu.RLock()
+				oldSessionID := d.session
+				d.mu.RUnlock()
+
+				tokenShared := false
+				if oldSessionID != "" && !samePublicKey {
+					tokenShared = d.addTokenForMobile(mobile)
+				}
+
+				// Single line notification
+				if samePublicKey {
+					printRaw("\n%s✓ Paired: %s (session unchanged)%s\n", green, mobile.Name, reset)
+				} else if tokenShared {
+					printRaw("\n%s✓ Paired: %s (session shared)%s\n", green, mobile.Name, reset)
+				} else {
+					printRaw("\n%s✓ Paired: %s%s\n", green, mobile.Name, reset)
+				}
+
+				if onComplete != nil {
+					onComplete()
+				}
+				return
+
+			case "expired":
+				return
+			}
+		}
+	}
 }
 

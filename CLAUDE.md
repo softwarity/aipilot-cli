@@ -57,7 +57,7 @@ make major   # X.0.0
 | `relay_api.go` | Client REST pour API relay |
 | `session.go` | Persistance sessions locales |
 | `ssh.go` | Detection SSH, installation cles authorized_keys |
-| `commands_session.go` | Commandes //qr, //status, //quit |
+| `commands_session.go` | Commande /qr (affichage QR pairing) |
 | `commands_pairing.go` | Affichage QR pairing depuis daemon |
 | `commands_info.go` | Envoi info CLI au mobile |
 | `commands_terminal.go` | Traitement messages controle (resize, file-upload) |
@@ -128,11 +128,11 @@ Le CLI appelle ces endpoints sur le relay:
 
 ## Commandes utilisateur
 
-Commandes tapees dans le terminal (prefixe `//`):
+Commandes tapees dans le terminal:
 
 | Commande | Action |
 |----------|--------|
-| `//qr` | Affiche QR pairing (alternate screen, press any key to return) |
+| `/qr` | Affiche QR pairing (alternate screen, ESC/Ctrl+C pour quitter) |
 
 Note: Le cleanup de session est automatique quand l'agent se termine (`/exit`, Ctrl+C, etc.)
 
@@ -283,7 +283,7 @@ go func() {
     for {
         b := make([]byte, 1)
         os.Stdin.Read(b)
-        // Detection //qr, //status, //quit
+        // Detection /qr command
         daemon.sendToPTY(b)
     }
 }()

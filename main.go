@@ -243,7 +243,8 @@ func createDaemon(session, token, relay, command, workDir string, agentType Agen
 // displayHeader displays the application header and session info
 func displayHeader(daemon *Daemon, session, command, workDir, agentVersion string) {
 	fmt.Println()
-	fmt.Printf("%s%sAIPilot CLI%s %s[%s]%s\n", bold, cyan, reset, dim, Build, reset)
+	fmt.Printf("%s%sAIPilot CLI%s %s[%s]%s  %s%s/qr%s %sto pair mobile%s\n",
+		bold, cyan, reset, dim, Build, reset, bold, cyan, reset, dim, reset)
 	fmt.Println()
 
 	// Connect to relay early
@@ -270,8 +271,6 @@ func displayHeader(daemon *Daemon, session, command, workDir, agentVersion strin
 	fmt.Println()
 	fmt.Printf("  WorkDir:  %s\n", workDir)
 	fmt.Printf("  Platform: %s/%s\n", runtime.GOOS, runtime.GOARCH)
-	fmt.Println()
-	fmt.Printf("%sAIPilot: //qr%s\n", dim, reset)
 	fmt.Println()
 }
 
@@ -349,6 +348,7 @@ func setupRawTerminal(daemon *Daemon) *term.State {
 }
 
 // startStdinReader starts a goroutine that reads from stdin and writes to PTY
+// It detects /qr command typed on empty line and intercepts it on Enter
 func startStdinReader(daemon *Daemon, oldState *term.State) {
 	go func() {
 		lineBuf := ""
@@ -365,6 +365,7 @@ func startStdinReader(daemon *Daemon, oldState *term.State) {
 
 			// Track escape sequences
 			if char == 0x1b { // ESC
+				lineBuf = ""
 				inEscapeSeq = true
 				daemon.sendToPTY(b)
 				continue
@@ -376,21 +377,31 @@ func startStdinReader(daemon *Daemon, oldState *term.State) {
 				continue
 			}
 
-			// Printable characters
-			if !inEscapeSeq && char >= 32 && char < 127 {
+			// Printable characters - send to PTY, accumulate in lineBuf
+			if char >= 32 && char < 127 {
 				lineBuf += string(char)
 				daemon.sendToPTY(b)
 				daemon.schedulePCSwitch()
 				continue
 			}
 
-			// Enter key
+			// Enter key - check for /qr command
 			if char == '\r' || char == '\n' {
-				lineBuf = handleEnterKey(daemon, lineBuf, b, oldState)
+				cmd := strings.TrimSpace(strings.ToLower(lineBuf))
+				if aipilotCmd := daemon.getAIPilotCommand(cmd); aipilotCmd != "" {
+					// It's an AIPilot command - clear line with Ctrl+U and execute
+					daemon.sendToPTY([]byte{0x15}) // Ctrl+U to clear line
+					lineBuf = ""
+					daemon.executeAIPilotCommand(aipilotCmd)
+				} else {
+					// Not a command - forward Enter
+					daemon.sendToPTY(b)
+					lineBuf = ""
+				}
 				continue
 			}
 
-			// Backspace
+			// Backspace - update lineBuf
 			if char == 127 || char == 8 {
 				if len(lineBuf) > 0 {
 					lineBuf = lineBuf[:len(lineBuf)-1]
@@ -399,40 +410,20 @@ func startStdinReader(daemon *Daemon, oldState *term.State) {
 				continue
 			}
 
-			// Ctrl+C or Ctrl+U - reset buffer
+			// Ctrl+C or Ctrl+U - reset lineBuf
 			if char == 3 || char == 0x15 {
 				lineBuf = ""
 				daemon.sendToPTY(b)
 				continue
 			}
 
-			// Other characters
+			// Other control characters - reset lineBuf and pass through
+			lineBuf = ""
 			daemon.sendToPTY(b)
 		}
 	}()
 }
 
-// handleEnterKey processes the enter key and returns the new line buffer
-func handleEnterKey(daemon *Daemon, lineBuf string, b []byte, oldState *term.State) string {
-	cmd := strings.TrimSpace(strings.ToLower(lineBuf))
-	if aipilotCmd := daemon.getAIPilotCommand(cmd); aipilotCmd != "" {
-		daemon.sendToPTY([]byte{0x15}) // Ctrl+U
-
-		if oldState != nil {
-			term.Restore(daemon.stdinFd, oldState)
-		}
-
-		daemon.executeAIPilotCommand(aipilotCmd)
-
-		if oldState != nil {
-			newState, _ := term.MakeRaw(daemon.stdinFd)
-			daemon.oldState = newState
-		}
-	} else {
-		daemon.sendToPTY(b)
-	}
-	return ""
-}
 
 // startResizeHandler starts a goroutine that handles terminal resize signals
 func startResizeHandler(daemon *Daemon, resizeChan <-chan os.Signal) {
