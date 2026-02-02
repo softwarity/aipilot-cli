@@ -166,6 +166,21 @@ func (d *Daemon) handleWebSocketMessages(conn *websocket.Conn) {
 		case "disconnected":
 			d.setMobileConnected(false)
 
+		case "mobile_paired":
+			// A new mobile was paired on this PC - add our session token for it
+			if msg.MobileID != "" && msg.PublicKey != "" {
+				mobile := PairedMobile{
+					ID:        msg.MobileID,
+					Name:      msg.MobileName,
+					PublicKey: msg.PublicKey,
+				}
+				// Update local pcConfig with the new mobile
+				d.pcConfig.addPairedMobile(mobile)
+				savePCConfig(d.pcConfig)
+				// Add encrypted token for this session
+				d.addTokenForMobile(mobile)
+			}
+
 		case "pong":
 			// Keepalive response
 		}

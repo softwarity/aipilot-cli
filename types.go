@@ -109,14 +109,17 @@ type Daemon struct {
 
 // Message types for WebSocket communication
 type Message struct {
-	Type    string `json:"type"`
-	Session string `json:"session,omitempty"`
-	Token   string `json:"token,omitempty"`
-	Role    string `json:"role,omitempty"`
-	Payload string `json:"payload,omitempty"`
-	Cols    int    `json:"cols,omitempty"`
-	Rows    int    `json:"rows,omitempty"`
-	Error   string `json:"error,omitempty"`
+	Type       string `json:"type"`
+	Session    string `json:"session,omitempty"`
+	Token      string `json:"token,omitempty"`
+	Role       string `json:"role,omitempty"`
+	Payload    string `json:"payload,omitempty"`
+	Cols       int    `json:"cols,omitempty"`
+	Rows       int    `json:"rows,omitempty"`
+	Error      string `json:"error,omitempty"`
+	MobileID   string `json:"mobile_id,omitempty"`
+	MobileName string `json:"mobile_name,omitempty"`
+	PublicKey  string `json:"public_key,omitempty"`
 }
 
 // Daemon helper methods for state access
