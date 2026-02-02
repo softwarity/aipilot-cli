@@ -22,6 +22,7 @@ import (
 // cliFlags holds all parsed command-line flags
 type cliFlags struct {
 	agent         string
+	selectAgent   bool
 	workDir       string
 	listAgents    bool
 	listSessions  bool
@@ -33,7 +34,8 @@ type cliFlags struct {
 
 // parseFlags parses command-line arguments and returns the flags
 func parseFlags() *cliFlags {
-	agent := flag.String("agent", "", "Agent to run (claude, aider, gemini). Use '?' to force re-selection.")
+	agent := flag.String("agent", "", "Agent to run (claude, aider, gemini)")
+	selectAgent := flag.Bool("select", false, "Force agent selection (ignore saved preference)")
 	workDir := flag.String("workdir", "", "Working directory")
 	showVersion := flag.Bool("version", false, "Show version and exit")
 	listAgents := flag.Bool("agents", false, "List available AI agents and exit")
@@ -51,6 +53,7 @@ func parseFlags() *cliFlags {
 
 	return &cliFlags{
 		agent:         *agent,
+		selectAgent:   *selectAgent,
 		workDir:       *workDir,
 		listAgents:    *listAgents,
 		listSessions:  *listSessions,
@@ -154,11 +157,11 @@ func resolveWorkDir(workDir string) string {
 // selectAgentCommand selects the agent command based on flags and saved preferences
 func selectAgentCommand(flags *cliFlags, workDir string) string {
 	// Agent selection logic:
-	// 1. If --agent ?: force re-selection
+	// 1. If --select or --agent ?: force re-selection
 	// 2. If --agent <name> specified: use that agent
 	// 3. Otherwise: use saved agent for this directory, or detect/ask
 
-	if flags.agent == "?" {
+	if flags.selectAgent || flags.agent == "?" {
 		// Force re-selection
 		agents := detectAvailableAgents()
 		if len(agents) == 0 {

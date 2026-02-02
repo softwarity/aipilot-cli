@@ -98,7 +98,7 @@ func (d *Daemon) showPairingQRRaw(onComplete func()) {
 	printRaw("%sCreating pairing code...%s\n", dim, reset)
 	pairingResp, err := d.relayClient.InitPairing()
 	if err != nil {
-		printRaw("%sError: %v%s\n", red, err)
+		printRaw("%sError: %v%s\n", red, err, reset)
 		return
 	}
 
@@ -136,7 +136,7 @@ func (d *Daemon) showPairingQRRaw(onComplete func()) {
 
 	qrJSON, err := json.Marshal(qrData)
 	if err != nil {
-		printRaw("%sError creating QR: %v%s\n", red, err)
+		printRaw("%sError creating QR: %v%s\n", red, err, reset)
 		return
 	}
 
@@ -145,7 +145,7 @@ func (d *Daemon) showPairingQRRaw(onComplete func()) {
 	// Generate and print QR code with \r\n
 	qr, err := qrcode.New(string(qrJSON), qrcode.Medium)
 	if err != nil {
-		printRaw("%sError generating QR code: %v%s\n", red, err)
+		printRaw("%sError generating QR code: %v%s\n", red, err, reset)
 		return
 	}
 	qrStr := qr.ToSmallString(false)
