@@ -48,8 +48,9 @@ jobs:
         env:
           GOOS: ${{ matrix.goos }}
           GOARCH: ${{ matrix.goarch }}
+          RELAY_URL: ${{ vars.RELAY_URL || 'wss://aipilot-relay.softwarity.io' }}
         run: |
-          go build -ldflags="-s -w -X main.Version=${{ steps.version.outputs.VERSION }} -X main.RelayURL=${{ vars.RELAY_URL }}" -o aipilot-cli-${{ matrix.suffix }} .
+          go build -ldflags="-s -w -X main.Version=${{ steps.version.outputs.VERSION }} -X main.RelayURL=${RELAY_URL}" -o aipilot-cli-${{ matrix.suffix }} .
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
