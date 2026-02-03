@@ -42,8 +42,8 @@ jobs:
       - name: Add redirect and .nojekyll
         working-directory: ./public
         run: |
-          cp public/index.html public/dist/browser/
-          touch public/dist/browser/.nojekyll
+          cp public/index.html dist/browser/
+          touch dist/browser/.nojekyll
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
@@ -51,7 +51,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: public/dist/browser
+          path: dist/browser
 
   deploy:
     environment:
