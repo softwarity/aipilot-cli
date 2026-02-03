@@ -34,7 +34,7 @@ type cliFlags struct {
 
 // parseFlags parses command-line arguments and returns the flags
 func parseFlags() *cliFlags {
-	agent := flag.String("agent", "", "Agent to run (claude, aider, gemini)")
+	agent := flag.String("agent", "", "Agent to run (claude, gemini, codex)")
 	selectAgent := flag.Bool("select", false, "Force agent selection (ignore saved preference)")
 	workDir := flag.String("workdir", "", "Working directory")
 	showVersion := flag.Bool("version", false, "Show version and exit")
@@ -127,7 +127,7 @@ func handleListAgents(listAgents bool) {
 	agents := detectAvailableAgents()
 	if len(agents) == 0 {
 		fmt.Println("No AI agents found in PATH.")
-		fmt.Println("Supported agents: claude, aider, codex, copilot, cursor")
+		fmt.Println("Supported agents: claude, gemini, codex")
 		os.Exit(1)
 	}
 	fmt.Printf("\n%s=== Available AI Agents ===%s\n", bold, reset)

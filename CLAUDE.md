@@ -4,7 +4,7 @@ Ce fichier fournit le contexte pour Claude Code travaillant sur le projet CLI.
 
 ## Vue d'ensemble
 
-Le CLI AIPilot est un daemon Go qui spawn un PTY (pseudo-terminal) avec un agent IA (claude, aider, gemini) et permet le controle depuis un mobile via un relay WebSocket. Le CLI agit comme bridge entre le terminal local et l'application mobile.
+Le CLI AIPilot est un daemon Go qui spawn un PTY (pseudo-terminal) avec un agent IA (claude, gemini, codex) et permet le controle depuis un mobile via un relay WebSocket. Le CLI agit comme bridge entre le terminal local et l'application mobile.
 
 ```
 ┌─────────────┐     WebSocket     ┌─────────────┐     WebSocket     ┌─────────────┐
@@ -47,7 +47,7 @@ make major   # X.0.0
 | `main.go` | Entry point, parsing flags, demarrage PTY, boucle I/O |
 | `types.go` | Struct `Daemon`, `Message`, constantes ANSI |
 | `constants.go` | Timeouts, buffer sizes, permissions |
-| `agents.go` | Detection agents IA (claude, aider, gemini), selection |
+| `agents.go` | Detection agents IA (claude, gemini, codex), selection |
 | `encryption.go` | AES-256-GCM pour chiffrement donnees session |
 | `crypto.go` | X25519 ECDH, NaCl box pour chiffrement tokens |
 | `websocket.go` | Connexion relay, gestion messages WebSocket |
@@ -141,7 +141,7 @@ Note: Le cleanup de session est automatique quand l'agent se termine (`/exit`, C
 ```bash
 aipilot-cli [options]
 
---agent <name>      # Agent a executer (claude, aider, gemini)
+--agent <name>      # Agent a executer (claude, gemini, codex)
 --agent ?           # Force re-selection de l'agent
 --workdir <path>    # Repertoire de travail
 --agents            # Liste agents disponibles

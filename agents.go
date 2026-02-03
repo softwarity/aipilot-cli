@@ -10,11 +10,9 @@ import (
 type AgentType string
 
 const (
-	AgentClaude  AgentType = "claude"
-	AgentGemini  AgentType = "gemini"
-	AgentOpenAI  AgentType = "openai"
-	AgentAider   AgentType = "aider"
-	AgentGeneric AgentType = "generic"
+	AgentClaude AgentType = "claude"
+	AgentGemini AgentType = "gemini"
+	AgentCodex  AgentType = "codex"
 )
 
 // AgentInfo contains information about a detected agent
@@ -32,8 +30,8 @@ var knownAgents = []struct {
 	displayName string
 }{
 	{"claude", AgentClaude, "Claude Code"},
-	{"aider", AgentAider, "Aider"},
 	{"gemini", AgentGemini, "Google Gemini CLI"},
+	{"codex", AgentCodex, "OpenAI Codex"},
 }
 
 func checkCommand(command string) (string, error) {
@@ -51,12 +49,10 @@ func detectAgentType(command string) AgentType {
 		return AgentClaude
 	case strings.Contains(cmd, "gemini"):
 		return AgentGemini
-	case strings.Contains(cmd, "gpt") || strings.Contains(cmd, "codex") || strings.Contains(cmd, "openai"):
-		return AgentOpenAI
-	case strings.Contains(cmd, "aider"):
-		return AgentAider
+	case strings.Contains(cmd, "codex"):
+		return AgentCodex
 	default:
-		return AgentGeneric
+		return AgentClaude
 	}
 }
 

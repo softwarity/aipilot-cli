@@ -176,14 +176,14 @@ func (d *Daemon) insertFileReference(filePath string) {
 	var insertCmd string
 
 	switch d.agentType {
-	case AgentAider:
-		// Aider: use /add command
-		insertCmd = fmt.Sprintf("/add %s\n", filePath)
-	case AgentGemini, AgentClaude:
-		// Gemini and Claude: use @ prefix to reference files
+	case AgentGemini:
+		// Gemini: use @ prefix to reference files
 		insertCmd = fmt.Sprintf("@%s ", filePath)
+	case AgentCodex:
+		// Codex: use /mention command
+		insertCmd = fmt.Sprintf("/mention %s ", filePath)
 	default:
-		// Unknown agent: just output the path
+		// Claude and others: just output the path
 		insertCmd = filePath + " "
 	}
 
