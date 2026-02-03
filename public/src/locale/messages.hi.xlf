@@ -39,7 +39,6 @@
       <trans-unit id="pricing.pro.feature4" datatype="html"><source>E2E encryption</source><target>E2E एन्क्रिप्शन</target></trans-unit>
       <trans-unit id="pricing.pro.feature5" datatype="html"><source>SSH connections</source><target>SSH कनेक्शन</target></trans-unit>
       <trans-unit id="pricing.pro.feature6" datatype="html"><source>File &amp; image upload</source><target>फाइल और इमेज अपलोड</target></trans-unit>
-      <trans-unit id="pricing.pro.feature7" datatype="html"><source>Custom agent configuration</source><target>कस्टम एजेंट कॉन्फ़िगरेशन</target></trans-unit>
       <trans-unit id="pricing.pro.cta" datatype="html"><source>Get Pro</source><target>प्रो प्राप्त करें</target></trans-unit>
       <trans-unit id="installation.title" datatype="html"><source>Installation</source><target>इंस्टॉलेशन</target></trans-unit>
       <trans-unit id="installation.step1.title" datatype="html"><source>Install the CLI</source><target>CLI इंस्टॉल करें</target></trans-unit>
@@ -50,12 +49,17 @@
       <trans-unit id="doc.cliQR" datatype="html"><source>When you run the CLI for the first time, a QR code will be displayed in your terminal:</source><target>जब आप पहली बार CLI चलाते हैं, तो टर्मिनल में QR कोड दिखाई देगा:</target></trans-unit>
       <trans-unit id="installation.step2.title" datatype="html"><source>Install the Mobile App</source><target>मोबाइल ऐप इंस्टॉल करें</target></trans-unit>
       <trans-unit id="installation.step2.desc" datatype="html"><source>Get AIPilot from Google Play or App Store</source><target>Google Play या App Store से AIPilot प्राप्त करें</target></trans-unit>
+      <trans-unit id="installation.free" datatype="html"><source>Free</source><target>मुफ्त</target></trans-unit>
+      <trans-unit id="installation.pro" datatype="html"><source>Pro</source><target>प्रो</target></trans-unit>
       <trans-unit id="doc.welcomeScreen" datatype="html"><source>When you open the app for the first time, you'll see the welcome screen:</source><target>जब आप पहली बार ऐप खोलते हैं, तो वेलकम स्क्रीन दिखाई देगी:</target></trans-unit>
       <trans-unit id="installation.step3.title" datatype="html"><source>Pair Your Device</source><target>डिवाइस पेयर करें</target></trans-unit>
       <trans-unit id="installation.step3.desc" datatype="html"><source>Scan the QR code to pair your mobile with the CLI</source><target>अपने मोबाइल को CLI के साथ पेयर करने के लिए QR कोड स्कैन करें</target></trans-unit>
       <trans-unit id="doc.scanQR" datatype="html"><source>Tap the "Get aipilot-cli" button or the scan button to open the QR scanner. Point your camera at the QR code displayed in your terminal:</source><target>"aipilot-cli प्राप्त करें" बटन या स्कैन बटन पर टैप करके QR स्कैनर खोलें। अपने टर्मिनल में दिखाए गए QR कोड पर कैमरा पॉइंट करें:</target></trans-unit>
       <trans-unit id="doc.caption.scanner" datatype="html"><source>Scanning QR code</source><target>QR कोड स्कैन हो रहा है</target></trans-unit>
       <trans-unit id="doc.caption.paired" datatype="html"><source>Successfully paired</source><target>सफलतापूर्वक पेयर हुआ</target></trans-unit>
+      <trans-unit id="doc.caption.welcome" datatype="html"><source>Welcome screen</source><target>वेलकम स्क्रीन</target></trans-unit>
+      <trans-unit id="doc.caption.voice" datatype="html"><source>Voice input</source><target>वॉइस इनपुट</target></trans-unit>
+      <trans-unit id="doc.caption.history" datatype="html"><source>Command history</source><target>कमांड हिस्ट्री</target></trans-unit>
       <trans-unit id="installation.step4.title" datatype="html"><source>Start Coding</source><target>कोडिंग शुरू करें</target></trans-unit>
       <trans-unit id="installation.step4.desc" datatype="html"><source>Control your AI agent from anywhere</source><target>कहीं से भी अपने AI एजेंट को नियंत्रित करें</target></trans-unit>
       <trans-unit id="doc.homeScreen" datatype="html"><source>Once paired, you'll see your sessions on the home screen. Tap a session to connect:</source><target>पेयर होने के बाद, होम स्क्रीन पर सेशन दिखाई देंगे। कनेक्ट करने के लिए सेशन पर टैप करें:</target></trans-unit>

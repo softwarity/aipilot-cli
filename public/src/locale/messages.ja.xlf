@@ -39,7 +39,6 @@
       <trans-unit id="pricing.pro.feature4" datatype="html"><source>E2E encryption</source><target>E2E暗号化</target></trans-unit>
       <trans-unit id="pricing.pro.feature5" datatype="html"><source>SSH connections</source><target>SSH接続</target></trans-unit>
       <trans-unit id="pricing.pro.feature6" datatype="html"><source>File &amp; image upload</source><target>ファイルと画像のアップロード</target></trans-unit>
-      <trans-unit id="pricing.pro.feature7" datatype="html"><source>Custom agent configuration</source><target>カスタムエージェント設定</target></trans-unit>
       <trans-unit id="pricing.pro.cta" datatype="html"><source>Get Pro</source><target>プロを取得</target></trans-unit>
       <trans-unit id="installation.title" datatype="html"><source>Installation</source><target>インストール</target></trans-unit>
       <trans-unit id="installation.step1.title" datatype="html"><source>Install the CLI</source><target>CLIをインストール</target></trans-unit>
@@ -50,12 +49,17 @@
       <trans-unit id="doc.cliQR" datatype="html"><source>When you run the CLI for the first time, a QR code will be displayed in your terminal:</source><target>初めてCLIを実行すると、ターミナルにQRコードが表示されます:</target></trans-unit>
       <trans-unit id="installation.step2.title" datatype="html"><source>Install the Mobile App</source><target>モバイルアプリをインストール</target></trans-unit>
       <trans-unit id="installation.step2.desc" datatype="html"><source>Get AIPilot from Google Play or App Store</source><target>Google PlayまたはApp StoreからAIPilotを入手</target></trans-unit>
+      <trans-unit id="installation.free" datatype="html"><source>Free</source><target>無料</target></trans-unit>
+      <trans-unit id="installation.pro" datatype="html"><source>Pro</source><target>プロ</target></trans-unit>
       <trans-unit id="doc.welcomeScreen" datatype="html"><source>When you open the app for the first time, you'll see the welcome screen:</source><target>初めてアプリを開くと、ウェルカム画面が表示されます:</target></trans-unit>
       <trans-unit id="installation.step3.title" datatype="html"><source>Pair Your Device</source><target>デバイスをペアリング</target></trans-unit>
       <trans-unit id="installation.step3.desc" datatype="html"><source>Scan the QR code to pair your mobile with the CLI</source><target>QRコードをスキャンしてモバイルをCLIとペアリング</target></trans-unit>
       <trans-unit id="doc.scanQR" datatype="html"><source>Tap the "Get aipilot-cli" button or the scan button to open the QR scanner. Point your camera at the QR code displayed in your terminal:</source><target>「aipilot-cliを取得」ボタンまたはスキャンボタンをタップしてQRスキャナーを開きます。ターミナルに表示されているQRコードにカメラを向けてください:</target></trans-unit>
       <trans-unit id="doc.caption.scanner" datatype="html"><source>Scanning QR code</source><target>QRコードをスキャン</target></trans-unit>
       <trans-unit id="doc.caption.paired" datatype="html"><source>Successfully paired</source><target>ペアリング成功</target></trans-unit>
+      <trans-unit id="doc.caption.welcome" datatype="html"><source>Welcome screen</source><target>ウェルカム画面</target></trans-unit>
+      <trans-unit id="doc.caption.voice" datatype="html"><source>Voice input</source><target>音声入力</target></trans-unit>
+      <trans-unit id="doc.caption.history" datatype="html"><source>Command history</source><target>コマンド履歴</target></trans-unit>
       <trans-unit id="installation.step4.title" datatype="html"><source>Start Coding</source><target>コーディング開始</target></trans-unit>
       <trans-unit id="installation.step4.desc" datatype="html"><source>Control your AI agent from anywhere</source><target>どこからでもAIエージェントを制御</target></trans-unit>
       <trans-unit id="doc.homeScreen" datatype="html"><source>Once paired, you'll see your sessions on the home screen. Tap a session to connect:</source><target>ペアリング後、ホーム画面にセッションが表示されます。セッションをタップして接続:</target></trans-unit>

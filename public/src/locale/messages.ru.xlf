@@ -39,7 +39,6 @@
       <trans-unit id="pricing.pro.feature4" datatype="html"><source>E2E encryption</source><target>E2E шифрование</target></trans-unit>
       <trans-unit id="pricing.pro.feature5" datatype="html"><source>SSH connections</source><target>SSH подключения</target></trans-unit>
       <trans-unit id="pricing.pro.feature6" datatype="html"><source>File &amp; image upload</source><target>Загрузка файлов и изображений</target></trans-unit>
-      <trans-unit id="pricing.pro.feature7" datatype="html"><source>Custom agent configuration</source><target>Пользовательская конфигурация агента</target></trans-unit>
       <trans-unit id="pricing.pro.cta" datatype="html"><source>Get Pro</source><target>Получить Pro</target></trans-unit>
       <trans-unit id="installation.title" datatype="html"><source>Installation</source><target>Установка</target></trans-unit>
       <trans-unit id="installation.step1.title" datatype="html"><source>Install the CLI</source><target>Установить CLI</target></trans-unit>
@@ -50,12 +49,17 @@
       <trans-unit id="doc.cliQR" datatype="html"><source>When you run the CLI for the first time, a QR code will be displayed in your terminal:</source><target>Когда вы запускаете CLI впервые, QR код будет отображён в терминале:</target></trans-unit>
       <trans-unit id="installation.step2.title" datatype="html"><source>Install the Mobile App</source><target>Установить мобильное приложение</target></trans-unit>
       <trans-unit id="installation.step2.desc" datatype="html"><source>Get AIPilot from Google Play or App Store</source><target>Получите AIPilot из Google Play или App Store</target></trans-unit>
+      <trans-unit id="installation.free" datatype="html"><source>Free</source><target>Бесплатно</target></trans-unit>
+      <trans-unit id="installation.pro" datatype="html"><source>Pro</source><target>Pro</target></trans-unit>
       <trans-unit id="doc.welcomeScreen" datatype="html"><source>When you open the app for the first time, you'll see the welcome screen:</source><target>Когда вы открываете приложение впервые, вы увидите экран приветствия:</target></trans-unit>
       <trans-unit id="installation.step3.title" datatype="html"><source>Pair Your Device</source><target>Сопрягите устройство</target></trans-unit>
       <trans-unit id="installation.step3.desc" datatype="html"><source>Scan the QR code to pair your mobile with the CLI</source><target>Отсканируйте QR код для сопряжения мобильного с CLI</target></trans-unit>
       <trans-unit id="doc.scanQR" datatype="html"><source>Tap the "Get aipilot-cli" button or the scan button to open the QR scanner. Point your camera at the QR code displayed in your terminal:</source><target>Нажмите кнопку "Получить aipilot-cli" или кнопку сканирования чтобы открыть сканер QR. Наведите камеру на QR код отображаемый в терминале:</target></trans-unit>
       <trans-unit id="doc.caption.scanner" datatype="html"><source>Scanning QR code</source><target>Сканирование QR кода</target></trans-unit>
       <trans-unit id="doc.caption.paired" datatype="html"><source>Successfully paired</source><target>Успешно сопряжено</target></trans-unit>
+      <trans-unit id="doc.caption.welcome" datatype="html"><source>Welcome screen</source><target>Экран приветствия</target></trans-unit>
+      <trans-unit id="doc.caption.voice" datatype="html"><source>Voice input</source><target>Голосовой ввод</target></trans-unit>
+      <trans-unit id="doc.caption.history" datatype="html"><source>Command history</source><target>История команд</target></trans-unit>
       <trans-unit id="installation.step4.title" datatype="html"><source>Start Coding</source><target>Начните программировать</target></trans-unit>
       <trans-unit id="installation.step4.desc" datatype="html"><source>Control your AI agent from anywhere</source><target>Управляйте вашим AI агентом откуда угодно</target></trans-unit>
       <trans-unit id="doc.homeScreen" datatype="html"><source>Once paired, you'll see your sessions on the home screen. Tap a session to connect:</source><target>После сопряжения вы увидите свои сессии на главном экране. Нажмите на сессию чтобы подключиться:</target></trans-unit>

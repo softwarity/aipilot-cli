@@ -155,43 +155,49 @@
         </div>
       </div>
 
-      <!-- Step 2: Install Mobile App -->
-      <div class="doc-step">
-        <div class="doc-step-header">
-          <div class="step-number">2</div>
-          <h3 i18n="@@installation.step2.title">Install the Mobile App</h3>
-        </div>
-        <div class="doc-step-content">
-          <p i18n="@@installation.step2.desc">Get AIPilot from Google Play or App Store</p>
-          <div class="store-buttons">
-            <a href="https://play.google.com/store/apps/details?id=com.softwarity.aipilot" target="_blank" class="store-button">
-              <img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" alt="Google Play" height="40">
-            </a>
+      <!-- Steps 2 & 3: Install App + Pair Device (side by side) -->
+      <div class="doc-steps-row">
+        <!-- Step 2: Install Mobile App -->
+        <div class="doc-step">
+          <div class="doc-step-header">
+            <div class="step-number">2</div>
+            <h3 i18n="@@installation.step2.title">Install the Mobile App</h3>
           </div>
-          <p i18n="@@doc.welcomeScreen">When you open the app for the first time, you'll see the welcome screen:</p>
-          <div class="doc-screenshot single">
-            <img src="assets/screenshots/welcome.jpeg" alt="Welcome Screen" loading="lazy">
+          <div class="doc-step-content">
+            <p i18n="@@installation.step2.desc">Get AIPilot from Google Play or App Store</p>
+            <div class="store-buttons-grid">
+              <div class="store-option">
+                <span class="store-label" i18n="@@installation.free">Free</span>
+                <a href="https://play.google.com/store/apps/details?id=com.softwarity.aipilot" target="_blank" class="store-button">
+                  <img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" alt="Google Play Free" height="40">
+                </a>
+              </div>
+              <div class="store-option">
+                <span class="store-label pro" i18n="@@installation.pro">Pro</span>
+                <a href="https://play.google.com/store/apps/details?id=com.softwarity.aipilot.pro" target="_blank" class="store-button">
+                  <img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" alt="Google Play Pro" height="40">
+                </a>
+              </div>
+            </div>
+            <div class="doc-screenshot single">
+              <img src="assets/screenshots/welcome.jpeg" alt="Welcome Screen" loading="lazy">
+              <span class="screenshot-caption" i18n="@@doc.caption.welcome">Welcome screen</span>
+            </div>
           </div>
         </div>
-      </div>
 
-      <!-- Step 3: Pair Device -->
-      <div class="doc-step">
-        <div class="doc-step-header">
-          <div class="step-number">3</div>
-          <h3 i18n="@@installation.step3.title">Pair Your Device</h3>
-        </div>
-        <div class="doc-step-content">
-          <p i18n="@@installation.step3.desc">Scan the QR code to pair your mobile with the CLI</p>
-          <p i18n="@@doc.scanQR">Tap the "Get aipilot-cli" button or the scan button to open the QR scanner. Point your camera at the QR code displayed in your terminal:</p>
-          <div class="doc-screenshots-row">
-            <div class="doc-screenshot">
+        <!-- Step 3: Pair Device -->
+        <div class="doc-step">
+          <div class="doc-step-header">
+            <div class="step-number">3</div>
+            <h3 i18n="@@installation.step3.title">Pair Your Device</h3>
+          </div>
+          <div class="doc-step-content">
+            <p i18n="@@installation.step3.desc">Scan the QR code to pair your mobile with the CLI</p>
+            <p i18n="@@doc.scanQR">Tap the "Get aipilot-cli" button or the scan button to open the QR scanner. Point your camera at the QR code displayed in your terminal:</p>
+            <div class="doc-screenshot single">
               <img src="assets/screenshots/qr-scanner.jpeg" alt="QR Scanner" loading="lazy">
               <span class="screenshot-caption" i18n="@@doc.caption.scanner">Scanning QR code</span>
-            </div>
-            <div class="doc-screenshot">
-              <img src="assets/screenshots/pairing-success.jpeg" alt="Pairing Success" loading="lazy">
-              <span class="screenshot-caption" i18n="@@doc.caption.paired">Successfully paired</span>
             </div>
           </div>
         </div>
@@ -215,6 +221,10 @@
               <img src="assets/screenshots/terminal-cli.jpeg" alt="Terminal" loading="lazy">
               <span class="screenshot-caption" i18n="@@doc.caption.terminal">Terminal view</span>
             </div>
+            <div class="doc-screenshot">
+              <img src="assets/screenshots/voice-input.jpeg" alt="Voice Input" loading="lazy">
+              <span class="screenshot-caption" i18n="@@doc.caption.voice">Voice input</span>
+            </div>
           </div>
         </div>
       </div>
@@ -228,14 +238,6 @@
       <div class="doc-subsection">
         <h3 i18n="@@doc.terminal.title">Terminal Features</h3>
         <p i18n="@@doc.terminal.desc">The terminal provides full access to your AI agent with additional mobile-friendly features:</p>
-
-        <div class="doc-feature">
-          <h4 i18n="@@doc.terminal.voice">Voice Input</h4>
-          <p i18n="@@doc.terminal.voiceDesc">Use the microphone button to dictate commands using speech-to-text:</p>
-          <div class="doc-screenshot single">
-            <img src="assets/screenshots/voice-input.jpeg" alt="Voice Input" loading="lazy">
-          </div>
-        </div>
 
         <div class="doc-feature">
           <h4 i18n="@@doc.terminal.upload">File Upload</h4>
@@ -257,6 +259,7 @@
           <p i18n="@@doc.terminal.historyDesc">Quick access to common agent commands like /compact, /resume, /clear:</p>
           <div class="doc-screenshot single">
             <img src="assets/screenshots/history-menu.jpeg" alt="History Menu" loading="lazy">
+            <span class="screenshot-caption" i18n="@@doc.caption.history">Command history</span>
           </div>
         </div>
 

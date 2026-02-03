@@ -155,10 +155,6 @@
         <source>File &amp; image upload</source>
         <target>Subida de archivos e imagenes</target>
       </trans-unit>
-      <trans-unit id="pricing.pro.feature7" datatype="html">
-        <source>Custom agent configuration</source>
-        <target>Configuracion de agente personalizada</target>
-      </trans-unit>
       <trans-unit id="pricing.pro.cta" datatype="html">
         <source>Get Pro</source>
         <target>Obtener Pro</target>
@@ -201,6 +197,14 @@
         <source>Get AIPilot from Google Play or App Store</source>
         <target>Obtener AIPilot de Google Play o App Store</target>
       </trans-unit>
+      <trans-unit id="installation.free" datatype="html">
+        <source>Free</source>
+        <target>Gratis</target>
+      </trans-unit>
+      <trans-unit id="installation.pro" datatype="html">
+        <source>Pro</source>
+        <target>Pro</target>
+      </trans-unit>
       <trans-unit id="doc.welcomeScreen" datatype="html">
         <source>When you open the app for the first time, you'll see the welcome screen:</source>
         <target>Cuando abras la app por primera vez, veras la pantalla de bienvenida:</target>
@@ -224,6 +228,18 @@
       <trans-unit id="doc.caption.paired" datatype="html">
         <source>Successfully paired</source>
         <target>Emparejado con exito</target>
+      </trans-unit>
+      <trans-unit id="doc.caption.welcome" datatype="html">
+        <source>Welcome screen</source>
+        <target>Pantalla de bienvenida</target>
+      </trans-unit>
+      <trans-unit id="doc.caption.voice" datatype="html">
+        <source>Voice input</source>
+        <target>Entrada de voz</target>
+      </trans-unit>
+      <trans-unit id="doc.caption.history" datatype="html">
+        <source>Command history</source>
+        <target>Historial de comandos</target>
       </trans-unit>
       <trans-unit id="installation.step4.title" datatype="html">
         <source>Start Coding</source>
