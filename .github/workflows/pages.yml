@@ -39,24 +39,11 @@ jobs:
         working-directory: ./public
         run: npm run build:all
 
-      - name: Organize build output
+      - name: Add redirect and .nojekyll
+        working-directory: ./public
         run: |
-          mkdir -p ./public/dist/deploy
-          # Copy redirect index.html to root
-          cp ./public/public/index.html ./public/dist/deploy/
-          # Copy all locales to their subdirectories
-          cp -r ./public/dist/aipilot-cli-landing/browser/en ./public/dist/deploy/
-          cp -r ./public/dist/aipilot-cli-landing/browser/fr ./public/dist/deploy/
-          cp -r ./public/dist/aipilot-cli-landing/browser/de ./public/dist/deploy/
-          cp -r ./public/dist/aipilot-cli-landing/browser/es ./public/dist/deploy/
-          cp -r ./public/dist/aipilot-cli-landing/browser/pt ./public/dist/deploy/
-          cp -r ./public/dist/aipilot-cli-landing/browser/zh ./public/dist/deploy/
-          cp -r ./public/dist/aipilot-cli-landing/browser/ja ./public/dist/deploy/
-          cp -r ./public/dist/aipilot-cli-landing/browser/hi ./public/dist/deploy/
-          cp -r ./public/dist/aipilot-cli-landing/browser/vi ./public/dist/deploy/
-          cp -r ./public/dist/aipilot-cli-landing/browser/ru ./public/dist/deploy/
-          # Copy .nojekyll
-          touch ./public/dist/deploy/.nojekyll
+          cp public/index.html public/dist/browser/
+          touch public/dist/browser/.nojekyll
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
@@ -64,7 +51,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./public/dist/deploy
+          path: public/dist/browser
 
   deploy:
     environment:

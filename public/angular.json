@@ -56,7 +56,7 @@
         "build": {
           "builder": "@angular/build:application",
           "options": {
-            "outputPath": "dist/aipilot-cli-landing",
+            "outputPath": "dist",
             "browser": "src/main.ts",
             "polyfills": ["@angular/localize/init"],
             "tsConfig": "tsconfig.app.json",
@@ -99,35 +99,44 @@
               "sourceMap": true,
               "localize": false
             },
-            "fr": {
-              "localize": ["fr"]
-            },
-            "de": {
-              "localize": ["de"]
-            },
-            "es": {
-              "localize": ["es"]
-            },
-            "pt": {
-              "localize": ["pt"]
-            },
-            "zh": {
-              "localize": ["zh"]
-            },
-            "ja": {
-              "localize": ["ja"]
-            },
-            "hi": {
-              "localize": ["hi"]
-            },
-            "vi": {
-              "localize": ["vi"]
-            },
-            "ru": {
-              "localize": ["ru"]
-            },
             "en": {
               "localize": ["en"]
+            },
+            "fr": {
+              "localize": ["fr"],
+              "deleteOutputPath": false
+            },
+            "de": {
+              "localize": ["de"],
+              "deleteOutputPath": false
+            },
+            "es": {
+              "localize": ["es"],
+              "deleteOutputPath": false
+            },
+            "pt": {
+              "localize": ["pt"],
+              "deleteOutputPath": false
+            },
+            "zh": {
+              "localize": ["zh"],
+              "deleteOutputPath": false
+            },
+            "ja": {
+              "localize": ["ja"],
+              "deleteOutputPath": false
+            },
+            "hi": {
+              "localize": ["hi"],
+              "deleteOutputPath": false
+            },
+            "vi": {
+              "localize": ["vi"],
+              "deleteOutputPath": false
+            },
+            "ru": {
+              "localize": ["ru"],
+              "deleteOutputPath": false
             }
           },
           "defaultConfiguration": "production"
