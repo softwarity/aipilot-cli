@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+  <file source-language="en" target-language="vi" datatype="plaintext" original="ng2.template">
+    <body>
+      <trans-unit id="hero.title" datatype="html"><source>Control AI Agents from Your Mobile</source><target>Điều Khiển AI Từ Điện Thoại</target></trans-unit>
+      <trans-unit id="hero.description" datatype="html"><source>AIPilot CLI spawns a terminal with your favorite AI agent (Claude, Gemini, Codex) and lets you control it remotely from your mobile device.</source><target>AIPilot CLI khởi động terminal với AI yêu thích (Claude, Gemini, Codex) và cho phép bạn điều khiển từ xa từ điện thoại.</target></trans-unit>
+      <trans-unit id="hero.getStarted" datatype="html"><source>Get Started</source><target>Bắt Đầu</target></trans-unit>
+      <trans-unit id="hero.viewOnGithub" datatype="html"><source>View on GitHub</source><target>Xem trên GitHub</target></trans-unit>
+      <trans-unit id="features.title" datatype="html"><source>Features</source><target>Tính Năng</target></trans-unit>
+      <trans-unit id="features.agents.title" datatype="html"><source>Multiple AI Agents</source><target>Nhiều AI Agent</target></trans-unit>
+      <trans-unit id="features.agents.desc" datatype="html"><source>Support for Claude, Gemini, and Codex CLI agents</source><target>Hỗ trợ Claude, Gemini và Codex CLI</target></trans-unit>
+      <trans-unit id="features.realtime.title" datatype="html"><source>Real-time Control</source><target>Điều Khiển Thời Gian Thực</target></trans-unit>
+      <trans-unit id="features.realtime.desc" datatype="html"><source>Full terminal access via WebSocket with E2E encryption</source><target>Truy cập terminal đầy đủ qua WebSocket với mã hóa E2E</target></trans-unit>
+      <trans-unit id="features.upload.title" datatype="html"><source>File Upload</source><target>Tải Lên Tệp</target></trans-unit>
+      <trans-unit id="features.upload.desc" datatype="html"><source>Send files and images directly to your AI agent</source><target>Gửi tệp và hình ảnh trực tiếp đến AI</target></trans-unit>
+      <trans-unit id="features.voice.title" datatype="html"><source>Voice Input</source><target>Nhập Giọng Nói</target></trans-unit>
+      <trans-unit id="features.voice.desc" datatype="html"><source>Use speech-to-text to send commands</source><target>Sử dụng giọng nói để gửi lệnh</target></trans-unit>
+      <trans-unit id="features.ssh.title" datatype="html"><source>SSH Support</source><target>Hỗ Trợ SSH</target></trans-unit>
+      <trans-unit id="features.ssh.desc" datatype="html"><source>Connect via SSH for remote server access</source><target>Kết nối SSH để truy cập máy chủ từ xa</target></trans-unit>
+      <trans-unit id="features.multisession.title" datatype="html"><source>Multi-session</source><target>Đa Phiên</target></trans-unit>
+      <trans-unit id="features.multisession.desc" datatype="html"><source>Manage multiple terminal sessions simultaneously</source><target>Quản lý nhiều phiên terminal cùng lúc</target></trans-unit>
+      <trans-unit id="pricing.title" datatype="html"><source>Free vs Pro</source><target>Miễn phí vs Pro</target></trans-unit>
+      <trans-unit id="pricing.intro" datatype="html"><source>AIPilot is available in two versions. The free version lets you get started, while Pro unlocks the full potential.</source><target>AIPilot có hai phiên bản. Phiên bản miễn phí để bắt đầu, Pro mở khóa toàn bộ tiềm năng.</target></trans-unit>
+      <trans-unit id="pricing.free.title" datatype="html"><source>Free</source><target>Miễn phí</target></trans-unit>
+      <trans-unit id="pricing.free.price" datatype="html"><source>$0</source><target>$0</target></trans-unit>
+      <trans-unit id="pricing.free.feature1" datatype="html"><source>1 paired PC</source><target>1 PC ghép nối</target></trans-unit>
+      <trans-unit id="pricing.free.feature2" datatype="html"><source>1 CLI session</source><target>1 phiên CLI</target></trans-unit>
+      <trans-unit id="pricing.free.feature3" datatype="html"><source>Real-time terminal control</source><target>Điều khiển terminal thời gian thực</target></trans-unit>
+      <trans-unit id="pricing.free.feature4" datatype="html"><source>E2E encryption</source><target>Mã hóa E2E</target></trans-unit>
+      <trans-unit id="pricing.free.limit1" datatype="html"><source>No SSH connections</source><target>Không có kết nối SSH</target></trans-unit>
+      <trans-unit id="pricing.free.limit2" datatype="html"><source>No file/image upload</source><target>Không tải lên tệp/hình ảnh</target></trans-unit>
+      <trans-unit id="pricing.free.limit3" datatype="html"><source>No agent configuration</source><target>Không cấu hình agent</target></trans-unit>
+      <trans-unit id="pricing.free.cta" datatype="html"><source>Download Free</source><target>Tải Miễn phí</target></trans-unit>
+      <trans-unit id="pricing.pro.title" datatype="html"><source>Pro</source><target>Pro</target></trans-unit>
+      <trans-unit id="pricing.pro.price" datatype="html"><source>One-time</source><target>Một lần</target></trans-unit>
+      <trans-unit id="pricing.pro.feature1" datatype="html"><source>Unlimited PCs</source><target>Không giới hạn PC</target></trans-unit>
+      <trans-unit id="pricing.pro.feature2" datatype="html"><source>Unlimited CLI sessions</source><target>Không giới hạn phiên CLI</target></trans-unit>
+      <trans-unit id="pricing.pro.feature3" datatype="html"><source>Real-time terminal control</source><target>Điều khiển terminal thời gian thực</target></trans-unit>
+      <trans-unit id="pricing.pro.feature4" datatype="html"><source>E2E encryption</source><target>Mã hóa E2E</target></trans-unit>
+      <trans-unit id="pricing.pro.feature5" datatype="html"><source>SSH connections</source><target>Kết nối SSH</target></trans-unit>
+      <trans-unit id="pricing.pro.feature6" datatype="html"><source>File &amp; image upload</source><target>Tải lên tệp và hình ảnh</target></trans-unit>
+      <trans-unit id="pricing.pro.feature7" datatype="html"><source>Custom agent configuration</source><target>Cấu hình agent tùy chỉnh</target></trans-unit>
+      <trans-unit id="pricing.pro.cta" datatype="html"><source>Get Pro</source><target>Mua Pro</target></trans-unit>
+      <trans-unit id="installation.title" datatype="html"><source>Installation</source><target>Cài Đặt</target></trans-unit>
+      <trans-unit id="installation.step1.title" datatype="html"><source>Install the CLI</source><target>Cài Đặt CLI</target></trans-unit>
+      <trans-unit id="installation.step1.desc" datatype="html"><source>Download and install the CLI on your computer</source><target>Tải và cài đặt CLI trên máy tính</target></trans-unit>
+      <trans-unit id="installation.linux" datatype="html"><source>Linux / macOS</source><target>Linux / macOS</target></trans-unit>
+      <trans-unit id="installation.windows" datatype="html"><source>Windows (PowerShell)</source><target>Windows (PowerShell)</target></trans-unit>
+      <trans-unit id="installation.windowsAlt" datatype="html"><source>Or download directly from GitHub Releases</source><target>Hoặc tải trực tiếp từ GitHub Releases</target></trans-unit>
+      <trans-unit id="doc.cliQR" datatype="html"><source>When you run the CLI for the first time, a QR code will be displayed in your terminal:</source><target>Khi bạn chạy CLI lần đầu tiên, mã QR sẽ được hiển thị trong terminal:</target></trans-unit>
+      <trans-unit id="installation.step2.title" datatype="html"><source>Install the Mobile App</source><target>Cài Đặt Ứng Dụng</target></trans-unit>
+      <trans-unit id="installation.step2.desc" datatype="html"><source>Get AIPilot from Google Play or App Store</source><target>Tải AIPilot từ Google Play hoặc App Store</target></trans-unit>
+      <trans-unit id="doc.welcomeScreen" datatype="html"><source>When you open the app for the first time, you'll see the welcome screen:</source><target>Khi bạn mở ứng dụng lần đầu tiên, bạn sẽ thấy màn hình chào mừng:</target></trans-unit>
+      <trans-unit id="installation.step3.title" datatype="html"><source>Pair Your Device</source><target>Ghép Nối Thiết Bị</target></trans-unit>
+      <trans-unit id="installation.step3.desc" datatype="html"><source>Scan the QR code to pair your mobile with the CLI</source><target>Quét mã QR để ghép nối điện thoại với CLI</target></trans-unit>
+      <trans-unit id="doc.scanQR" datatype="html"><source>Tap the "Get aipilot-cli" button or the scan button to open the QR scanner. Point your camera at the QR code displayed in your terminal:</source><target>Nhấn nút "Tải aipilot-cli" hoặc nút quét để mở trình quét QR. Hướng camera vào mã QR hiển thị trong terminal:</target></trans-unit>
+      <trans-unit id="doc.caption.scanner" datatype="html"><source>Scanning QR code</source><target>Đang quét mã QR</target></trans-unit>
+      <trans-unit id="doc.caption.paired" datatype="html"><source>Successfully paired</source><target>Ghép nối thành công</target></trans-unit>
+      <trans-unit id="installation.step4.title" datatype="html"><source>Start Coding</source><target>Bắt Đầu Lập Trình</target></trans-unit>
+      <trans-unit id="installation.step4.desc" datatype="html"><source>Control your AI agent from anywhere</source><target>Điều khiển AI từ bất kỳ đâu</target></trans-unit>
+      <trans-unit id="doc.homeScreen" datatype="html"><source>Once paired, you'll see your sessions on the home screen. Tap a session to connect:</source><target>Sau khi ghép nối, bạn sẽ thấy các phiên trên màn hình chính. Nhấn vào phiên để kết nối:</target></trans-unit>
+      <trans-unit id="doc.caption.sessions" datatype="html"><source>Active sessions</source><target>Phiên đang hoạt động</target></trans-unit>
+      <trans-unit id="doc.caption.terminal" datatype="html"><source>Terminal view</source><target>Giao diện terminal</target></trans-unit>
+      <trans-unit id="doc.title" datatype="html"><source>Documentation</source><target>Tài liệu</target></trans-unit>
+      <trans-unit id="doc.terminal.title" datatype="html"><source>Terminal Features</source><target>Tính năng Terminal</target></trans-unit>
+      <trans-unit id="doc.terminal.desc" datatype="html"><source>The terminal provides full access to your AI agent with additional mobile-friendly features:</source><target>Terminal cung cấp quyền truy cập đầy đủ đến AI với các tính năng thân thiện di động:</target></trans-unit>
+      <trans-unit id="doc.terminal.voice" datatype="html"><source>Voice Input</source><target>Nhập Giọng Nói</target></trans-unit>
+      <trans-unit id="doc.terminal.voiceDesc" datatype="html"><source>Use the microphone button to dictate commands using speech-to-text:</source><target>Sử dụng nút micro để đọc lệnh bằng nhận dạng giọng nói:</target></trans-unit>
+      <trans-unit id="doc.terminal.upload" datatype="html"><source>File Upload</source><target>Tải Lên Tệp</target></trans-unit>
+      <trans-unit id="doc.terminal.uploadDesc" datatype="html"><source>Send files and images directly to your AI agent. Tap the attachment button to select from camera or files:</source><target>Gửi tệp và hình ảnh trực tiếp đến AI. Nhấn nút đính kèm để chọn từ camera hoặc tệp:</target></trans-unit>
+      <trans-unit id="doc.caption.uploadMenu" datatype="html"><source>Upload options</source><target>Tùy chọn tải lên</target></trans-unit>
+      <trans-unit id="doc.caption.uploads" datatype="html"><source>Upload progress</source><target>Tiến trình tải lên</target></trans-unit>
+      <trans-unit id="doc.terminal.history" datatype="html"><source>History Commands</source><target>Lệnh Lịch sử</target></trans-unit>
+      <trans-unit id="doc.terminal.historyDesc" datatype="html"><source>Quick access to common agent commands like /compact, /resume, /clear:</source><target>Truy cập nhanh các lệnh thường dùng như /compact, /resume, /clear:</target></trans-unit>
+      <trans-unit id="doc.terminal.switch" datatype="html"><source>PC/Mobile Mode</source><target>Chế độ PC/Di động</target></trans-unit>
+      <trans-unit id="doc.terminal.switchDesc" datatype="html"><source>Switch control between your PC and mobile device. The terminal resizes automatically:</source><target>Chuyển đổi điều khiển giữa PC và di động. Terminal tự động thay đổi kích thước:</target></trans-unit>
+      <trans-unit id="doc.caption.pcMode" datatype="html"><source>PC mode</source><target>Chế độ PC</target></trans-unit>
+      <trans-unit id="doc.caption.switch" datatype="html"><source>Multi-session view</source><target>Giao diện đa phiên</target></trans-unit>
+      <trans-unit id="doc.ssh.title" datatype="html"><source>SSH Mode</source><target>Chế độ SSH</target></trans-unit>
+      <trans-unit id="doc.ssh.desc" datatype="html"><source>Connect directly to remote servers via SSH without the CLI:</source><target>Kết nối trực tiếp đến máy chủ từ xa qua SSH mà không cần CLI:</target></trans-unit>
+      <trans-unit id="doc.caption.sshEmpty" datatype="html"><source>SSH connections</source><target>Kết nối SSH</target></trans-unit>
+      <trans-unit id="doc.caption.sshForm" datatype="html"><source>New connection</source><target>Kết nối mới</target></trans-unit>
+      <trans-unit id="doc.caption.agentForm" datatype="html"><source>Configure agent</source><target>Cấu hình agent</target></trans-unit>
+      <trans-unit id="doc.caption.sshTerminal" datatype="html"><source>SSH terminal</source><target>Terminal SSH</target></trans-unit>
+      <trans-unit id="doc.settings.title" datatype="html"><source>Settings</source><target>Cài đặt</target></trans-unit>
+      <trans-unit id="doc.settings.desc" datatype="html"><source>Customize font size, view session info, and configure LAN connections:</source><target>Tùy chỉnh kích thước font, xem thông tin phiên và cấu hình kết nối LAN:</target></trans-unit>
+      <trans-unit id="doc.caption.settings" datatype="html"><source>Settings menu</source><target>Menu cài đặt</target></trans-unit>
+      <trans-unit id="doc.caption.fontSize" datatype="html"><source>Font size</source><target>Kích thước font</target></trans-unit>
+      <trans-unit id="doc.caption.sessionInfo" datatype="html"><source>Session info</source><target>Thông tin phiên</target></trans-unit>
+      <trans-unit id="doc.caption.lanIp" datatype="html"><source>LAN configuration</source><target>Cấu hình LAN</target></trans-unit>
+      <trans-unit id="usage.title" datatype="html"><source>CLI Usage</source><target>Sử dụng CLI</target></trans-unit>
+      <trans-unit id="usage.basic" datatype="html"><source>Basic usage</source><target>Sử dụng cơ bản</target></trans-unit>
+      <trans-unit id="usage.options" datatype="html"><source>Options</source><target>Tùy chọn</target></trans-unit>
+      <trans-unit id="usage.commands" datatype="html"><source>Commands</source><target>Lệnh</target></trans-unit>
+      <trans-unit id="footer.madeBy" datatype="html"><source>Made by</source><target>Tạo bởi</target></trans-unit>
+    </body>
+  </file>
+</xliff>

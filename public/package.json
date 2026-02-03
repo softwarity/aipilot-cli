@@ -1,0 +1,62 @@
+{
+  "name": "aipilot-cli-landing",
+  "version": "0.0.0",
+  "scripts": {
+    "ng": "ng",
+    "start": "ng serve --configuration en",
+    "serve:en": "ng serve --configuration en",
+    "serve:fr": "ng serve --configuration fr",
+    "serve:de": "ng serve --configuration de",
+    "serve:es": "ng serve --configuration es",
+    "serve:pt": "ng serve --configuration pt",
+    "serve:zh": "ng serve --configuration zh",
+    "serve:ja": "ng serve --configuration ja",
+    "serve:hi": "ng serve --configuration hi",
+    "serve:vi": "ng serve --configuration vi",
+    "serve:ru": "ng serve --configuration ru",
+    "build": "ng build --configuration production,en --base-href /aipilot-cli/en/",
+    "build:en": "ng build --configuration production,en --base-href /aipilot-cli/en/",
+    "build:fr": "ng build --configuration production,fr --base-href /aipilot-cli/fr/",
+    "build:de": "ng build --configuration production,de --base-href /aipilot-cli/de/",
+    "build:es": "ng build --configuration production,es --base-href /aipilot-cli/es/",
+    "build:pt": "ng build --configuration production,pt --base-href /aipilot-cli/pt/",
+    "build:zh": "ng build --configuration production,zh --base-href /aipilot-cli/zh/",
+    "build:ja": "ng build --configuration production,ja --base-href /aipilot-cli/ja/",
+    "build:hi": "ng build --configuration production,hi --base-href /aipilot-cli/hi/",
+    "build:vi": "ng build --configuration production,vi --base-href /aipilot-cli/vi/",
+    "build:ru": "ng build --configuration production,ru --base-href /aipilot-cli/ru/",
+    "build:all": "npm run build:en && npm run build:fr && npm run build:de && npm run build:es && npm run build:pt && npm run build:zh && npm run build:ja && npm run build:hi && npm run build:vi && npm run build:ru",
+    "extract-i18n": "ng extract-i18n --output-path src/locale",
+    "watch": "ng build --watch --configuration development"
+  },
+  "prettier": {
+    "printWidth": 100,
+    "singleQuote": true,
+    "overrides": [
+      {
+        "files": "*.html",
+        "options": {
+          "parser": "angular"
+        }
+      }
+    ]
+  },
+  "private": true,
+  "packageManager": "npm@11.6.4",
+  "dependencies": {
+    "@angular/common": "^21.0.0",
+    "@angular/compiler": "^21.0.0",
+    "@angular/core": "^21.0.0",
+    "@angular/localize": "^21.0.0",
+    "@angular/platform-browser": "^21.0.0",
+    "@angular/router": "^21.0.0",
+    "rxjs": "~7.8.0",
+    "tslib": "^2.3.0"
+  },
+  "devDependencies": {
+    "@angular/build": "^21.0.5",
+    "@angular/cli": "^21.0.5",
+    "@angular/compiler-cli": "^21.0.0",
+    "typescript": "~5.9.2"
+  }
+}

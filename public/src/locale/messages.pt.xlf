@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+  <file source-language="en" target-language="pt" datatype="plaintext" original="ng2.template">
+    <body>
+      <trans-unit id="hero.title" datatype="html">
+        <source>Control AI Agents from Your Mobile</source>
+        <target>Controle Agentes IA do seu Celular</target>
+      </trans-unit>
+      <trans-unit id="hero.description" datatype="html">
+        <source>AIPilot CLI spawns a terminal with your favorite AI agent (Claude, Gemini, Codex) and lets you control it remotely from your mobile device.</source>
+        <target>AIPilot CLI inicia um terminal com seu agente IA favorito (Claude, Gemini, Codex) e permite controla-lo remotamente do seu celular.</target>
+      </trans-unit>
+      <trans-unit id="hero.getStarted" datatype="html"><source>Get Started</source><target>Comecar</target></trans-unit>
+      <trans-unit id="hero.viewOnGithub" datatype="html"><source>View on GitHub</source><target>Ver no GitHub</target></trans-unit>
+      <trans-unit id="features.title" datatype="html"><source>Features</source><target>Recursos</target></trans-unit>
+      <trans-unit id="features.agents.title" datatype="html"><source>Multiple AI Agents</source><target>Multiplos Agentes IA</target></trans-unit>
+      <trans-unit id="features.agents.desc" datatype="html"><source>Support for Claude, Gemini, and Codex CLI agents</source><target>Suporte para Claude, Gemini e Codex CLI</target></trans-unit>
+      <trans-unit id="features.realtime.title" datatype="html"><source>Real-time Control</source><target>Controle em Tempo Real</target></trans-unit>
+      <trans-unit id="features.realtime.desc" datatype="html"><source>Full terminal access via WebSocket with E2E encryption</source><target>Acesso completo ao terminal via WebSocket com criptografia E2E</target></trans-unit>
+      <trans-unit id="features.upload.title" datatype="html"><source>File Upload</source><target>Upload de Arquivos</target></trans-unit>
+      <trans-unit id="features.upload.desc" datatype="html"><source>Send files and images directly to your AI agent</source><target>Envie arquivos e imagens diretamente ao seu agente IA</target></trans-unit>
+      <trans-unit id="features.voice.title" datatype="html"><source>Voice Input</source><target>Entrada de Voz</target></trans-unit>
+      <trans-unit id="features.voice.desc" datatype="html"><source>Use speech-to-text to send commands</source><target>Use reconhecimento de voz para enviar comandos</target></trans-unit>
+      <trans-unit id="features.ssh.title" datatype="html"><source>SSH Support</source><target>Suporte SSH</target></trans-unit>
+      <trans-unit id="features.ssh.desc" datatype="html"><source>Connect via SSH for remote server access</source><target>Conecte via SSH para acesso remoto a servidores</target></trans-unit>
+      <trans-unit id="features.multisession.title" datatype="html"><source>Multi-session</source><target>Multi-sessao</target></trans-unit>
+      <trans-unit id="features.multisession.desc" datatype="html"><source>Manage multiple terminal sessions simultaneously</source><target>Gerencie multiplas sessoes de terminal simultaneamente</target></trans-unit>
+      <trans-unit id="pricing.title" datatype="html"><source>Free vs Pro</source><target>Gratis vs Pro</target></trans-unit>
+      <trans-unit id="pricing.intro" datatype="html"><source>AIPilot is available in two versions. The free version lets you get started, while Pro unlocks the full potential.</source><target>AIPilot esta disponivel em duas versoes. A versao gratuita permite comecar, enquanto Pro desbloqueia todo o potencial.</target></trans-unit>
+      <trans-unit id="pricing.free.title" datatype="html"><source>Free</source><target>Gratis</target></trans-unit>
+      <trans-unit id="pricing.free.price" datatype="html"><source>$0</source><target>R$0</target></trans-unit>
+      <trans-unit id="pricing.free.feature1" datatype="html"><source>1 paired PC</source><target>1 PC emparelhado</target></trans-unit>
+      <trans-unit id="pricing.free.feature2" datatype="html"><source>1 CLI session</source><target>1 sessao CLI</target></trans-unit>
+      <trans-unit id="pricing.free.feature3" datatype="html"><source>Real-time terminal control</source><target>Controle de terminal em tempo real</target></trans-unit>
+      <trans-unit id="pricing.free.feature4" datatype="html"><source>E2E encryption</source><target>Criptografia E2E</target></trans-unit>
+      <trans-unit id="pricing.free.limit1" datatype="html"><source>No SSH connections</source><target>Sem conexoes SSH</target></trans-unit>
+      <trans-unit id="pricing.free.limit2" datatype="html"><source>No file/image upload</source><target>Sem upload de arquivos/imagens</target></trans-unit>
+      <trans-unit id="pricing.free.limit3" datatype="html"><source>No agent configuration</source><target>Sem configuracao de agente</target></trans-unit>
+      <trans-unit id="pricing.free.cta" datatype="html"><source>Download Free</source><target>Baixar Gratis</target></trans-unit>
+      <trans-unit id="pricing.pro.title" datatype="html"><source>Pro</source><target>Pro</target></trans-unit>
+      <trans-unit id="pricing.pro.price" datatype="html"><source>One-time</source><target>Pagamento unico</target></trans-unit>
+      <trans-unit id="pricing.pro.feature1" datatype="html"><source>Unlimited PCs</source><target>PCs ilimitados</target></trans-unit>
+      <trans-unit id="pricing.pro.feature2" datatype="html"><source>Unlimited CLI sessions</source><target>Sessoes CLI ilimitadas</target></trans-unit>
+      <trans-unit id="pricing.pro.feature3" datatype="html"><source>Real-time terminal control</source><target>Controle de terminal em tempo real</target></trans-unit>
+      <trans-unit id="pricing.pro.feature4" datatype="html"><source>E2E encryption</source><target>Criptografia E2E</target></trans-unit>
+      <trans-unit id="pricing.pro.feature5" datatype="html"><source>SSH connections</source><target>Conexoes SSH</target></trans-unit>
+      <trans-unit id="pricing.pro.feature6" datatype="html"><source>File &amp; image upload</source><target>Upload de arquivos e imagens</target></trans-unit>
+      <trans-unit id="pricing.pro.feature7" datatype="html"><source>Custom agent configuration</source><target>Configuracao de agente personalizada</target></trans-unit>
+      <trans-unit id="pricing.pro.cta" datatype="html"><source>Get Pro</source><target>Obter Pro</target></trans-unit>
+      <trans-unit id="installation.title" datatype="html"><source>Installation</source><target>Instalacao</target></trans-unit>
+      <trans-unit id="installation.step1.title" datatype="html"><source>Install the CLI</source><target>Instalar o CLI</target></trans-unit>
+      <trans-unit id="installation.step1.desc" datatype="html"><source>Download and install the CLI on your computer</source><target>Baixe e instale o CLI no seu computador</target></trans-unit>
+      <trans-unit id="installation.linux" datatype="html"><source>Linux / macOS</source><target>Linux / macOS</target></trans-unit>
+      <trans-unit id="installation.windows" datatype="html"><source>Windows (PowerShell)</source><target>Windows (PowerShell)</target></trans-unit>
+      <trans-unit id="installation.windowsAlt" datatype="html"><source>Or download directly from GitHub Releases</source><target>Ou baixe diretamente do GitHub Releases</target></trans-unit>
+      <trans-unit id="doc.cliQR" datatype="html"><source>When you run the CLI for the first time, a QR code will be displayed in your terminal:</source><target>Quando voce executa o CLI pela primeira vez, um codigo QR sera exibido no seu terminal:</target></trans-unit>
+      <trans-unit id="installation.step2.title" datatype="html"><source>Install the Mobile App</source><target>Instalar o App Movel</target></trans-unit>
+      <trans-unit id="installation.step2.desc" datatype="html"><source>Get AIPilot from Google Play or App Store</source><target>Obtenha AIPilot do Google Play ou App Store</target></trans-unit>
+      <trans-unit id="doc.welcomeScreen" datatype="html"><source>When you open the app for the first time, you'll see the welcome screen:</source><target>Quando voce abrir o app pela primeira vez, vera a tela de boas-vindas:</target></trans-unit>
+      <trans-unit id="installation.step3.title" datatype="html"><source>Pair Your Device</source><target>Emparelhar seu Dispositivo</target></trans-unit>
+      <trans-unit id="installation.step3.desc" datatype="html"><source>Scan the QR code to pair your mobile with the CLI</source><target>Escaneie o codigo QR para emparelhar seu celular com o CLI</target></trans-unit>
+      <trans-unit id="doc.scanQR" datatype="html"><source>Tap the "Get aipilot-cli" button or the scan button to open the QR scanner. Point your camera at the QR code displayed in your terminal:</source><target>Toque no botao "Obter aipilot-cli" ou no botao de escanear para abrir o scanner QR. Aponte sua camera para o codigo QR exibido no seu terminal:</target></trans-unit>
+      <trans-unit id="doc.caption.scanner" datatype="html"><source>Scanning QR code</source><target>Escaneando codigo QR</target></trans-unit>
+      <trans-unit id="doc.caption.paired" datatype="html"><source>Successfully paired</source><target>Emparelhado com sucesso</target></trans-unit>
+      <trans-unit id="installation.step4.title" datatype="html"><source>Start Coding</source><target>Comecar a Programar</target></trans-unit>
+      <trans-unit id="installation.step4.desc" datatype="html"><source>Control your AI agent from anywhere</source><target>Controle seu agente IA de qualquer lugar</target></trans-unit>
+      <trans-unit id="doc.homeScreen" datatype="html"><source>Once paired, you'll see your sessions on the home screen. Tap a session to connect:</source><target>Uma vez emparelhado, voce vera suas sessoes na tela inicial. Toque em uma sessao para conectar:</target></trans-unit>
+      <trans-unit id="doc.caption.sessions" datatype="html"><source>Active sessions</source><target>Sessoes ativas</target></trans-unit>
+      <trans-unit id="doc.caption.terminal" datatype="html"><source>Terminal view</source><target>Vista do terminal</target></trans-unit>
+      <trans-unit id="doc.title" datatype="html"><source>Documentation</source><target>Documentacao</target></trans-unit>
+      <trans-unit id="doc.terminal.title" datatype="html"><source>Terminal Features</source><target>Recursos do Terminal</target></trans-unit>
+      <trans-unit id="doc.terminal.desc" datatype="html"><source>The terminal provides full access to your AI agent with additional mobile-friendly features:</source><target>O terminal fornece acesso completo ao seu agente IA com recursos adicionais para celular:</target></trans-unit>
+      <trans-unit id="doc.terminal.voice" datatype="html"><source>Voice Input</source><target>Entrada de Voz</target></trans-unit>
+      <trans-unit id="doc.terminal.voiceDesc" datatype="html"><source>Use the microphone button to dictate commands using speech-to-text:</source><target>Use o botao do microfone para ditar comandos usando reconhecimento de voz:</target></trans-unit>
+      <trans-unit id="doc.terminal.upload" datatype="html"><source>File Upload</source><target>Upload de Arquivos</target></trans-unit>
+      <trans-unit id="doc.terminal.uploadDesc" datatype="html"><source>Send files and images directly to your AI agent. Tap the attachment button to select from camera or files:</source><target>Envie arquivos e imagens diretamente ao seu agente IA. Toque no botao de anexo para selecionar camera ou arquivos:</target></trans-unit>
+      <trans-unit id="doc.caption.uploadMenu" datatype="html"><source>Upload options</source><target>Opcoes de upload</target></trans-unit>
+      <trans-unit id="doc.caption.uploads" datatype="html"><source>Upload progress</source><target>Progresso de upload</target></trans-unit>
+      <trans-unit id="doc.terminal.history" datatype="html"><source>History Commands</source><target>Comandos do Historico</target></trans-unit>
+      <trans-unit id="doc.terminal.historyDesc" datatype="html"><source>Quick access to common agent commands like /compact, /resume, /clear:</source><target>Acesso rapido a comandos comuns como /compact, /resume, /clear:</target></trans-unit>
+      <trans-unit id="doc.terminal.switch" datatype="html"><source>PC/Mobile Mode</source><target>Modo PC/Movel</target></trans-unit>
+      <trans-unit id="doc.terminal.switchDesc" datatype="html"><source>Switch control between your PC and mobile device. The terminal resizes automatically:</source><target>Alterne o controle entre seu PC e celular. O terminal redimensiona automaticamente:</target></trans-unit>
+      <trans-unit id="doc.caption.pcMode" datatype="html"><source>PC mode</source><target>Modo PC</target></trans-unit>
+      <trans-unit id="doc.caption.switch" datatype="html"><source>Multi-session view</source><target>Vista multi-sessao</target></trans-unit>
+      <trans-unit id="doc.ssh.title" datatype="html"><source>SSH Mode</source><target>Modo SSH</target></trans-unit>
+      <trans-unit id="doc.ssh.desc" datatype="html"><source>Connect directly to remote servers via SSH without the CLI:</source><target>Conecte diretamente a servidores remotos via SSH sem o CLI:</target></trans-unit>
+      <trans-unit id="doc.caption.sshEmpty" datatype="html"><source>SSH connections</source><target>Conexoes SSH</target></trans-unit>
+      <trans-unit id="doc.caption.sshForm" datatype="html"><source>New connection</source><target>Nova conexao</target></trans-unit>
+      <trans-unit id="doc.caption.agentForm" datatype="html"><source>Configure agent</source><target>Configurar agente</target></trans-unit>
+      <trans-unit id="doc.caption.sshTerminal" datatype="html"><source>SSH terminal</source><target>Terminal SSH</target></trans-unit>
+      <trans-unit id="doc.settings.title" datatype="html"><source>Settings</source><target>Configuracoes</target></trans-unit>
+      <trans-unit id="doc.settings.desc" datatype="html"><source>Customize font size, view session info, and configure LAN connections:</source><target>Personalize tamanho da fonte, veja info da sessao e configure conexoes LAN:</target></trans-unit>
+      <trans-unit id="doc.caption.settings" datatype="html"><source>Settings menu</source><target>Menu de configuracoes</target></trans-unit>
+      <trans-unit id="doc.caption.fontSize" datatype="html"><source>Font size</source><target>Tamanho da fonte</target></trans-unit>
+      <trans-unit id="doc.caption.sessionInfo" datatype="html"><source>Session info</source><target>Info da sessao</target></trans-unit>
+      <trans-unit id="doc.caption.lanIp" datatype="html"><source>LAN configuration</source><target>Configuracao LAN</target></trans-unit>
+      <trans-unit id="usage.title" datatype="html"><source>CLI Usage</source><target>Uso do CLI</target></trans-unit>
+      <trans-unit id="usage.basic" datatype="html"><source>Basic usage</source><target>Uso basico</target></trans-unit>
+      <trans-unit id="usage.options" datatype="html"><source>Options</source><target>Opcoes</target></trans-unit>
+      <trans-unit id="usage.commands" datatype="html"><source>Commands</source><target>Comandos</target></trans-unit>
+      <trans-unit id="footer.madeBy" datatype="html"><source>Made by</source><target>Feito por</target></trans-unit>
+    </body>
+  </file>
+</xliff>

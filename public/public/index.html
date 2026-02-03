@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AIPilot CLI - Redirecting...</title>
+  <script>
+    (function() {
+      var LANG_STORAGE_KEY = 'aipilot-lang';
+      var VALID_LANGS = ['en', 'fr', 'de', 'es', 'pt', 'zh', 'ja', 'hi', 'vi', 'ru'];
+      var DEFAULT_LANG = 'en';
+
+      // Get saved language or detect from browser
+      var savedLang = localStorage.getItem(LANG_STORAGE_KEY);
+      var targetLang = DEFAULT_LANG;
+
+      if (savedLang && VALID_LANGS.indexOf(savedLang) !== -1) {
+        targetLang = savedLang;
+      } else {
+        // Detect browser language
+        var browserLang = (navigator.language || navigator.userLanguage || '').split('-')[0].toLowerCase();
+        if (VALID_LANGS.indexOf(browserLang) !== -1) {
+          targetLang = browserLang;
+        }
+      }
+
+      // Redirect to the appropriate language
+      var basePath = window.location.pathname.replace(/\/$/, '');
+      window.location.replace(basePath + '/' + targetLang + '/');
+    })();
+  </script>
+  <noscript>
+    <meta http-equiv="refresh" content="0;url=en/">
+    <p>Redirecting to <a href="en/">English version</a>...</p>
+  </noscript>
+</head>
+<body>
+  <p>Redirecting...</p>
+</body>
+</html>

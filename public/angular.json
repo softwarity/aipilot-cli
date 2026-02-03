@@ -1,0 +1,183 @@
+{
+  "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+  "version": 1,
+  "cli": {
+    "packageManager": "npm"
+  },
+  "newProjectRoot": "projects",
+  "projects": {
+    "aipilot-cli-landing": {
+      "projectType": "application",
+      "i18n": {
+        "sourceLocale": "en",
+        "locales": {
+          "fr": "src/locale/messages.fr.xlf",
+          "de": "src/locale/messages.de.xlf",
+          "es": "src/locale/messages.es.xlf",
+          "pt": "src/locale/messages.pt.xlf",
+          "zh": "src/locale/messages.zh.xlf",
+          "ja": "src/locale/messages.ja.xlf",
+          "hi": "src/locale/messages.hi.xlf",
+          "vi": "src/locale/messages.vi.xlf",
+          "ru": "src/locale/messages.ru.xlf"
+        }
+      },
+      "schematics": {
+        "@schematics/angular:component": {
+          "style": "scss",
+          "skipTests": true
+        },
+        "@schematics/angular:class": {
+          "skipTests": true
+        },
+        "@schematics/angular:directive": {
+          "skipTests": true
+        },
+        "@schematics/angular:guard": {
+          "skipTests": true
+        },
+        "@schematics/angular:interceptor": {
+          "skipTests": true
+        },
+        "@schematics/angular:pipe": {
+          "skipTests": true
+        },
+        "@schematics/angular:resolver": {
+          "skipTests": true
+        },
+        "@schematics/angular:service": {
+          "skipTests": true
+        }
+      },
+      "root": "",
+      "sourceRoot": "src",
+      "prefix": "app",
+      "architect": {
+        "build": {
+          "builder": "@angular/build:application",
+          "options": {
+            "outputPath": "dist/aipilot-cli-landing",
+            "browser": "src/main.ts",
+            "polyfills": ["@angular/localize/init"],
+            "tsConfig": "tsconfig.app.json",
+            "inlineStyleLanguage": "scss",
+            "assets": [
+              {
+                "glob": "**/*",
+                "input": "public"
+              },
+              {
+                "glob": "**/*",
+                "input": "src/assets",
+                "output": "assets"
+              }
+            ],
+            "styles": [
+              "src/styles.scss"
+            ],
+            "localize": ["en"]
+          },
+          "configurations": {
+            "production": {
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "1MB",
+                  "maximumError": "2MB"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "8kB",
+                  "maximumError": "16kB"
+                }
+              ],
+              "outputHashing": "all"
+            },
+            "development": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "localize": false
+            },
+            "fr": {
+              "localize": ["fr"]
+            },
+            "de": {
+              "localize": ["de"]
+            },
+            "es": {
+              "localize": ["es"]
+            },
+            "pt": {
+              "localize": ["pt"]
+            },
+            "zh": {
+              "localize": ["zh"]
+            },
+            "ja": {
+              "localize": ["ja"]
+            },
+            "hi": {
+              "localize": ["hi"]
+            },
+            "vi": {
+              "localize": ["vi"]
+            },
+            "ru": {
+              "localize": ["ru"]
+            },
+            "en": {
+              "localize": ["en"]
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "serve": {
+          "builder": "@angular/build:dev-server",
+          "configurations": {
+            "production": {
+              "buildTarget": "aipilot-cli-landing:build:production"
+            },
+            "development": {
+              "buildTarget": "aipilot-cli-landing:build:development"
+            },
+            "en": {
+              "buildTarget": "aipilot-cli-landing:build:development,en"
+            },
+            "fr": {
+              "buildTarget": "aipilot-cli-landing:build:development,fr"
+            },
+            "de": {
+              "buildTarget": "aipilot-cli-landing:build:development,de"
+            },
+            "es": {
+              "buildTarget": "aipilot-cli-landing:build:development,es"
+            },
+            "pt": {
+              "buildTarget": "aipilot-cli-landing:build:development,pt"
+            },
+            "zh": {
+              "buildTarget": "aipilot-cli-landing:build:development,zh"
+            },
+            "ja": {
+              "buildTarget": "aipilot-cli-landing:build:development,ja"
+            },
+            "hi": {
+              "buildTarget": "aipilot-cli-landing:build:development,hi"
+            },
+            "vi": {
+              "buildTarget": "aipilot-cli-landing:build:development,vi"
+            },
+            "ru": {
+              "buildTarget": "aipilot-cli-landing:build:development,ru"
+            }
+          },
+          "defaultConfiguration": "development"
+        },
+        "extract-i18n": {
+          "builder": "@angular/build:extract-i18n"
+        }
+      }
+    }
+  }
+}

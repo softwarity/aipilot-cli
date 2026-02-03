@@ -1,0 +1,78 @@
+name: Deploy Landing Page to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'public/**'
+      - '.github/workflows/pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: public/package-lock.json
+
+      - name: Install dependencies
+        working-directory: ./public
+        run: npm ci
+
+      - name: Build all locales
+        working-directory: ./public
+        run: npm run build:all
+
+      - name: Organize build output
+        run: |
+          mkdir -p ./public/dist/deploy
+          # Copy redirect index.html to root
+          cp ./public/public/index.html ./public/dist/deploy/
+          # Copy all locales to their subdirectories
+          cp -r ./public/dist/aipilot-cli-landing/browser/en ./public/dist/deploy/
+          cp -r ./public/dist/aipilot-cli-landing/browser/fr ./public/dist/deploy/
+          cp -r ./public/dist/aipilot-cli-landing/browser/de ./public/dist/deploy/
+          cp -r ./public/dist/aipilot-cli-landing/browser/es ./public/dist/deploy/
+          cp -r ./public/dist/aipilot-cli-landing/browser/pt ./public/dist/deploy/
+          cp -r ./public/dist/aipilot-cli-landing/browser/zh ./public/dist/deploy/
+          cp -r ./public/dist/aipilot-cli-landing/browser/ja ./public/dist/deploy/
+          cp -r ./public/dist/aipilot-cli-landing/browser/hi ./public/dist/deploy/
+          cp -r ./public/dist/aipilot-cli-landing/browser/vi ./public/dist/deploy/
+          cp -r ./public/dist/aipilot-cli-landing/browser/ru ./public/dist/deploy/
+          # Copy .nojekyll
+          touch ./public/dist/deploy/.nojekyll
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./public/dist/deploy
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

@@ -1,0 +1,368 @@
+<!-- Main Content -->
+<main class="main-content">
+  <!-- Central Card Container -->
+  <div class="card-container">
+    <!-- Card Header -->
+    <header class="card-header">
+      <div class="header-left">
+        <a href="https://www.softwarity.io/" target="_blank" class="logo-link">
+          <img src="https://www.softwarity.io/img/softwarity.svg" alt="Softwarity" class="logo">
+        </a>
+        <div class="title-block">
+          <h1>AIPilot CLI</h1>
+          <div class="badges">
+            <img src="https://img.shields.io/github/v/release/softwarity/aipilot-cli.svg" alt="version">
+            <img src="https://img.shields.io/badge/license-MIT-blue" alt="license">
+          </div>
+        </div>
+      </div>
+      <nav class="nav-links">
+        <div class="lang-switcher">
+          @for (lang of languages; track lang.code) {
+            <a [href]="getLangHref(lang)" (click)="onLangClick(lang)" class="lang-link" [class.active]="currentLocale === lang.code">{{ lang.label }}</a>
+          }
+        </div>
+        <a href="https://github.com/softwarity/aipilot-cli" target="_blank" class="nav-button">
+          <svg class="github-icon" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+          </svg>
+          GitHub
+        </a>
+        <a href="https://www.softwarity.io/" target="_blank" class="nav-button">
+          <span class="material-icons">public</span>
+          Softwarity
+        </a>
+        <softwarity-projects></softwarity-projects>
+      </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+      <h2 class="hero-title" i18n="@@hero.title">Control AI Agents from Your Mobile</h2>
+      <p class="hero-description" i18n="@@hero.description">AIPilot CLI spawns a terminal with your favorite AI agent (Claude, Gemini, Codex) and lets you control it remotely from your mobile device.</p>
+      <div class="hero-buttons">
+        <a href="#installation" class="primary-button">
+          <span class="material-icons">rocket_launch</span>
+          <span i18n="@@hero.getStarted">Get Started</span>
+        </a>
+        <a href="https://github.com/softwarity/aipilot-cli" target="_blank" class="secondary-button">
+          <svg class="github-icon" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+          </svg>
+          <span i18n="@@hero.viewOnGithub">View on GitHub</span>
+        </a>
+      </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="section" id="features">
+      <h2 i18n="@@features.title">Features</h2>
+      <div class="features-grid">
+        <div class="feature-card">
+          <span class="material-icons feature-icon">smart_toy</span>
+          <h3 i18n="@@features.agents.title">Multiple AI Agents</h3>
+          <p i18n="@@features.agents.desc">Support for Claude, Gemini, and Codex CLI agents</p>
+        </div>
+        <div class="feature-card">
+          <span class="material-icons feature-icon">sync</span>
+          <h3 i18n="@@features.realtime.title">Real-time Control</h3>
+          <p i18n="@@features.realtime.desc">Full terminal access via WebSocket with E2E encryption</p>
+        </div>
+        <div class="feature-card">
+          <span class="material-icons feature-icon">upload_file</span>
+          <h3 i18n="@@features.upload.title">File Upload</h3>
+          <p i18n="@@features.upload.desc">Send files and images directly to your AI agent</p>
+        </div>
+        <div class="feature-card">
+          <span class="material-icons feature-icon">mic</span>
+          <h3 i18n="@@features.voice.title">Voice Input</h3>
+          <p i18n="@@features.voice.desc">Use speech-to-text to send commands</p>
+        </div>
+        <div class="feature-card">
+          <span class="material-icons feature-icon">terminal</span>
+          <h3 i18n="@@features.ssh.title">SSH Support</h3>
+          <p i18n="@@features.ssh.desc">Connect via SSH for remote server access</p>
+        </div>
+        <div class="feature-card">
+          <span class="material-icons feature-icon">tab</span>
+          <h3 i18n="@@features.multisession.title">Multi-session</h3>
+          <p i18n="@@features.multisession.desc">Manage multiple terminal sessions simultaneously</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section class="section" id="pricing">
+      <h2 i18n="@@pricing.title">Free vs Pro</h2>
+      <p class="pricing-intro" i18n="@@pricing.intro">AIPilot is available in two versions. The free version lets you get started, while Pro unlocks the full potential.</p>
+
+      <div class="pricing-grid">
+        <div class="pricing-card free">
+          <div class="pricing-header">
+            <h3 i18n="@@pricing.free.title">Free</h3>
+            <span class="pricing-badge" i18n="@@pricing.free.price">$0</span>
+          </div>
+          <ul class="pricing-features">
+            <li><span class="material-icons">check</span><span i18n="@@pricing.free.feature1">1 paired PC</span></li>
+            <li><span class="material-icons">check</span><span i18n="@@pricing.free.feature2">1 CLI session</span></li>
+            <li><span class="material-icons">check</span><span i18n="@@pricing.free.feature3">Real-time terminal control</span></li>
+            <li><span class="material-icons">check</span><span i18n="@@pricing.free.feature4">E2E encryption</span></li>
+            <li class="disabled"><span class="material-icons">close</span><span i18n="@@pricing.free.limit1">No SSH connections</span></li>
+            <li class="disabled"><span class="material-icons">close</span><span i18n="@@pricing.free.limit2">No file/image upload</span></li>
+            <li class="disabled"><span class="material-icons">close</span><span i18n="@@pricing.free.limit3">No agent configuration</span></li>
+          </ul>
+          <a href="https://play.google.com/store/apps/details?id=com.softwarity.aipilot" target="_blank" class="pricing-button secondary" i18n="@@pricing.free.cta">Download Free</a>
+        </div>
+
+        <div class="pricing-card pro">
+          <div class="pricing-header">
+            <h3 i18n="@@pricing.pro.title">Pro</h3>
+            <span class="pricing-badge pro" i18n="@@pricing.pro.price">One-time</span>
+          </div>
+          <ul class="pricing-features">
+            <li><span class="material-icons">check</span><span i18n="@@pricing.pro.feature1">Unlimited PCs</span></li>
+            <li><span class="material-icons">check</span><span i18n="@@pricing.pro.feature2">Unlimited CLI sessions</span></li>
+            <li><span class="material-icons">check</span><span i18n="@@pricing.pro.feature3">Real-time terminal control</span></li>
+            <li><span class="material-icons">check</span><span i18n="@@pricing.pro.feature4">E2E encryption</span></li>
+            <li><span class="material-icons">check</span><span i18n="@@pricing.pro.feature5">SSH connections</span></li>
+            <li><span class="material-icons">check</span><span i18n="@@pricing.pro.feature6">File & image upload</span></li>
+            <li><span class="material-icons">check</span><span i18n="@@pricing.pro.feature7">Custom agent configuration</span></li>
+          </ul>
+          <a href="https://play.google.com/store/apps/details?id=com.softwarity.aipilot.pro" target="_blank" class="pricing-button primary" i18n="@@pricing.pro.cta">Get Pro</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Installation Section -->
+    <section class="section" id="installation">
+      <h2 i18n="@@installation.title">Installation</h2>
+
+      <!-- Step 1: Install CLI -->
+      <div class="doc-step">
+        <div class="doc-step-header">
+          <div class="step-number">1</div>
+          <h3 i18n="@@installation.step1.title">Install the CLI</h3>
+        </div>
+        <div class="doc-step-content">
+          <p i18n="@@installation.step1.desc">Download and install the CLI on your computer</p>
+
+          <h4 i18n="@@installation.linux">Linux / macOS</h4>
+          <pre><code>curl -fsSL https://raw.githubusercontent.com/softwarity/aipilot-cli/main/install.sh | bash</code></pre>
+
+          <h4 i18n="@@installation.windows">Windows (PowerShell)</h4>
+          <pre><code>irm https://raw.githubusercontent.com/softwarity/aipilot-cli/main/install.ps1 | iex</code></pre>
+          <p i18n="@@installation.windowsAlt">Or download directly from <a href="https://github.com/softwarity/aipilot-cli/releases" target="_blank">GitHub Releases</a></p>
+
+          <p i18n="@@doc.cliQR">When you run the CLI for the first time, a QR code will be displayed in your terminal:</p>
+          <!-- <div class="doc-screenshot single">
+            <img src="assets/screenshots/qrcode-cli.png" alt="QR Code in CLI" loading="lazy">
+          </div> -->
+        </div>
+      </div>
+
+      <!-- Step 2: Install Mobile App -->
+      <div class="doc-step">
+        <div class="doc-step-header">
+          <div class="step-number">2</div>
+          <h3 i18n="@@installation.step2.title">Install the Mobile App</h3>
+        </div>
+        <div class="doc-step-content">
+          <p i18n="@@installation.step2.desc">Get AIPilot from Google Play or App Store</p>
+          <div class="store-buttons">
+            <a href="https://play.google.com/store/apps/details?id=com.softwarity.aipilot" target="_blank" class="store-button">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" alt="Google Play" height="40">
+            </a>
+          </div>
+          <p i18n="@@doc.welcomeScreen">When you open the app for the first time, you'll see the welcome screen:</p>
+          <div class="doc-screenshot single">
+            <img src="assets/screenshots/welcome.jpeg" alt="Welcome Screen" loading="lazy">
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3: Pair Device -->
+      <div class="doc-step">
+        <div class="doc-step-header">
+          <div class="step-number">3</div>
+          <h3 i18n="@@installation.step3.title">Pair Your Device</h3>
+        </div>
+        <div class="doc-step-content">
+          <p i18n="@@installation.step3.desc">Scan the QR code to pair your mobile with the CLI</p>
+          <p i18n="@@doc.scanQR">Tap the "Get aipilot-cli" button or the scan button to open the QR scanner. Point your camera at the QR code displayed in your terminal:</p>
+          <div class="doc-screenshots-row">
+            <div class="doc-screenshot">
+              <img src="assets/screenshots/qr-scanner.jpeg" alt="QR Scanner" loading="lazy">
+              <span class="screenshot-caption" i18n="@@doc.caption.scanner">Scanning QR code</span>
+            </div>
+            <div class="doc-screenshot">
+              <img src="assets/screenshots/pairing-success.jpeg" alt="Pairing Success" loading="lazy">
+              <span class="screenshot-caption" i18n="@@doc.caption.paired">Successfully paired</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 4: Start Using -->
+      <div class="doc-step">
+        <div class="doc-step-header">
+          <div class="step-number">4</div>
+          <h3 i18n="@@installation.step4.title">Start Coding</h3>
+        </div>
+        <div class="doc-step-content">
+          <p i18n="@@installation.step4.desc">Control your AI agent from anywhere</p>
+          <p i18n="@@doc.homeScreen">Once paired, you'll see your sessions on the home screen. Tap a session to connect:</p>
+          <div class="doc-screenshots-row">
+            <div class="doc-screenshot">
+              <img src="assets/screenshots/home-sessions.jpeg" alt="Home Sessions" loading="lazy">
+              <span class="screenshot-caption" i18n="@@doc.caption.sessions">Active sessions</span>
+            </div>
+            <div class="doc-screenshot">
+              <img src="assets/screenshots/terminal-cli.jpeg" alt="Terminal" loading="lazy">
+              <span class="screenshot-caption" i18n="@@doc.caption.terminal">Terminal view</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Documentation Section -->
+    <section class="section" id="documentation">
+      <h2 i18n="@@doc.title">Documentation</h2>
+
+      <!-- Terminal Features -->
+      <div class="doc-subsection">
+        <h3 i18n="@@doc.terminal.title">Terminal Features</h3>
+        <p i18n="@@doc.terminal.desc">The terminal provides full access to your AI agent with additional mobile-friendly features:</p>
+
+        <div class="doc-feature">
+          <h4 i18n="@@doc.terminal.voice">Voice Input</h4>
+          <p i18n="@@doc.terminal.voiceDesc">Use the microphone button to dictate commands using speech-to-text:</p>
+          <div class="doc-screenshot single">
+            <img src="assets/screenshots/voice-input.jpeg" alt="Voice Input" loading="lazy">
+          </div>
+        </div>
+
+        <div class="doc-feature">
+          <h4 i18n="@@doc.terminal.upload">File Upload</h4>
+          <p i18n="@@doc.terminal.uploadDesc">Send files and images directly to your AI agent. Tap the attachment button to select from camera or files:</p>
+          <div class="doc-screenshots-row">
+            <div class="doc-screenshot">
+              <img src="assets/screenshots/file-upload-menu.jpeg" alt="Upload Menu" loading="lazy">
+              <span class="screenshot-caption" i18n="@@doc.caption.uploadMenu">Upload options</span>
+            </div>
+            <div class="doc-screenshot">
+              <img src="assets/screenshots/uploads-sheet.jpeg" alt="Uploads Sheet" loading="lazy">
+              <span class="screenshot-caption" i18n="@@doc.caption.uploads">Upload progress</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="doc-feature">
+          <h4 i18n="@@doc.terminal.history">History Commands</h4>
+          <p i18n="@@doc.terminal.historyDesc">Quick access to common agent commands like /compact, /resume, /clear:</p>
+          <div class="doc-screenshot single">
+            <img src="assets/screenshots/history-menu.jpeg" alt="History Menu" loading="lazy">
+          </div>
+        </div>
+
+        <div class="doc-feature">
+          <h4 i18n="@@doc.terminal.switch">PC/Mobile Mode</h4>
+          <p i18n="@@doc.terminal.switchDesc">Switch control between your PC and mobile device. The terminal resizes automatically:</p>
+          <div class="doc-screenshots-row">
+            <div class="doc-screenshot">
+              <img src="assets/screenshots/terminal-pc-mode.jpeg" alt="PC Mode" loading="lazy">
+              <span class="screenshot-caption" i18n="@@doc.caption.pcMode">PC mode</span>
+            </div>
+            <div class="doc-screenshot">
+              <img src="assets/screenshots/terminal-switch.jpeg" alt="Switch View" loading="lazy">
+              <span class="screenshot-caption" i18n="@@doc.caption.switch">Multi-session view</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SSH Mode -->
+      <div class="doc-subsection">
+        <h3 i18n="@@doc.ssh.title">SSH Mode</h3>
+        <p i18n="@@doc.ssh.desc">Connect directly to remote servers via SSH without the CLI:</p>
+        <div class="doc-screenshots-row">
+          <div class="doc-screenshot">
+            <img src="assets/screenshots/ssh-screen-empty.jpeg" alt="SSH Screen" loading="lazy">
+            <span class="screenshot-caption" i18n="@@doc.caption.sshEmpty">SSH connections</span>
+          </div>
+          <div class="doc-screenshot">
+            <img src="assets/screenshots/ssh-connection-form.jpeg" alt="SSH Form" loading="lazy">
+            <span class="screenshot-caption" i18n="@@doc.caption.sshForm">New connection</span>
+          </div>
+        </div>
+        <div class="doc-screenshots-row">
+          <div class="doc-screenshot">
+            <img src="assets/screenshots/ssh-agent-form.jpeg" alt="Agent Form" loading="lazy">
+            <span class="screenshot-caption" i18n="@@doc.caption.agentForm">Configure agent</span>
+          </div>
+          <div class="doc-screenshot">
+            <img src="assets/screenshots/terminal-ssh.jpeg" alt="SSH Terminal" loading="lazy">
+            <span class="screenshot-caption" i18n="@@doc.caption.sshTerminal">SSH terminal</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Settings -->
+      <div class="doc-subsection">
+        <h3 i18n="@@doc.settings.title">Settings</h3>
+        <p i18n="@@doc.settings.desc">Customize font size, view session info, and configure LAN connections:</p>
+        <div class="doc-screenshots-row">
+          <div class="doc-screenshot">
+            <img src="assets/screenshots/settings-sheet.jpeg" alt="Settings" loading="lazy">
+            <span class="screenshot-caption" i18n="@@doc.caption.settings">Settings menu</span>
+          </div>
+          <div class="doc-screenshot">
+            <img src="assets/screenshots/font-size-slider.jpeg" alt="Font Size" loading="lazy">
+            <span class="screenshot-caption" i18n="@@doc.caption.fontSize">Font size</span>
+          </div>
+        </div>
+        <div class="doc-screenshots-row">
+          <div class="doc-screenshot">
+            <img src="assets/screenshots/session-info.jpeg" alt="Session Info" loading="lazy">
+            <span class="screenshot-caption" i18n="@@doc.caption.sessionInfo">Session info</span>
+          </div>
+          <div class="doc-screenshot">
+            <img src="assets/screenshots/lan-ip-dialog.jpeg" alt="LAN IP" loading="lazy">
+            <span class="screenshot-caption" i18n="@@doc.caption.lanIp">LAN configuration</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Usage Section -->
+    <section class="section" id="usage">
+      <h2 i18n="@@usage.title">CLI Usage</h2>
+      <h3 i18n="@@usage.basic">Basic usage</h3>
+      <pre><code>aipilot-cli --agent claude</code></pre>
+
+      <h3 i18n="@@usage.options">Options</h3>
+      <pre><code>aipilot-cli [options]
+
+--agent &lt;name&gt;      # Agent: claude, gemini, codex
+--agent ?           # Force agent selection
+--workdir &lt;path&gt;    # Working directory
+--agents            # List available agents
+--sessions          # List saved sessions
+--clear-session     # Delete current session
+--clear-sessions    # Delete all sessions
+--unpair &lt;id&gt;       # Remove paired mobile
+--status            # Show PC and mobile status
+--version           # Show version</code></pre>
+
+      <h3 i18n="@@usage.commands">Commands</h3>
+      <pre><code>/qr                 # Display pairing QR code</code></pre>
+    </section>
+
+    <!-- Card Footer -->
+    <footer class="card-footer">
+      <img src="https://www.softwarity.io/img/softwarity.svg" alt="Softwarity" class="footer-logo">
+      <span i18n="@@footer.madeBy">Made by</span>
+      <a href="https://www.softwarity.io/" target="_blank">Softwarity</a>
+    </footer>
+  </div>
+</main>
