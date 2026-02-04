@@ -46,23 +46,31 @@
       <trans-unit id="installation.linux" datatype="html"><source>Linux / macOS</source><target>Linux / macOS</target></trans-unit>
       <trans-unit id="installation.windows" datatype="html"><source>Windows (PowerShell)</source><target>Windows (PowerShell)</target></trans-unit>
       <trans-unit id="installation.windowsAlt" datatype="html"><source>Or download directly from GitHub Releases</source><target>या सीधे GitHub Releases से डाउनलोड करें</target></trans-unit>
-      <trans-unit id="doc.cliQR" datatype="html"><source>When you run the CLI for the first time, a QR code will be displayed in your terminal:</source><target>जब आप पहली बार CLI चलाते हैं, तो टर्मिनल में QR कोड दिखाई देगा:</target></trans-unit>
+      <trans-unit id="installation.prerequisites.title" datatype="html"><source>Prerequisites</source><target>आवश्यकताएं</target></trans-unit>
+      <trans-unit id="installation.prerequisites.desc" datatype="html"><source>Before starting, install at least one AI coding agent on your computer:</source><target>शुरू करने से पहले, अपने कंप्यूटर पर कम से कम एक AI कोडिंग एजेंट इंस्टॉल करें:</target></trans-unit>
+      <trans-unit id="installation.prerequisites.comingSoon" datatype="html"><source>Coming soon</source><target>जल्द आ रहा है</target></trans-unit>
       <trans-unit id="installation.step2.title" datatype="html"><source>Install the Mobile App</source><target>मोबाइल ऐप इंस्टॉल करें</target></trans-unit>
       <trans-unit id="installation.step2.desc" datatype="html"><source>Get AIPilot from Google Play or App Store</source><target>Google Play या App Store से AIPilot प्राप्त करें</target></trans-unit>
       <trans-unit id="installation.free" datatype="html"><source>Free</source><target>मुफ्त</target></trans-unit>
       <trans-unit id="installation.pro" datatype="html"><source>Pro</source><target>प्रो</target></trans-unit>
       <trans-unit id="doc.welcomeScreen" datatype="html"><source>When you open the app for the first time, you'll see the welcome screen:</source><target>जब आप पहली बार ऐप खोलते हैं, तो वेलकम स्क्रीन दिखाई देगी:</target></trans-unit>
-      <trans-unit id="installation.step3.title" datatype="html"><source>Pair Your Device</source><target>डिवाइस पेयर करें</target></trans-unit>
-      <trans-unit id="installation.step3.desc" datatype="html"><source>Scan the QR code to pair your mobile with the CLI</source><target>अपने मोबाइल को CLI के साथ पेयर करने के लिए QR कोड स्कैन करें</target></trans-unit>
-      <trans-unit id="doc.scanQR" datatype="html"><source>Tap the "Get aipilot-cli" button or the scan button to open the QR scanner. Point your camera at the QR code displayed in your terminal:</source><target>"aipilot-cli प्राप्त करें" बटन या स्कैन बटन पर टैप करके QR स्कैनर खोलें। अपने टर्मिनल में दिखाए गए QR कोड पर कैमरा पॉइंट करें:</target></trans-unit>
+      <trans-unit id="installation.step3.title" datatype="html"><source>First Launch &amp; Pairing</source><target>पहला लॉन्च और पेयरिंग</target></trans-unit>
+      <trans-unit id="installation.step3.desc" datatype="html"><source>Navigate to your project directory and launch the CLI with your preferred agent:</source><target>अपने प्रोजेक्ट डायरेक्टरी में जाएं और अपने पसंदीदा एजेंट के साथ CLI लॉन्च करें:</target></trans-unit>
+      <trans-unit id="installation.step3.pairingNote" datatype="html"><source>Pairing is a one-time operation. On subsequent launches, the connection between your mobile and PC is automatic.</source><target>पेयरिंग एक बार की प्रक्रिया है। बाद के लॉन्च में, मोबाइल और PC के बीच कनेक्शन स्वचालित होता है।</target></trans-unit>
       <trans-unit id="doc.caption.scanner" datatype="html"><source>Scanning QR code</source><target>QR कोड स्कैन हो रहा है</target></trans-unit>
       <trans-unit id="doc.caption.paired" datatype="html"><source>Successfully paired</source><target>सफलतापूर्वक पेयर हुआ</target></trans-unit>
       <trans-unit id="doc.caption.welcome" datatype="html"><source>Welcome screen</source><target>वेलकम स्क्रीन</target></trans-unit>
       <trans-unit id="doc.caption.voice" datatype="html"><source>Voice input</source><target>वॉइस इनपुट</target></trans-unit>
+      <trans-unit id="doc.caption.qrCode" datatype="html"><source>Pairing QR code</source><target>पेयरिंग QR कोड</target></trans-unit>
+      <trans-unit id="doc.caption.enterQr" datatype="html"><source>Typing /qr command</source><target>/qr कमांड टाइप करना</target></trans-unit>
+      <trans-unit id="doc.caption.failedSession" datatype="html"><source>Connection failed</source><target>कनेक्शन विफल</target></trans-unit>
+      <trans-unit id="doc.caption.moreMenu" datatype="html"><source>More options</source><target>अधिक विकल्प</target></trans-unit>
       <trans-unit id="doc.caption.history" datatype="html"><source>Command history</source><target>कमांड हिस्ट्री</target></trans-unit>
       <trans-unit id="installation.step4.title" datatype="html"><source>Start Coding</source><target>कोडिंग शुरू करें</target></trans-unit>
       <trans-unit id="installation.step4.desc" datatype="html"><source>Control your AI agent from anywhere</source><target>कहीं से भी अपने AI एजेंट को नियंत्रित करें</target></trans-unit>
-      <trans-unit id="doc.homeScreen" datatype="html"><source>Once paired, you'll see your sessions on the home screen. Tap a session to connect:</source><target>पेयर होने के बाद, होम स्क्रीन पर सेशन दिखाई देंगे। कनेक्ट करने के लिए सेशन पर टैप करें:</target></trans-unit>
+      <trans-unit id="installation.step4.launch" datatype="html"><source>Run the CLI in your working directory. The mobile app detects the session automatically:</source><target>अपनी कार्य डायरेक्टरी में CLI चलाएं। मोबाइल ऐप सेशन को स्वचालित रूप से पहचानता है:</target></trans-unit>
+      <trans-unit id="installation.step4.qrTip" datatype="html"><source>Use the /qr command at any time to display the pairing QR code and pair additional devices.</source><target>पेयरिंग QR कोड दिखाने और अतिरिक्त डिवाइस पेयर करने के लिए किसी भी समय /qr कमांड का उपयोग करें।</target></trans-unit>
+      <trans-unit id="installation.step4.modeNote" datatype="html"><source>Terminal rendering is exclusive: for a given session, only one device (mobile or PC) displays the terminal at a time. You can still send voice commands and upload files or images from your mobile, even when the PC has control.</source><target>टर्मिनल रेंडरिंग एक्सक्लूसिव है: किसी दिए गए सत्र के लिए, एक समय में केवल एक डिवाइस (मोबाइल या PC) टर्मिनल दिखाता है। PC का नियंत्रण होने पर भी आप अपने मोबाइल से वॉइस कमांड भेज सकते हैं और फ़ाइलें या इमेज अपलोड कर सकते हैं।</target></trans-unit>
       <trans-unit id="doc.caption.sessions" datatype="html"><source>Active sessions</source><target>सक्रिय सेशन</target></trans-unit>
       <trans-unit id="doc.caption.terminal" datatype="html"><source>Terminal view</source><target>टर्मिनल व्यू</target></trans-unit>
       <trans-unit id="doc.title" datatype="html"><source>Documentation</source><target>दस्तावेज़</target></trans-unit>
@@ -70,14 +78,8 @@
       <trans-unit id="doc.terminal.desc" datatype="html"><source>The terminal provides full access to your AI agent with additional mobile-friendly features:</source><target>टर्मिनल अतिरिक्त मोबाइल-फ्रेंडली सुविधाओं के साथ AI एजेंट तक पूर्ण पहुंच प्रदान करता है:</target></trans-unit>
       <trans-unit id="doc.terminal.voice" datatype="html"><source>Voice Input</source><target>वॉइस इनपुट</target></trans-unit>
       <trans-unit id="doc.terminal.voiceDesc" datatype="html"><source>Use the microphone button to dictate commands using speech-to-text:</source><target>स्पीच-टू-टेक्स्ट का उपयोग करके कमांड बोलने के लिए माइक्रोफ़ोन बटन का उपयोग करें:</target></trans-unit>
-      <trans-unit id="doc.terminal.upload" datatype="html"><source>File Upload</source><target>फाइल अपलोड</target></trans-unit>
-      <trans-unit id="doc.terminal.uploadDesc" datatype="html"><source>Send files and images directly to your AI agent. Tap the attachment button to select from camera or files:</source><target>अपने AI एजेंट को सीधे फाइल और इमेज भेजें। कैमरा या फाइलों से चुनने के लिए अटैचमेंट बटन पर टैप करें:</target></trans-unit>
       <trans-unit id="doc.caption.uploadMenu" datatype="html"><source>Upload options</source><target>अपलोड विकल्प</target></trans-unit>
       <trans-unit id="doc.caption.uploads" datatype="html"><source>Upload progress</source><target>अपलोड प्रगति</target></trans-unit>
-      <trans-unit id="doc.terminal.history" datatype="html"><source>History Commands</source><target>हिस्ट्री कमांड</target></trans-unit>
-      <trans-unit id="doc.terminal.historyDesc" datatype="html"><source>Quick access to common agent commands like /compact, /resume, /clear:</source><target>/compact, /resume, /clear जैसे सामान्य कमांड तक त्वरित पहुंच:</target></trans-unit>
-      <trans-unit id="doc.terminal.switch" datatype="html"><source>PC/Mobile Mode</source><target>PC/मोबाइल मोड</target></trans-unit>
-      <trans-unit id="doc.terminal.switchDesc" datatype="html"><source>Switch control between your PC and mobile device. The terminal resizes automatically:</source><target>PC और मोबाइल के बीच नियंत्रण स्विच करें। टर्मिनल स्वचालित रूप से आकार बदलता है:</target></trans-unit>
       <trans-unit id="doc.caption.pcMode" datatype="html"><source>PC mode</source><target>PC मोड</target></trans-unit>
       <trans-unit id="doc.caption.switch" datatype="html"><source>Multi-session view</source><target>मल्टी-सेशन व्यू</target></trans-unit>
       <trans-unit id="doc.ssh.title" datatype="html"><source>SSH Mode</source><target>SSH मोड</target></trans-unit>

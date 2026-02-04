@@ -46,23 +46,31 @@
       <trans-unit id="installation.linux" datatype="html"><source>Linux / macOS</source><target>Linux / macOS</target></trans-unit>
       <trans-unit id="installation.windows" datatype="html"><source>Windows (PowerShell)</source><target>Windows (PowerShell)</target></trans-unit>
       <trans-unit id="installation.windowsAlt" datatype="html"><source>Or download directly from GitHub Releases</source><target>またはGitHub Releasesから直接ダウンロード</target></trans-unit>
-      <trans-unit id="doc.cliQR" datatype="html"><source>When you run the CLI for the first time, a QR code will be displayed in your terminal:</source><target>初めてCLIを実行すると、ターミナルにQRコードが表示されます:</target></trans-unit>
+      <trans-unit id="installation.prerequisites.title" datatype="html"><source>Prerequisites</source><target>前提条件</target></trans-unit>
+      <trans-unit id="installation.prerequisites.desc" datatype="html"><source>Before starting, install at least one AI coding agent on your computer:</source><target>開始する前に、コンピューターに少なくとも1つのAIコーディングエージェントをインストールしてください:</target></trans-unit>
+      <trans-unit id="installation.prerequisites.comingSoon" datatype="html"><source>Coming soon</source><target>近日公開</target></trans-unit>
       <trans-unit id="installation.step2.title" datatype="html"><source>Install the Mobile App</source><target>モバイルアプリをインストール</target></trans-unit>
       <trans-unit id="installation.step2.desc" datatype="html"><source>Get AIPilot from Google Play or App Store</source><target>Google PlayまたはApp StoreからAIPilotを入手</target></trans-unit>
       <trans-unit id="installation.free" datatype="html"><source>Free</source><target>無料</target></trans-unit>
       <trans-unit id="installation.pro" datatype="html"><source>Pro</source><target>プロ</target></trans-unit>
       <trans-unit id="doc.welcomeScreen" datatype="html"><source>When you open the app for the first time, you'll see the welcome screen:</source><target>初めてアプリを開くと、ウェルカム画面が表示されます:</target></trans-unit>
-      <trans-unit id="installation.step3.title" datatype="html"><source>Pair Your Device</source><target>デバイスをペアリング</target></trans-unit>
-      <trans-unit id="installation.step3.desc" datatype="html"><source>Scan the QR code to pair your mobile with the CLI</source><target>QRコードをスキャンしてモバイルをCLIとペアリング</target></trans-unit>
-      <trans-unit id="doc.scanQR" datatype="html"><source>Tap the "Get aipilot-cli" button or the scan button to open the QR scanner. Point your camera at the QR code displayed in your terminal:</source><target>「aipilot-cliを取得」ボタンまたはスキャンボタンをタップしてQRスキャナーを開きます。ターミナルに表示されているQRコードにカメラを向けてください:</target></trans-unit>
+      <trans-unit id="installation.step3.title" datatype="html"><source>First Launch &amp; Pairing</source><target>初回起動とペアリング</target></trans-unit>
+      <trans-unit id="installation.step3.desc" datatype="html"><source>Navigate to your project directory and launch the CLI with your preferred agent:</source><target>プロジェクトディレクトリに移動し、お好みのエージェントでCLIを起動してください:</target></trans-unit>
+      <trans-unit id="installation.step3.pairingNote" datatype="html"><source>Pairing is a one-time operation. On subsequent launches, the connection between your mobile and PC is automatic.</source><target>ペアリングは一度だけの操作です。以降の起動では、モバイルとPCの接続は自動的に行われます。</target></trans-unit>
       <trans-unit id="doc.caption.scanner" datatype="html"><source>Scanning QR code</source><target>QRコードをスキャン</target></trans-unit>
       <trans-unit id="doc.caption.paired" datatype="html"><source>Successfully paired</source><target>ペアリング成功</target></trans-unit>
       <trans-unit id="doc.caption.welcome" datatype="html"><source>Welcome screen</source><target>ウェルカム画面</target></trans-unit>
       <trans-unit id="doc.caption.voice" datatype="html"><source>Voice input</source><target>音声入力</target></trans-unit>
+      <trans-unit id="doc.caption.qrCode" datatype="html"><source>Pairing QR code</source><target>ペアリングQRコード</target></trans-unit>
+      <trans-unit id="doc.caption.enterQr" datatype="html"><source>Typing /qr command</source><target>/qr コマンドの入力</target></trans-unit>
+      <trans-unit id="doc.caption.failedSession" datatype="html"><source>Connection failed</source><target>接続失敗</target></trans-unit>
+      <trans-unit id="doc.caption.moreMenu" datatype="html"><source>More options</source><target>その他のオプション</target></trans-unit>
       <trans-unit id="doc.caption.history" datatype="html"><source>Command history</source><target>コマンド履歴</target></trans-unit>
       <trans-unit id="installation.step4.title" datatype="html"><source>Start Coding</source><target>コーディング開始</target></trans-unit>
       <trans-unit id="installation.step4.desc" datatype="html"><source>Control your AI agent from anywhere</source><target>どこからでもAIエージェントを制御</target></trans-unit>
-      <trans-unit id="doc.homeScreen" datatype="html"><source>Once paired, you'll see your sessions on the home screen. Tap a session to connect:</source><target>ペアリング後、ホーム画面にセッションが表示されます。セッションをタップして接続:</target></trans-unit>
+      <trans-unit id="installation.step4.launch" datatype="html"><source>Run the CLI in your working directory. The mobile app detects the session automatically:</source><target>作業ディレクトリでCLIを実行してください。モバイルアプリがセッションを自動的に検出します:</target></trans-unit>
+      <trans-unit id="installation.step4.qrTip" datatype="html"><source>Use the /qr command at any time to display the pairing QR code and pair additional devices.</source><target>/qr コマンドをいつでも使用して、ペアリングQRコードを表示し、追加のデバイスをペアリングできます。</target></trans-unit>
+      <trans-unit id="installation.step4.modeNote" datatype="html"><source>Terminal rendering is exclusive: for a given session, only one device (mobile or PC) displays the terminal at a time. You can still send voice commands and upload files or images from your mobile, even when the PC has control.</source><target>ターミナルレンダリングは排他的です：特定のセッションでは、一度に1つのデバイス（モバイルまたはPC）のみがターミナルを表示します。PCが制御権を持っている場合でも、モバイルから音声コマンドの送信やファイル・画像のアップロードが可能です。</target></trans-unit>
       <trans-unit id="doc.caption.sessions" datatype="html"><source>Active sessions</source><target>アクティブセッション</target></trans-unit>
       <trans-unit id="doc.caption.terminal" datatype="html"><source>Terminal view</source><target>ターミナル表示</target></trans-unit>
       <trans-unit id="doc.title" datatype="html"><source>Documentation</source><target>ドキュメント</target></trans-unit>
@@ -70,14 +78,8 @@
       <trans-unit id="doc.terminal.desc" datatype="html"><source>The terminal provides full access to your AI agent with additional mobile-friendly features:</source><target>ターミナルはモバイルフレンドリーな機能付きでAIエージェントに完全アクセスを提供:</target></trans-unit>
       <trans-unit id="doc.terminal.voice" datatype="html"><source>Voice Input</source><target>音声入力</target></trans-unit>
       <trans-unit id="doc.terminal.voiceDesc" datatype="html"><source>Use the microphone button to dictate commands using speech-to-text:</source><target>マイクボタンを使って音声認識でコマンドを入力:</target></trans-unit>
-      <trans-unit id="doc.terminal.upload" datatype="html"><source>File Upload</source><target>ファイルアップロード</target></trans-unit>
-      <trans-unit id="doc.terminal.uploadDesc" datatype="html"><source>Send files and images directly to your AI agent. Tap the attachment button to select from camera or files:</source><target>AIエージェントに直接ファイルや画像を送信。添付ボタンをタップしてカメラやファイルから選択:</target></trans-unit>
       <trans-unit id="doc.caption.uploadMenu" datatype="html"><source>Upload options</source><target>アップロードオプション</target></trans-unit>
       <trans-unit id="doc.caption.uploads" datatype="html"><source>Upload progress</source><target>アップロード進捗</target></trans-unit>
-      <trans-unit id="doc.terminal.history" datatype="html"><source>History Commands</source><target>履歴コマンド</target></trans-unit>
-      <trans-unit id="doc.terminal.historyDesc" datatype="html"><source>Quick access to common agent commands like /compact, /resume, /clear:</source><target>/compact, /resume, /clearなどの一般的なコマンドに素早くアクセス:</target></trans-unit>
-      <trans-unit id="doc.terminal.switch" datatype="html"><source>PC/Mobile Mode</source><target>PC/モバイルモード</target></trans-unit>
-      <trans-unit id="doc.terminal.switchDesc" datatype="html"><source>Switch control between your PC and mobile device. The terminal resizes automatically:</source><target>PCとモバイル間で制御を切り替え。ターミナルは自動的にサイズ変更:</target></trans-unit>
       <trans-unit id="doc.caption.pcMode" datatype="html"><source>PC mode</source><target>PCモード</target></trans-unit>
       <trans-unit id="doc.caption.switch" datatype="html"><source>Multi-session view</source><target>マルチセッション表示</target></trans-unit>
       <trans-unit id="doc.ssh.title" datatype="html"><source>SSH Mode</source><target>SSHモード</target></trans-unit>

@@ -46,23 +46,31 @@
       <trans-unit id="installation.linux" datatype="html"><source>Linux / macOS</source><target>Linux / macOS</target></trans-unit>
       <trans-unit id="installation.windows" datatype="html"><source>Windows (PowerShell)</source><target>Windows (PowerShell)</target></trans-unit>
       <trans-unit id="installation.windowsAlt" datatype="html"><source>Or download directly from GitHub Releases</source><target>Hoặc tải trực tiếp từ GitHub Releases</target></trans-unit>
-      <trans-unit id="doc.cliQR" datatype="html"><source>When you run the CLI for the first time, a QR code will be displayed in your terminal:</source><target>Khi bạn chạy CLI lần đầu tiên, mã QR sẽ được hiển thị trong terminal:</target></trans-unit>
+      <trans-unit id="installation.prerequisites.title" datatype="html"><source>Prerequisites</source><target>Dieu kien tien quyet</target></trans-unit>
+      <trans-unit id="installation.prerequisites.desc" datatype="html"><source>Before starting, install at least one AI coding agent on your computer:</source><target>Truoc khi bat dau, cai dat it nhat mot AI coding agent tren may tinh cua ban:</target></trans-unit>
+      <trans-unit id="installation.prerequisites.comingSoon" datatype="html"><source>Coming soon</source><target>Sap ra mat</target></trans-unit>
       <trans-unit id="installation.step2.title" datatype="html"><source>Install the Mobile App</source><target>Cài Đặt Ứng Dụng</target></trans-unit>
       <trans-unit id="installation.step2.desc" datatype="html"><source>Get AIPilot from Google Play or App Store</source><target>Tải AIPilot từ Google Play hoặc App Store</target></trans-unit>
       <trans-unit id="installation.free" datatype="html"><source>Free</source><target>Miễn phí</target></trans-unit>
       <trans-unit id="installation.pro" datatype="html"><source>Pro</source><target>Pro</target></trans-unit>
       <trans-unit id="doc.welcomeScreen" datatype="html"><source>When you open the app for the first time, you'll see the welcome screen:</source><target>Khi bạn mở ứng dụng lần đầu tiên, bạn sẽ thấy màn hình chào mừng:</target></trans-unit>
-      <trans-unit id="installation.step3.title" datatype="html"><source>Pair Your Device</source><target>Ghép Nối Thiết Bị</target></trans-unit>
-      <trans-unit id="installation.step3.desc" datatype="html"><source>Scan the QR code to pair your mobile with the CLI</source><target>Quét mã QR để ghép nối điện thoại với CLI</target></trans-unit>
-      <trans-unit id="doc.scanQR" datatype="html"><source>Tap the "Get aipilot-cli" button or the scan button to open the QR scanner. Point your camera at the QR code displayed in your terminal:</source><target>Nhấn nút "Tải aipilot-cli" hoặc nút quét để mở trình quét QR. Hướng camera vào mã QR hiển thị trong terminal:</target></trans-unit>
+      <trans-unit id="installation.step3.title" datatype="html"><source>First Launch &amp; Pairing</source><target>Lan Khoi Dong Dau va Ghep Noi</target></trans-unit>
+      <trans-unit id="installation.step3.desc" datatype="html"><source>Navigate to your project directory and launch the CLI with your preferred agent:</source><target>Di chuyen den thu muc du an va khoi dong CLI voi agent uu thich:</target></trans-unit>
+      <trans-unit id="installation.step3.pairingNote" datatype="html"><source>Pairing is a one-time operation. On subsequent launches, the connection between your mobile and PC is automatic.</source><target>Ghep noi la thao tac mot lan. Cac lan khoi dong sau, ket noi giua dien thoai va PC la tu dong.</target></trans-unit>
       <trans-unit id="doc.caption.scanner" datatype="html"><source>Scanning QR code</source><target>Đang quét mã QR</target></trans-unit>
       <trans-unit id="doc.caption.paired" datatype="html"><source>Successfully paired</source><target>Ghép nối thành công</target></trans-unit>
       <trans-unit id="doc.caption.welcome" datatype="html"><source>Welcome screen</source><target>Man hinh chao mung</target></trans-unit>
       <trans-unit id="doc.caption.voice" datatype="html"><source>Voice input</source><target>Nhap giong noi</target></trans-unit>
+      <trans-unit id="doc.caption.qrCode" datatype="html"><source>Pairing QR code</source><target>Ma QR ghep noi</target></trans-unit>
+      <trans-unit id="doc.caption.enterQr" datatype="html"><source>Typing /qr command</source><target>Nhap lenh /qr</target></trans-unit>
+      <trans-unit id="doc.caption.failedSession" datatype="html"><source>Connection failed</source><target>Ket noi that bai</target></trans-unit>
+      <trans-unit id="doc.caption.moreMenu" datatype="html"><source>More options</source><target>Tuy chon khac</target></trans-unit>
       <trans-unit id="doc.caption.history" datatype="html"><source>Command history</source><target>Lich su lenh</target></trans-unit>
       <trans-unit id="installation.step4.title" datatype="html"><source>Start Coding</source><target>Bắt Đầu Lập Trình</target></trans-unit>
       <trans-unit id="installation.step4.desc" datatype="html"><source>Control your AI agent from anywhere</source><target>Điều khiển AI từ bất kỳ đâu</target></trans-unit>
-      <trans-unit id="doc.homeScreen" datatype="html"><source>Once paired, you'll see your sessions on the home screen. Tap a session to connect:</source><target>Sau khi ghép nối, bạn sẽ thấy các phiên trên màn hình chính. Nhấn vào phiên để kết nối:</target></trans-unit>
+      <trans-unit id="installation.step4.launch" datatype="html"><source>Run the CLI in your working directory. The mobile app detects the session automatically:</source><target>Chay CLI trong thu muc lam viec. Ung dung di dong tu dong phat hien phien:</target></trans-unit>
+      <trans-unit id="installation.step4.qrTip" datatype="html"><source>Use the /qr command at any time to display the pairing QR code and pair additional devices.</source><target>Su dung lenh /qr bat ky luc nao de hien thi ma QR ghep noi va ghep noi them thiet bi.</target></trans-unit>
+      <trans-unit id="installation.step4.modeNote" datatype="html"><source>Terminal rendering is exclusive: for a given session, only one device (mobile or PC) displays the terminal at a time. You can still send voice commands and upload files or images from your mobile, even when the PC has control.</source><target>Hiển thị terminal là độc quyền: đối với một phiên nhất định, chỉ một thiết bị (điện thoại hoặc PC) hiển thị terminal tại một thời điểm. Bạn vẫn có thể gửi lệnh giọng nói và tải lên tệp hoặc hình ảnh từ điện thoại, ngay cả khi PC đang điều khiển.</target></trans-unit>
       <trans-unit id="doc.caption.sessions" datatype="html"><source>Active sessions</source><target>Phiên đang hoạt động</target></trans-unit>
       <trans-unit id="doc.caption.terminal" datatype="html"><source>Terminal view</source><target>Giao diện terminal</target></trans-unit>
       <trans-unit id="doc.title" datatype="html"><source>Documentation</source><target>Tài liệu</target></trans-unit>
@@ -70,14 +78,8 @@
       <trans-unit id="doc.terminal.desc" datatype="html"><source>The terminal provides full access to your AI agent with additional mobile-friendly features:</source><target>Terminal cung cấp quyền truy cập đầy đủ đến AI với các tính năng thân thiện di động:</target></trans-unit>
       <trans-unit id="doc.terminal.voice" datatype="html"><source>Voice Input</source><target>Nhập Giọng Nói</target></trans-unit>
       <trans-unit id="doc.terminal.voiceDesc" datatype="html"><source>Use the microphone button to dictate commands using speech-to-text:</source><target>Sử dụng nút micro để đọc lệnh bằng nhận dạng giọng nói:</target></trans-unit>
-      <trans-unit id="doc.terminal.upload" datatype="html"><source>File Upload</source><target>Tải Lên Tệp</target></trans-unit>
-      <trans-unit id="doc.terminal.uploadDesc" datatype="html"><source>Send files and images directly to your AI agent. Tap the attachment button to select from camera or files:</source><target>Gửi tệp và hình ảnh trực tiếp đến AI. Nhấn nút đính kèm để chọn từ camera hoặc tệp:</target></trans-unit>
       <trans-unit id="doc.caption.uploadMenu" datatype="html"><source>Upload options</source><target>Tùy chọn tải lên</target></trans-unit>
       <trans-unit id="doc.caption.uploads" datatype="html"><source>Upload progress</source><target>Tiến trình tải lên</target></trans-unit>
-      <trans-unit id="doc.terminal.history" datatype="html"><source>History Commands</source><target>Lệnh Lịch sử</target></trans-unit>
-      <trans-unit id="doc.terminal.historyDesc" datatype="html"><source>Quick access to common agent commands like /compact, /resume, /clear:</source><target>Truy cập nhanh các lệnh thường dùng như /compact, /resume, /clear:</target></trans-unit>
-      <trans-unit id="doc.terminal.switch" datatype="html"><source>PC/Mobile Mode</source><target>Chế độ PC/Di động</target></trans-unit>
-      <trans-unit id="doc.terminal.switchDesc" datatype="html"><source>Switch control between your PC and mobile device. The terminal resizes automatically:</source><target>Chuyển đổi điều khiển giữa PC và di động. Terminal tự động thay đổi kích thước:</target></trans-unit>
       <trans-unit id="doc.caption.pcMode" datatype="html"><source>PC mode</source><target>Chế độ PC</target></trans-unit>
       <trans-unit id="doc.caption.switch" datatype="html"><source>Multi-session view</source><target>Giao diện đa phiên</target></trans-unit>
       <trans-unit id="doc.ssh.title" datatype="html"><source>SSH Mode</source><target>Chế độ SSH</target></trans-unit>

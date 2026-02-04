@@ -52,23 +52,31 @@
       <trans-unit id="installation.linux" datatype="html"><source>Linux / macOS</source><target>Linux / macOS</target></trans-unit>
       <trans-unit id="installation.windows" datatype="html"><source>Windows (PowerShell)</source><target>Windows (PowerShell)</target></trans-unit>
       <trans-unit id="installation.windowsAlt" datatype="html"><source>Or download directly from GitHub Releases</source><target>Ou baixe diretamente do GitHub Releases</target></trans-unit>
-      <trans-unit id="doc.cliQR" datatype="html"><source>When you run the CLI for the first time, a QR code will be displayed in your terminal:</source><target>Quando voce executa o CLI pela primeira vez, um codigo QR sera exibido no seu terminal:</target></trans-unit>
+      <trans-unit id="installation.prerequisites.title" datatype="html"><source>Prerequisites</source><target>Pre-requisitos</target></trans-unit>
+      <trans-unit id="installation.prerequisites.desc" datatype="html"><source>Before starting, install at least one AI coding agent on your computer:</source><target>Antes de comecar, instale pelo menos um agente IA de programacao no seu computador:</target></trans-unit>
+      <trans-unit id="installation.prerequisites.comingSoon" datatype="html"><source>Coming soon</source><target>Em breve</target></trans-unit>
       <trans-unit id="installation.step2.title" datatype="html"><source>Install the Mobile App</source><target>Instalar o App Movel</target></trans-unit>
       <trans-unit id="installation.step2.desc" datatype="html"><source>Get AIPilot from Google Play or App Store</source><target>Obtenha AIPilot do Google Play ou App Store</target></trans-unit>
       <trans-unit id="installation.free" datatype="html"><source>Free</source><target>Gratis</target></trans-unit>
       <trans-unit id="installation.pro" datatype="html"><source>Pro</source><target>Pro</target></trans-unit>
       <trans-unit id="doc.welcomeScreen" datatype="html"><source>When you open the app for the first time, you'll see the welcome screen:</source><target>Quando voce abrir o app pela primeira vez, vera a tela de boas-vindas:</target></trans-unit>
-      <trans-unit id="installation.step3.title" datatype="html"><source>Pair Your Device</source><target>Emparelhar seu Dispositivo</target></trans-unit>
-      <trans-unit id="installation.step3.desc" datatype="html"><source>Scan the QR code to pair your mobile with the CLI</source><target>Escaneie o codigo QR para emparelhar seu celular com o CLI</target></trans-unit>
-      <trans-unit id="doc.scanQR" datatype="html"><source>Tap the "Get aipilot-cli" button or the scan button to open the QR scanner. Point your camera at the QR code displayed in your terminal:</source><target>Toque no botao "Obter aipilot-cli" ou no botao de escanear para abrir o scanner QR. Aponte sua camera para o codigo QR exibido no seu terminal:</target></trans-unit>
+      <trans-unit id="installation.step3.title" datatype="html"><source>First Launch &amp; Pairing</source><target>Primeiro Inicio e Emparelhamento</target></trans-unit>
+      <trans-unit id="installation.step3.desc" datatype="html"><source>Navigate to your project directory and launch the CLI with your preferred agent:</source><target>Navegue ate o diretorio do seu projeto e inicie o CLI com seu agente preferido:</target></trans-unit>
+      <trans-unit id="installation.step3.pairingNote" datatype="html"><source>Pairing is a one-time operation. On subsequent launches, the connection between your mobile and PC is automatic.</source><target>O emparelhamento e uma operacao unica. Nos inicios seguintes, a conexao entre seu celular e PC e automatica.</target></trans-unit>
       <trans-unit id="doc.caption.scanner" datatype="html"><source>Scanning QR code</source><target>Escaneando codigo QR</target></trans-unit>
       <trans-unit id="doc.caption.paired" datatype="html"><source>Successfully paired</source><target>Emparelhado com sucesso</target></trans-unit>
       <trans-unit id="doc.caption.welcome" datatype="html"><source>Welcome screen</source><target>Tela de boas-vindas</target></trans-unit>
       <trans-unit id="doc.caption.voice" datatype="html"><source>Voice input</source><target>Entrada de voz</target></trans-unit>
+      <trans-unit id="doc.caption.qrCode" datatype="html"><source>Pairing QR code</source><target>Codigo QR de emparelhamento</target></trans-unit>
+      <trans-unit id="doc.caption.enterQr" datatype="html"><source>Typing /qr command</source><target>Digitando o comando /qr</target></trans-unit>
+      <trans-unit id="doc.caption.failedSession" datatype="html"><source>Connection failed</source><target>Conexao falhou</target></trans-unit>
+      <trans-unit id="doc.caption.moreMenu" datatype="html"><source>More options</source><target>Mais opcoes</target></trans-unit>
       <trans-unit id="doc.caption.history" datatype="html"><source>Command history</source><target>Historico de comandos</target></trans-unit>
       <trans-unit id="installation.step4.title" datatype="html"><source>Start Coding</source><target>Comecar a Programar</target></trans-unit>
       <trans-unit id="installation.step4.desc" datatype="html"><source>Control your AI agent from anywhere</source><target>Controle seu agente IA de qualquer lugar</target></trans-unit>
-      <trans-unit id="doc.homeScreen" datatype="html"><source>Once paired, you'll see your sessions on the home screen. Tap a session to connect:</source><target>Uma vez emparelhado, voce vera suas sessoes na tela inicial. Toque em uma sessao para conectar:</target></trans-unit>
+      <trans-unit id="installation.step4.launch" datatype="html"><source>Run the CLI in your working directory. The mobile app detects the session automatically:</source><target>Execute o CLI no seu diretorio de trabalho. O app movel detecta a sessao automaticamente:</target></trans-unit>
+      <trans-unit id="installation.step4.qrTip" datatype="html"><source>Use the /qr command at any time to display the pairing QR code and pair additional devices.</source><target>Use o comando /qr a qualquer momento para exibir o codigo QR de emparelhamento e emparelhar dispositivos adicionais.</target></trans-unit>
+      <trans-unit id="installation.step4.modeNote" datatype="html"><source>Terminal rendering is exclusive: for a given session, only one device (mobile or PC) displays the terminal at a time. You can still send voice commands and upload files or images from your mobile, even when the PC has control.</source><target>A renderização do terminal é exclusiva: para uma sessão específica, apenas um dispositivo (celular ou PC) exibe o terminal por vez. Você ainda pode enviar comandos de voz e enviar arquivos ou imagens do seu celular, mesmo quando o PC está no controle.</target></trans-unit>
       <trans-unit id="doc.caption.sessions" datatype="html"><source>Active sessions</source><target>Sessoes ativas</target></trans-unit>
       <trans-unit id="doc.caption.terminal" datatype="html"><source>Terminal view</source><target>Vista do terminal</target></trans-unit>
       <trans-unit id="doc.title" datatype="html"><source>Documentation</source><target>Documentacao</target></trans-unit>
@@ -76,14 +84,8 @@
       <trans-unit id="doc.terminal.desc" datatype="html"><source>The terminal provides full access to your AI agent with additional mobile-friendly features:</source><target>O terminal fornece acesso completo ao seu agente IA com recursos adicionais para celular:</target></trans-unit>
       <trans-unit id="doc.terminal.voice" datatype="html"><source>Voice Input</source><target>Entrada de Voz</target></trans-unit>
       <trans-unit id="doc.terminal.voiceDesc" datatype="html"><source>Use the microphone button to dictate commands using speech-to-text:</source><target>Use o botao do microfone para ditar comandos usando reconhecimento de voz:</target></trans-unit>
-      <trans-unit id="doc.terminal.upload" datatype="html"><source>File Upload</source><target>Upload de Arquivos</target></trans-unit>
-      <trans-unit id="doc.terminal.uploadDesc" datatype="html"><source>Send files and images directly to your AI agent. Tap the attachment button to select from camera or files:</source><target>Envie arquivos e imagens diretamente ao seu agente IA. Toque no botao de anexo para selecionar camera ou arquivos:</target></trans-unit>
       <trans-unit id="doc.caption.uploadMenu" datatype="html"><source>Upload options</source><target>Opcoes de upload</target></trans-unit>
       <trans-unit id="doc.caption.uploads" datatype="html"><source>Upload progress</source><target>Progresso de upload</target></trans-unit>
-      <trans-unit id="doc.terminal.history" datatype="html"><source>History Commands</source><target>Comandos do Historico</target></trans-unit>
-      <trans-unit id="doc.terminal.historyDesc" datatype="html"><source>Quick access to common agent commands like /compact, /resume, /clear:</source><target>Acesso rapido a comandos comuns como /compact, /resume, /clear:</target></trans-unit>
-      <trans-unit id="doc.terminal.switch" datatype="html"><source>PC/Mobile Mode</source><target>Modo PC/Movel</target></trans-unit>
-      <trans-unit id="doc.terminal.switchDesc" datatype="html"><source>Switch control between your PC and mobile device. The terminal resizes automatically:</source><target>Alterne o controle entre seu PC e celular. O terminal redimensiona automaticamente:</target></trans-unit>
       <trans-unit id="doc.caption.pcMode" datatype="html"><source>PC mode</source><target>Modo PC</target></trans-unit>
       <trans-unit id="doc.caption.switch" datatype="html"><source>Multi-session view</source><target>Vista multi-sessao</target></trans-unit>
       <trans-unit id="doc.ssh.title" datatype="html"><source>SSH Mode</source><target>Modo SSH</target></trans-unit>

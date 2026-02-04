@@ -135,6 +135,41 @@
     <section class="section" id="installation">
       <h2 i18n="@@installation.title">Installation</h2>
 
+      <!-- Prerequisites -->
+      <div class="doc-step prerequisites-section">
+        <div class="doc-step-header">
+          <div class="prerequisites-icon">
+            <span class="material-icons">checklist</span>
+          </div>
+          <h3 i18n="@@installation.prerequisites.title">Prerequisites</h3>
+        </div>
+        <div class="doc-step-content">
+          <p i18n="@@installation.prerequisites.desc">Before starting, install at least one AI coding agent on your computer:</p>
+          <div class="agent-cards-grid">
+            <a href="https://docs.anthropic.com/en/docs/claude-code/overview" target="_blank" class="agent-card">
+              <div class="agent-card-name">Claude Code</div>
+              <div class="agent-card-vendor">Anthropic</div>
+              <code>npm install -g @anthropic-ai/claude-code</code>
+            </a>
+            <a href="https://github.com/google-gemini/gemini-cli" target="_blank" class="agent-card">
+              <div class="agent-card-name">Gemini CLI</div>
+              <div class="agent-card-vendor">Google</div>
+              <code>npm install -g @anthropic-ai/gemini-cli</code>
+            </a>
+            <a href="https://github.com/openai/codex" target="_blank" class="agent-card">
+              <div class="agent-card-name">Codex CLI</div>
+              <div class="agent-card-vendor">OpenAI</div>
+              <code>npm install -g @openai/codex</code>
+            </a>
+            <div class="agent-card coming-soon">
+              <div class="agent-card-name">Kimi</div>
+              <div class="agent-card-vendor">Moonshot AI</div>
+              <span class="coming-soon-badge" i18n="@@installation.prerequisites.comingSoon">Coming soon</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Step 1: Install CLI -->
       <div class="doc-step">
         <div class="doc-step-header">
@@ -150,60 +185,73 @@
           <h4 i18n="@@installation.windows">Windows (PowerShell)</h4>
           <pre><code>irm https://raw.githubusercontent.com/softwarity/aipilot-cli/main/install.ps1 | iex</code></pre>
           <p i18n="@@installation.windowsAlt">Or download directly from <a href="https://github.com/softwarity/aipilot-cli/releases" target="_blank">GitHub Releases</a></p>
-
-          <p i18n="@@doc.cliQR">When you run the CLI for the first time, a QR code will be displayed in your terminal:</p>
         </div>
       </div>
 
-      <!-- Steps 2 & 3: Install App + Pair Device (side by side) -->
-      <div class="doc-steps-row">
-        <!-- Step 2: Install Mobile App -->
-        <div class="doc-step">
-          <div class="doc-step-header">
-            <div class="step-number">2</div>
-            <h3 i18n="@@installation.step2.title">Install the Mobile App</h3>
-          </div>
-          <div class="doc-step-content">
-            <p i18n="@@installation.step2.desc">Get AIPilot from Google Play or App Store</p>
-            <div class="store-buttons-grid">
-              <div class="store-option">
-                <span class="store-label" i18n="@@installation.free">Free</span>
-                <a href="https://play.google.com/store/apps/details?id=com.softwarity.aipilot" target="_blank" class="store-button">
-                  <img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" alt="Google Play Free" height="40">
-                </a>
-              </div>
-              <div class="store-option">
-                <span class="store-label pro" i18n="@@installation.pro">Pro</span>
-                <a href="https://play.google.com/store/apps/details?id=com.softwarity.aipilot.pro" target="_blank" class="store-button">
-                  <img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" alt="Google Play Pro" height="40">
-                </a>
-              </div>
+      <!-- Step 2: Install Mobile App -->
+      <div class="doc-step">
+        <div class="doc-step-header">
+          <div class="step-number">2</div>
+          <h3 i18n="@@installation.step2.title">Install the Mobile App</h3>
+        </div>
+        <div class="doc-step-content">
+          <p i18n="@@installation.step2.desc">Get AIPilot from Google Play or App Store</p>
+          <div class="store-buttons-grid">
+            <div class="store-option">
+              <span class="store-label" i18n="@@installation.free">Free</span>
+              <a href="https://play.google.com/store/apps/details?id=com.softwarity.aipilot" target="_blank" class="store-button">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" alt="Google Play Free" height="40">
+              </a>
             </div>
-            <div class="doc-screenshot single">
-              <img src="assets/screenshots/welcome.jpeg" alt="Welcome Screen" loading="lazy">
-              <span class="screenshot-caption" i18n="@@doc.caption.welcome">Welcome screen</span>
+            <div class="store-option">
+              <span class="store-label pro" i18n="@@installation.pro">Pro</span>
+              <a href="https://play.google.com/store/apps/details?id=com.softwarity.aipilot.pro" target="_blank" class="store-button">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" alt="Google Play Pro" height="40">
+              </a>
             </div>
           </div>
         </div>
+      </div>
 
-        <!-- Step 3: Pair Device -->
-        <div class="doc-step">
-          <div class="doc-step-header">
-            <div class="step-number">3</div>
-            <h3 i18n="@@installation.step3.title">Pair Your Device</h3>
+      <!-- Step 3: First Launch & Pairing -->
+      <div class="doc-step">
+        <div class="doc-step-header">
+          <div class="step-number">3</div>
+          <h3 i18n="@@installation.step3.title">First Launch &amp; Pairing</h3>
+        </div>
+        <div class="doc-step-content">
+          <p i18n="@@installation.step3.desc">Navigate to your project directory and launch the CLI with your preferred agent:</p>
+          <pre><code>cd /path/to/project && aipilot-cli</code></pre>
+          <div class="info-note">
+            <span class="material-icons">tips_and_updates</span>
+            <p i18n="@@installation.step4.qrTip">Use the /qr command at any time to display the pairing QR code and pair additional devices.</p>
           </div>
-          <div class="doc-step-content">
-            <p i18n="@@installation.step3.desc">Scan the QR code to pair your mobile with the CLI</p>
-            <p i18n="@@doc.scanQR">Tap the "Get aipilot-cli" button or the scan button to open the QR scanner. Point your camera at the QR code displayed in your terminal:</p>
-            <div class="doc-screenshot single">
+          <div class="doc-screenshots-row">
+            <div class="doc-screenshot">
+              <img src="assets/screenshots/enter-slash-qr.png" alt="Enter /qr command" loading="lazy">
+              <span class="screenshot-caption" i18n="@@doc.caption.enterQr">Typing /qr command</span>
+            </div>
+            <div class="doc-screenshot">
+              <img src="assets/screenshots/qr-code.png" alt="QR Code" loading="lazy">
+              <span class="screenshot-caption" i18n="@@doc.caption.qrCode">Pairing QR code</span>
+            </div>
+            <div class="doc-screenshot">
+              <img src="assets/screenshots/welcome.jpeg" alt="Welcome Screen" loading="lazy">
+              <span class="screenshot-caption" i18n="@@doc.caption.welcome">Welcome screen</span>
+            </div>
+            <div class="doc-screenshot">
               <img src="assets/screenshots/qr-scanner.jpeg" alt="QR Scanner" loading="lazy">
               <span class="screenshot-caption" i18n="@@doc.caption.scanner">Scanning QR code</span>
             </div>
           </div>
+          <div class="info-note">
+            <span class="material-icons">info</span>
+            <p i18n="@@installation.step3.pairingNote">Pairing is a one-time operation. On subsequent launches, the connection between your mobile and PC is automatic.</p>
+          </div>
         </div>
       </div>
 
-      <!-- Step 4: Start Using -->
+      <!-- Step 4: Start Coding -->
       <div class="doc-step">
         <div class="doc-step-header">
           <div class="step-number">4</div>
@@ -211,11 +259,15 @@
         </div>
         <div class="doc-step-content">
           <p i18n="@@installation.step4.desc">Control your AI agent from anywhere</p>
-          <p i18n="@@doc.homeScreen">Once paired, you'll see your sessions on the home screen. Tap a session to connect:</p>
+          <p i18n="@@installation.step4.launch">Run the CLI in your working directory. The mobile app detects the session automatically:</p>
           <div class="doc-screenshots-row">
             <div class="doc-screenshot">
               <img src="assets/screenshots/home-sessions.jpeg" alt="Home Sessions" loading="lazy">
               <span class="screenshot-caption" i18n="@@doc.caption.sessions">Active sessions</span>
+            </div>
+            <div class="doc-screenshot">
+              <img src="assets/screenshots/terminal-switch.jpeg" alt="Switch View" loading="lazy">
+              <span class="screenshot-caption" i18n="@@doc.caption.switch">Swipe between sessions</span>
             </div>
             <div class="doc-screenshot">
               <img src="assets/screenshots/terminal-cli.jpeg" alt="Terminal" loading="lazy">
@@ -226,108 +278,86 @@
               <span class="screenshot-caption" i18n="@@doc.caption.voice">Voice input</span>
             </div>
           </div>
+          <div class="info-note">
+            <span class="material-icons">info</span>
+            <p i18n="@@installation.step4.modeNote">Terminal rendering is exclusive: for a given session, only one device (mobile or PC) displays the terminal at a time. You can still send voice commands and upload files or images from your mobile, even when the PC has control.</p>
+          </div>
         </div>
       </div>
     </section>
 
-    <!-- Documentation Section -->
-    <section class="section" id="documentation">
-      <h2 i18n="@@doc.title">Documentation</h2>
-
-      <!-- Terminal Features -->
-      <div class="doc-subsection">
-        <h3 i18n="@@doc.terminal.title">Terminal Features</h3>
-        <p i18n="@@doc.terminal.desc">The terminal provides full access to your AI agent with additional mobile-friendly features:</p>
-
-        <div class="doc-feature">
-          <h4 i18n="@@doc.terminal.upload">File Upload</h4>
-          <p i18n="@@doc.terminal.uploadDesc">Send files and images directly to your AI agent. Tap the attachment button to select from camera or files:</p>
-          <div class="doc-screenshots-row">
-            <div class="doc-screenshot">
-              <img src="assets/screenshots/file-upload-menu.jpeg" alt="Upload Menu" loading="lazy">
-              <span class="screenshot-caption" i18n="@@doc.caption.uploadMenu">Upload options</span>
-            </div>
-            <div class="doc-screenshot">
-              <img src="assets/screenshots/uploads-sheet.jpeg" alt="Uploads Sheet" loading="lazy">
-              <span class="screenshot-caption" i18n="@@doc.caption.uploads">Upload progress</span>
-            </div>
-          </div>
+    <!-- Terminal Features -->
+    <section class="section" id="terminal-features">
+      <h2 i18n="@@doc.terminal.title">Terminal Features</h2>
+      <p i18n="@@doc.terminal.desc">The terminal provides full access to your AI agent with additional mobile-friendly features:</p>
+      <div class="doc-screenshots-row">
+        <div class="doc-screenshot">
+          <img src="assets/screenshots/history-menu.jpeg" alt="History Menu" loading="lazy">
+          <span class="screenshot-caption" i18n="@@doc.caption.history">Command history</span>
         </div>
-
-        <div class="doc-feature">
-          <h4 i18n="@@doc.terminal.history">History Commands</h4>
-          <p i18n="@@doc.terminal.historyDesc">Quick access to common agent commands like /compact, /resume, /clear:</p>
-          <div class="doc-screenshot single">
-            <img src="assets/screenshots/history-menu.jpeg" alt="History Menu" loading="lazy">
-            <span class="screenshot-caption" i18n="@@doc.caption.history">Command history</span>
-          </div>
+        <div class="doc-screenshot">
+          <img src="assets/screenshots/more-menu.jpeg" alt="More Menu" loading="lazy">
+          <span class="screenshot-caption" i18n="@@doc.caption.moreMenu">More options</span>
         </div>
-
-        <div class="doc-feature">
-          <h4 i18n="@@doc.terminal.switch">PC/Mobile Mode</h4>
-          <p i18n="@@doc.terminal.switchDesc">Switch control between your PC and mobile device. The terminal resizes automatically:</p>
-          <div class="doc-screenshots-row">
-            <div class="doc-screenshot">
-              <img src="assets/screenshots/terminal-pc-mode.jpeg" alt="PC Mode" loading="lazy">
-              <span class="screenshot-caption" i18n="@@doc.caption.pcMode">PC mode</span>
-            </div>
-            <div class="doc-screenshot">
-              <img src="assets/screenshots/terminal-switch.jpeg" alt="Switch View" loading="lazy">
-              <span class="screenshot-caption" i18n="@@doc.caption.switch">Multi-session view</span>
-            </div>
-          </div>
+        <div class="doc-screenshot">
+          <img src="assets/screenshots/terminal-pc-mode.jpeg" alt="PC Mode" loading="lazy">
+          <span class="screenshot-caption" i18n="@@doc.caption.pcMode">PC mode</span>
         </div>
       </div>
-
-      <!-- SSH Mode -->
-      <div class="doc-subsection">
-        <h3 i18n="@@doc.ssh.title">SSH Mode</h3>
-        <p i18n="@@doc.ssh.desc">Connect directly to remote servers via SSH without the CLI:</p>
-        <div class="doc-screenshots-row">
-          <div class="doc-screenshot">
-            <img src="assets/screenshots/ssh-screen-empty.jpeg" alt="SSH Screen" loading="lazy">
-            <span class="screenshot-caption" i18n="@@doc.caption.sshEmpty">SSH connections</span>
-          </div>
-          <div class="doc-screenshot">
-            <img src="assets/screenshots/ssh-connection-form.jpeg" alt="SSH Form" loading="lazy">
-            <span class="screenshot-caption" i18n="@@doc.caption.sshForm">New connection</span>
-          </div>
+      <div class="doc-screenshots-row">
+        <div class="doc-screenshot">
+          <img src="assets/screenshots/file-upload-menu.jpeg" alt="Upload Menu" loading="lazy">
+          <span class="screenshot-caption" i18n="@@doc.caption.uploadMenu">Upload options</span>
         </div>
-        <div class="doc-screenshots-row">
-          <div class="doc-screenshot">
-            <img src="assets/screenshots/ssh-agent-form.jpeg" alt="Agent Form" loading="lazy">
-            <span class="screenshot-caption" i18n="@@doc.caption.agentForm">Configure agent</span>
-          </div>
-          <div class="doc-screenshot">
-            <img src="assets/screenshots/terminal-ssh.jpeg" alt="SSH Terminal" loading="lazy">
-            <span class="screenshot-caption" i18n="@@doc.caption.sshTerminal">SSH terminal</span>
-          </div>
+        <div class="doc-screenshot">
+          <img src="assets/screenshots/uploads-sheet.jpeg" alt="Uploads Sheet" loading="lazy">
+          <span class="screenshot-caption" i18n="@@doc.caption.uploads">Upload progress</span>
         </div>
       </div>
+    </section>
 
-      <!-- Settings -->
-      <div class="doc-subsection">
-        <h3 i18n="@@doc.settings.title">Settings</h3>
-        <p i18n="@@doc.settings.desc">Customize font size, view session info, and configure LAN connections:</p>
-        <div class="doc-screenshots-row">
-          <div class="doc-screenshot">
-            <img src="assets/screenshots/settings-sheet.jpeg" alt="Settings" loading="lazy">
-            <span class="screenshot-caption" i18n="@@doc.caption.settings">Settings menu</span>
-          </div>
-          <div class="doc-screenshot">
-            <img src="assets/screenshots/font-size-slider.jpeg" alt="Font Size" loading="lazy">
-            <span class="screenshot-caption" i18n="@@doc.caption.fontSize">Font size</span>
-          </div>
+    <!-- SSH Mode -->
+    <section class="section" id="ssh">
+      <h2 i18n="@@doc.ssh.title">SSH Mode</h2>
+      <p i18n="@@doc.ssh.desc">Connect directly to remote servers via SSH without the CLI:</p>
+      <div class="doc-screenshots-row">
+        <div class="doc-screenshot">
+          <img src="assets/screenshots/ssh-screen-empty.jpeg" alt="SSH Screen" loading="lazy">
+          <span class="screenshot-caption" i18n="@@doc.caption.sshEmpty">SSH connections</span>
         </div>
-        <div class="doc-screenshots-row">
-          <div class="doc-screenshot">
-            <img src="assets/screenshots/session-info.jpeg" alt="Session Info" loading="lazy">
-            <span class="screenshot-caption" i18n="@@doc.caption.sessionInfo">Session info</span>
-          </div>
-          <div class="doc-screenshot">
-            <img src="assets/screenshots/lan-ip-dialog.jpeg" alt="LAN IP" loading="lazy">
-            <span class="screenshot-caption" i18n="@@doc.caption.lanIp">LAN configuration</span>
-          </div>
+        <div class="doc-screenshot">
+          <img src="assets/screenshots/ssh-connection-form.jpeg" alt="SSH Form" loading="lazy">
+          <span class="screenshot-caption" i18n="@@doc.caption.sshForm">New connection</span>
+        </div>
+      </div>
+      <div class="doc-screenshots-row">
+        <div class="doc-screenshot">
+          <img src="assets/screenshots/ssh-agent-form.jpeg" alt="Agent Form" loading="lazy">
+          <span class="screenshot-caption" i18n="@@doc.caption.agentForm">Configure agent</span>
+        </div>
+        <div class="doc-screenshot">
+          <img src="assets/screenshots/terminal-ssh.jpeg" alt="SSH Terminal" loading="lazy">
+          <span class="screenshot-caption" i18n="@@doc.caption.sshTerminal">SSH terminal</span>
+        </div>
+        <div class="doc-screenshot">
+          <img src="assets/screenshots/lan-ip-dialog.jpeg" alt="LAN IP" loading="lazy">
+          <span class="screenshot-caption" i18n="@@doc.caption.lanIp">LAN configuration</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Settings -->
+    <section class="section" id="settings">
+      <h2 i18n="@@doc.settings.title">Settings</h2>
+      <p i18n="@@doc.settings.desc">Customize font size, view session info, and configure LAN connections:</p>
+      <div class="doc-screenshots-row">
+        <div class="doc-screenshot">
+          <img src="assets/screenshots/settings-sheet.jpeg" alt="Settings" loading="lazy">
+          <span class="screenshot-caption" i18n="@@doc.caption.settings">Settings menu</span>
+        </div>
+        <div class="doc-screenshot">
+          <img src="assets/screenshots/font-size-slider.jpeg" alt="Font Size" loading="lazy">
+          <span class="screenshot-caption" i18n="@@doc.caption.fontSize">Font size</span>
         </div>
       </div>
     </section>
