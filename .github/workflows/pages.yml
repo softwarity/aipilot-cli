@@ -42,8 +42,7 @@ jobs:
       - name: Add redirect and .nojekyll
         working-directory: ./public
         run: |
-          cp public/index.html dist/browser/
-          touch dist/browser/.nojekyll
+          cp public/* dist/browser/
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
