@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"crypto/cipher"
-	"fmt"
 	"os"
 	"os/exec"
 	"sync"
@@ -141,20 +140,22 @@ func (d *Daemon) setRelayConnected(connected bool) {
 	d.mu.Unlock()
 }
 
-// cleanup deletes session from relay and removes local session file
+// cleanup closes connections gracefully. Session is preserved for resume on next start.
+// Use --clear-session or --clear-sessions to explicitly delete sessions.
 func (d *Daemon) cleanup() {
-	// Delete session from relay
-	if d.relayClient != nil && d.session != "" {
-		if err := d.relayClient.DeleteSession(d.session); err != nil {
-			fmt.Printf("%sWarning: Could not delete session from relay: %v%s\n", yellow, err, reset)
-		} else {
-			fmt.Printf("%s✓ Session cleaned up%s\n", dim, reset)
-		}
+	// Close WebSocket connection gracefully
+	d.mu.Lock()
+	if d.pingCancel != nil {
+		d.pingCancel()
 	}
+	conn := d.wsConn
+	d.wsConn = nil
+	d.relayConnected = false
+	d.mu.Unlock()
 
-	// Delete local session file
-	sessionPath := getSessionFilePath(d.workDir)
-	if sessionPath != "" {
-		os.Remove(sessionPath) // Ignore error if file doesn't exist
+	if conn != nil {
+		conn.WriteMessage(websocket.CloseMessage,
+			websocket.FormatCloseMessage(websocket.CloseNormalClosure, "CLI exiting"))
+		conn.Close()
 	}
 }

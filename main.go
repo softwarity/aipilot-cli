@@ -30,6 +30,7 @@ type cliFlags struct {
 	clearSessions bool
 	unpairMobile  string
 	showStatus    bool
+	doUpdate      bool
 }
 
 // parseFlags parses command-line arguments and returns the flags
@@ -44,10 +45,16 @@ func parseFlags() *cliFlags {
 	clearSessions := flag.Bool("clear-sessions", false, "Clear all saved sessions and exit")
 	unpairMobile := flag.String("unpair", "", "Unpair a mobile device by ID")
 	showStatus := flag.Bool("status", false, "Show PC status, paired mobiles, and exit")
+	doUpdate := flag.Bool("update", false, "Check for updates and install if available")
 	flag.Parse()
 
 	if *showVersion {
 		fmt.Printf("aipilot-cli version %s\n", Version)
+		os.Exit(0)
+	}
+
+	if *doUpdate {
+		forceUpdate()
 		os.Exit(0)
 	}
 
@@ -61,6 +68,7 @@ func parseFlags() *cliFlags {
 		clearSessions: *clearSessions,
 		unpairMobile:  *unpairMobile,
 		showStatus:    *showStatus,
+		doUpdate:      *doUpdate,
 	}
 }
 
@@ -477,13 +485,19 @@ func waitForTermination(sigChan <-chan os.Signal, cmd *exec.Cmd, daemon *Daemon)
 		fmt.Printf("\n%s\n", exitMsg)
 	}
 
-	// Cleanup: delete session from relay and local file
+	// Cleanup: close WebSocket gracefully (session preserved for resume)
 	daemon.cleanup()
 }
 
 func main() {
 	// Parse flags
 	flags := parseFlags()
+
+	// Cleanup leftover .old binary from previous Windows update
+	cleanupOldBinary()
+
+	// Check for updates (non-blocking for patch, blocking for minor/major)
+	checkUpdateOnStartup()
 
 	// Load or create PC configuration
 	pcConfig, err := getOrCreatePCConfig()
