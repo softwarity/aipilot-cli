@@ -57,7 +57,7 @@
           "builder": "@angular/build:application",
           "options": {
             "outputPath": "dist",
-            "baseHref": "/aipilot-cli/",
+            "baseHref": "/",
             "browser": "src/main.ts",
             "polyfills": ["@angular/localize/init"],
             "tsConfig": "tsconfig.app.json",
