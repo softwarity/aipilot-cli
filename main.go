@@ -254,8 +254,12 @@ func createDaemon(session, token, relay, command, workDir string, agentType Agen
 // displayHeader displays the application header and session info
 func displayHeader(daemon *Daemon, session, command, workDir, agentVersion string) {
 	fmt.Println()
-	fmt.Printf("%s%sAIPilot CLI%s %s[%s]%s  %s%s/qr%s %sto pair mobile%s\n",
-		bold, cyan, reset, dim, Build, reset, bold, cyan, reset, dim, reset)
+	versionDisplay := Version
+	if Version == "dev" {
+		versionDisplay = "dev [" + Build + "]"
+	}
+	fmt.Printf("%s%sAIPilot CLI%s %s%s%s  %s%s/qr%s %sto pair mobile%s\n",
+		bold, cyan, reset, dim, versionDisplay, reset, bold, cyan, reset, dim, reset)
 	fmt.Println()
 
 	// Connect to relay early

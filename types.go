@@ -34,7 +34,7 @@ const (
 // Version and RelayURL are set at build time via -ldflags
 var (
 	Version  = "dev"
-	Build    = "20260120-1"
+	Build    = "20260205"
 	RelayURL = "wss://aipilot-relay.softwarity.io"
 )
 

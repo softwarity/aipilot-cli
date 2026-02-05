@@ -201,18 +201,23 @@ func checkUpdateOnStartup() {
 		return // dev build, skip
 	}
 
+	fmt.Printf("%sChecking for updates...%s\r", dim, reset)
+
 	release, err := checkLatestVersion()
 	if err != nil {
-		return // network error, silent
+		fmt.Printf("                       \r") // clear line
+		return
 	}
 
 	latest, err := parseSemver(release.TagName)
 	if err != nil {
+		fmt.Printf("                       \r")
 		return
 	}
 
 	updateType := current.updateType(latest)
 	if updateType == "" {
+		fmt.Printf("                       \r")
 		return
 	}
 
