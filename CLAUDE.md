@@ -146,8 +146,6 @@ aipilot-cli [options]
 --workdir <path>    # Repertoire de travail
 --agents            # Liste agents disponibles
 --sessions          # Liste sessions sauvegardees
---clear-session     # Supprime la session du repertoire courant
---clear-sessions    # Supprime toutes les sessions
 --unpair <id>       # Supprime un mobile appaire
 --status            # Affiche statut PC et mobiles
 --version           # Affiche version

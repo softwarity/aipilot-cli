@@ -142,7 +142,7 @@ func (d *Daemon) setRelayConnected(connected bool) {
 
 // cleanup closes connections and deletes the session from the relay.
 // On intentional exit (Ctrl+C, /exit, agent quit), the session is removed.
-// Crash/kill-9 leaves the session dormant (TCP close → relay handles it).
+// On crash, relay webSocketClose handles cleanup.
 func (d *Daemon) cleanup() {
 	// Delete session from relay (intentional exit = session gone)
 	if d.relayClient != nil && d.session != "" {

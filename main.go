@@ -25,8 +25,6 @@ type cliFlags struct {
 	workDir       string
 	listAgents    bool
 	listSessions  bool
-	clearSession  bool
-	clearSessions bool
 	killSession   string
 	killSessions  bool
 	unpairMobile  string
@@ -42,9 +40,7 @@ func parseFlags() *cliFlags {
 	showVersion := flag.Bool("version", false, "Show version and exit")
 	listAgents := flag.Bool("agents", false, "List available AI agents and exit")
 	listSessions := flag.Bool("sessions", false, "List saved sessions and exit")
-	clearSession := flag.Bool("clear-session", false, "Clear saved session for current directory and exit")
-	clearSessions := flag.Bool("clear-sessions", false, "Clear all saved sessions and exit")
-	killSession := flag.String("kill-session", "", "Kill a specific dormant session by ID")
+	killSession := flag.String("kill-session", "", "Kill a specific session by ID")
 	killSessions := flag.Bool("kill-sessions", false, "Kill all sessions for this PC")
 	unpairMobile := flag.String("unpair", "", "Unpair a mobile device by ID")
 	showStatus := flag.Bool("status", false, "Show PC status, paired mobiles, and exit")
@@ -67,8 +63,6 @@ func parseFlags() *cliFlags {
 		workDir:       *workDir,
 		listAgents:    *listAgents,
 		listSessions:  *listSessions,
-		clearSession:  *clearSession,
-		clearSessions: *clearSessions,
 		killSession:   *killSession,
 		killSessions:  *killSessions,
 		unpairMobile:  *unpairMobile,
@@ -88,26 +82,6 @@ func handleSpecialModes(flags *cliFlags, pcConfig *PCConfig, relayClient *RelayC
 	// List sessions mode
 	if flags.listSessions {
 		listSessions(relayClient)
-		return true
-	}
-
-	// Clear current session mode
-	if flags.clearSession {
-		workDir := flags.workDir
-		if workDir == "" {
-			workDir, _ = os.Getwd()
-		}
-		clearCurrentSession(workDir, relayClient)
-		return true
-	}
-
-	// Clear all sessions mode
-	if flags.clearSessions {
-		workDir := flags.workDir
-		if workDir == "" {
-			workDir, _ = os.Getwd()
-		}
-		clearAllCurrentSessions(workDir, relayClient)
 		return true
 	}
 

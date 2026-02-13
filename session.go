@@ -48,35 +48,6 @@ func listSessions(relayClient *RelayClient) {
 	fmt.Println()
 }
 
-// clearCurrentSession removes all sessions for the given working directory
-func clearCurrentSession(workDir string, relayClient *RelayClient) {
-	sessions, err := relayClient.ListSessionsByWorkDir(workDir)
-	if err != nil {
-		fmt.Printf("%sError: could not query sessions: %v%s\n", red, err, reset)
-		return
-	}
-
-	count := 0
-	for _, s := range sessions {
-		if err := relayClient.DeleteSession(s.ID); err != nil {
-			fmt.Printf("%sWarning: could not delete session %s: %v%s\n", yellow, s.ID[:8], err, reset)
-			continue
-		}
-		count++
-	}
-
-	if count > 0 {
-		fmt.Printf("%s✓ Cleared %d session(s) for: %s%s\n", green, count, workDir, reset)
-	} else {
-		fmt.Printf("%sNo sessions for this directory.%s\n", dim, reset)
-	}
-}
-
-// clearAllCurrentSessions removes all sessions for the given working directory (alias)
-func clearAllCurrentSessions(workDir string, relayClient *RelayClient) {
-	clearCurrentSession(workDir, relayClient)
-}
-
 // killAllSessions purges all sessions for this PC from the relay
 func killAllSessions(relayClient *RelayClient) {
 	count, err := relayClient.PurgeAllSessions()

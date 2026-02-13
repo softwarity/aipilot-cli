@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"net/url"
 	"strings"
 )
 
@@ -346,34 +345,6 @@ type SessionInfo struct {
 	Status          string `json:"status"`
 	Token           string `json:"token,omitempty"`
 	CreatedAt       string `json:"created_at"`
-	BridgeConnected bool   `json:"bridge_connected"`
-}
-
-// ListSessionsByWorkDir returns sessions for a specific working directory
-func (c *RelayClient) ListSessionsByWorkDir(workDir string) ([]SessionInfo, error) {
-	reqURL := c.baseURL + "/api/sessions?for_cli=true&working_dir=" + url.QueryEscape(workDir)
-	httpReq, err := http.NewRequest("GET", reqURL, nil)
-	if err != nil {
-		return nil, err
-	}
-	httpReq.Header.Set("X-PC-ID", c.pcConfig.PCID)
-
-	resp, err := c.httpClient.Do(httpReq)
-	if err != nil {
-		return nil, fmt.Errorf("failed to list sessions: %w", err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		respBody, _ := io.ReadAll(resp.Body)
-		return nil, fmt.Errorf("list sessions failed: %s - %s", resp.Status, string(respBody))
-	}
-
-	var sessions []SessionInfo
-	if err := json.NewDecoder(resp.Body).Decode(&sessions); err != nil {
-		return nil, err
-	}
-	return sessions, nil
 }
 
 // ListAllSessions returns all sessions for this PC
