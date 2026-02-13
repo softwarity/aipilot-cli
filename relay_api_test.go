@@ -62,8 +62,8 @@ func TestListAllSessions_Success(t *testing.T) {
 			t.Fatalf("expected for_cli=true in query, got %s", r.URL.RawQuery)
 		}
 		sessions := []SessionInfo{
-			{ID: "s1", AgentType: "claude", WorkingDir: "/dir1", Token: "tok1", BridgeConnected: true},
-			{ID: "s2", AgentType: "gemini", WorkingDir: "/dir2", Token: "tok2", BridgeConnected: false},
+			{ID: "s1", AgentType: "claude", WorkingDir: "/dir1", Token: "tok1"},
+			{ID: "s2", AgentType: "gemini", WorkingDir: "/dir2", Token: "tok2"},
 		}
 		json.NewEncoder(w).Encode(sessions)
 	})
@@ -76,48 +76,11 @@ func TestListAllSessions_Success(t *testing.T) {
 	if len(sessions) != 2 {
 		t.Fatalf("expected 2 sessions, got %d", len(sessions))
 	}
-	if sessions[0].ID != "s1" || sessions[0].BridgeConnected != true {
+	if sessions[0].ID != "s1" || sessions[0].Token != "tok1" {
 		t.Fatalf("unexpected session[0]: %+v", sessions[0])
 	}
 	if sessions[1].ID != "s2" || sessions[1].Token != "tok2" {
 		t.Fatalf("unexpected session[1]: %+v", sessions[1])
-	}
-}
-
-func TestListSessionsByWorkDir_Success(t *testing.T) {
-	client, server := newTestClient(func(w http.ResponseWriter, r *http.Request) {
-		wd := r.URL.Query().Get("working_dir")
-		if wd != "/home/user/project" {
-			t.Fatalf("expected working_dir=/home/user/project, got %s", wd)
-		}
-		sessions := []SessionInfo{
-			{ID: "s1", AgentType: "claude", WorkingDir: "/home/user/project", Token: "tok1"},
-		}
-		json.NewEncoder(w).Encode(sessions)
-	})
-	defer server.Close()
-
-	sessions, err := client.ListSessionsByWorkDir("/home/user/project")
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
-	if len(sessions) != 1 {
-		t.Fatalf("expected 1 session, got %d", len(sessions))
-	}
-}
-
-func TestListSessionsByWorkDir_Empty(t *testing.T) {
-	client, server := newTestClient(func(w http.ResponseWriter, r *http.Request) {
-		json.NewEncoder(w).Encode([]SessionInfo{})
-	})
-	defer server.Close()
-
-	sessions, err := client.ListSessionsByWorkDir("/nonexistent")
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
-	if len(sessions) != 0 {
-		t.Fatalf("expected 0 sessions, got %d", len(sessions))
 	}
 }
 
