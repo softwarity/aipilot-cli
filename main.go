@@ -15,7 +15,6 @@ import (
 	"time"
 
 	"github.com/creack/pty"
-	"github.com/google/uuid"
 	"golang.org/x/term"
 )
 
@@ -28,6 +27,8 @@ type cliFlags struct {
 	listSessions  bool
 	clearSession  bool
 	clearSessions bool
+	killSession   string
+	killSessions  bool
 	unpairMobile  string
 	showStatus    bool
 	doUpdate      bool
@@ -43,6 +44,8 @@ func parseFlags() *cliFlags {
 	listSessions := flag.Bool("sessions", false, "List saved sessions and exit")
 	clearSession := flag.Bool("clear-session", false, "Clear saved session for current directory and exit")
 	clearSessions := flag.Bool("clear-sessions", false, "Clear all saved sessions and exit")
+	killSession := flag.String("kill-session", "", "Kill a specific dormant session by ID")
+	killSessions := flag.Bool("kill-sessions", false, "Kill all sessions for this PC")
 	unpairMobile := flag.String("unpair", "", "Unpair a mobile device by ID")
 	showStatus := flag.Bool("status", false, "Show PC status, paired mobiles, and exit")
 	doUpdate := flag.Bool("update", false, "Check for updates and install if available")
@@ -66,6 +69,8 @@ func parseFlags() *cliFlags {
 		listSessions:  *listSessions,
 		clearSession:  *clearSession,
 		clearSessions: *clearSessions,
+		killSession:   *killSession,
+		killSessions:  *killSessions,
 		unpairMobile:  *unpairMobile,
 		showStatus:    *showStatus,
 		doUpdate:      *doUpdate,
@@ -82,7 +87,7 @@ func handleSpecialModes(flags *cliFlags, pcConfig *PCConfig, relayClient *RelayC
 
 	// List sessions mode
 	if flags.listSessions {
-		listSavedSessions()
+		listSessions(relayClient)
 		return true
 	}
 
@@ -98,7 +103,23 @@ func handleSpecialModes(flags *cliFlags, pcConfig *PCConfig, relayClient *RelayC
 
 	// Clear all sessions mode
 	if flags.clearSessions {
-		clearSavedSessions(relayClient)
+		workDir := flags.workDir
+		if workDir == "" {
+			workDir, _ = os.Getwd()
+		}
+		clearAllCurrentSessions(workDir, relayClient)
+		return true
+	}
+
+	// Kill specific session mode
+	if flags.killSession != "" {
+		killSessionByID(flags.killSession, relayClient)
+		return true
+	}
+
+	// Kill all sessions mode
+	if flags.killSessions {
+		killAllSessions(relayClient)
 		return true
 	}
 
@@ -218,13 +239,7 @@ func createSession(relayClient *RelayClient, agentType AgentType, workDir, displ
 	fmt.Printf("%sCreating session on relay...%s\n", dim, reset)
 	sessionResp, err := relayClient.CreateSession(string(agentType), workDir, displayName, sshInfo)
 	if err != nil {
-		// Fallback to local session if relay is unavailable
-		fmt.Printf("%sWarning: Could not create session on relay: %v%s\n", yellow, err, reset)
-		fmt.Printf("%sFalling back to local session...%s\n", dim, reset)
-		return &CreateSessionResponse{
-			SessionID: uuid.New().String(),
-			Token:     generateRandomToken(),
-		}, nil
+		return nil, fmt.Errorf("could not create session on relay: %w", err)
 	}
 	return sessionResp, nil
 }
@@ -489,7 +504,7 @@ func waitForTermination(sigChan <-chan os.Signal, cmd *exec.Cmd, daemon *Daemon)
 		fmt.Printf("\n%s\n", exitMsg)
 	}
 
-	// Cleanup: close WebSocket gracefully (session preserved for resume)
+	// Cleanup: delete session from relay and close WebSocket
 	daemon.cleanup()
 }
 
@@ -539,33 +554,15 @@ func main() {
 	agentVersion := getAgentVersion(selectedCommand, agentType)
 	displayName := filepath.Base(workDir)
 
-	// Try to load existing session, or create new one
-	// Detect SSH availability for session info
 	sshInfo := DetectSSHInfo()
 
-	var session, token string
-
-	if savedSession, err := loadSession(workDir); err == nil {
-		// Reuse existing session
-		session = savedSession.Session
-		token = savedSession.Token
-		fmt.Printf("%s✓ Resuming session%s\n", green, reset)
-	} else {
-		// Create new session with SSH info
-		sessionResp, _ := createSession(relayClient, agentType, workDir, displayName, sshInfo)
-		session = sessionResp.SessionID
-		token = sessionResp.Token
-
-		// Save for next time
-		saveSession(workDir, &SessionData{
-			Session:   session,
-			Token:     token,
-			Relay:     RelayURL,
-			Command:   selectedCommand,
-			WorkDir:   workDir,
-			CreatedAt: time.Now().Format(time.RFC3339),
-		})
+	// Create a fresh session
+	sessionResp, err := createSession(relayClient, agentType, workDir, displayName, sshInfo)
+	if err != nil {
+		log.Fatal(err)
 	}
+	session := sessionResp.SessionID
+	token := sessionResp.Token
 
 	// Create and initialize daemon
 	daemon := createDaemon(session, token, RelayURL, selectedCommand, workDir, agentType, pcConfig, relayClient)

@@ -2,71 +2,9 @@ package main
 
 import (
 	"crypto/rand"
-	"crypto/sha256"
 	"encoding/hex"
-	"encoding/json"
 	"fmt"
-	"os"
-	"path/filepath"
 )
-
-// SessionData represents a saved session for persistence
-type SessionData struct {
-	Session   string `json:"session"`
-	Token     string `json:"token"`
-	Relay     string `json:"relay"`
-	Command   string `json:"command"`
-	WorkDir   string `json:"workdir"`
-	CreatedAt string `json:"created_at"`
-}
-
-func getSessionFilePath(workDir string) string {
-	home, err := os.UserHomeDir()
-	if err != nil {
-		return ""
-	}
-	h := sha256.Sum256([]byte(workDir))
-	hash := hex.EncodeToString(h[:8])
-	return filepath.Join(home, ".aipilot", "sessions", fmt.Sprintf("%s.json", hash))
-}
-
-func loadSession(workDir string) (*SessionData, error) {
-	path := getSessionFilePath(workDir)
-	if path == "" {
-		return nil, fmt.Errorf("cannot determine home directory")
-	}
-
-	data, err := os.ReadFile(path)
-	if err != nil {
-		return nil, err
-	}
-
-	var session SessionData
-	if err := json.Unmarshal(data, &session); err != nil {
-		return nil, err
-	}
-
-	return &session, nil
-}
-
-func saveSession(workDir string, session *SessionData) error {
-	path := getSessionFilePath(workDir)
-	if path == "" {
-		return fmt.Errorf("cannot determine home directory")
-	}
-
-	dir := filepath.Dir(path)
-	if err := os.MkdirAll(dir, DirPermissions); err != nil {
-		return err
-	}
-
-	data, err := json.MarshalIndent(session, "", "  ")
-	if err != nil {
-		return err
-	}
-
-	return os.WriteFile(path, data, FilePermissions)
-}
 
 func generateRandomToken() string {
 	b := make([]byte, 16)
@@ -77,105 +15,100 @@ func generateRandomToken() string {
 	return hex.EncodeToString(b)
 }
 
-// listSavedSessions lists all saved sessions
-func listSavedSessions() {
-	home, err := os.UserHomeDir()
+// listSessions lists all sessions from the relay, grouped by working directory
+func listSessions(relayClient *RelayClient) {
+	sessions, err := relayClient.ListAllSessions()
 	if err != nil {
-		fmt.Printf("%sError: cannot determine home directory%s\n", red, reset)
+		fmt.Printf("%sError: could not list sessions: %v%s\n", red, err, reset)
 		return
 	}
 
-	sessionsDir := filepath.Join(home, ".aipilot", "sessions")
-	entries, err := os.ReadDir(sessionsDir)
-	if err != nil {
-		fmt.Printf("%sNo saved sessions found.%s\n", dim, reset)
+	if len(sessions) == 0 {
+		fmt.Printf("%sNo sessions found.%s\n", dim, reset)
 		return
 	}
 
-	if len(entries) == 0 {
-		fmt.Printf("%sNo saved sessions found.%s\n", dim, reset)
-		return
+	// Group by working directory
+	groups := make(map[string][]SessionInfo)
+	var order []string
+	for _, s := range sessions {
+		if _, exists := groups[s.WorkingDir]; !exists {
+			order = append(order, s.WorkingDir)
+		}
+		groups[s.WorkingDir] = append(groups[s.WorkingDir], s)
 	}
 
-	fmt.Printf("%sSaved sessions:%s\n\n", bold, reset)
-	for _, entry := range entries {
-		if !entry.IsDir() && filepath.Ext(entry.Name()) == ".json" {
-			path := filepath.Join(sessionsDir, entry.Name())
-			data, err := os.ReadFile(path)
-			if err != nil {
-				continue
-			}
-			var session SessionData
-			if err := json.Unmarshal(data, &session); err != nil {
-				continue
-			}
-			fmt.Printf("  %s%s%s\n", cyan, session.WorkDir, reset)
-			fmt.Printf("    Session: %s...  Created: %s\n", session.Session[:8], session.CreatedAt)
+	fmt.Printf("%sSessions:%s\n\n", bold, reset)
+	for _, wd := range order {
+		fmt.Printf("  %s%s%s\n", cyan, wd, reset)
+		for _, s := range groups[wd] {
+			fmt.Printf("    %s  %s  %s\n", s.ID, s.AgentType, s.CreatedAt)
 		}
 	}
 	fmt.Println()
 }
 
-// clearCurrentSession removes the saved session for the current directory
+// clearCurrentSession removes all sessions for the given working directory
 func clearCurrentSession(workDir string, relayClient *RelayClient) {
-	session, err := loadSession(workDir)
+	sessions, err := relayClient.ListSessionsByWorkDir(workDir)
 	if err != nil {
-		fmt.Printf("%sNo saved session for this directory.%s\n", dim, reset)
+		fmt.Printf("%sError: could not query sessions: %v%s\n", red, err, reset)
 		return
 	}
 
-	// Delete from relay first
-	if relayClient != nil && session.Session != "" {
-		if err := relayClient.DeleteSession(session.Session); err != nil {
-			fmt.Printf("%sWarning: could not delete relay session: %v%s\n", yellow, err, reset)
+	count := 0
+	for _, s := range sessions {
+		if err := relayClient.DeleteSession(s.ID); err != nil {
+			fmt.Printf("%sWarning: could not delete session %s: %v%s\n", yellow, s.ID[:8], err, reset)
+			continue
 		}
+		count++
 	}
 
-	// Delete local file
-	path := getSessionFilePath(workDir)
-	if err := os.Remove(path); err != nil {
-		fmt.Printf("%sError: could not delete local session: %v%s\n", red, err, reset)
-		return
+	if count > 0 {
+		fmt.Printf("%s✓ Cleared %d session(s) for: %s%s\n", green, count, workDir, reset)
+	} else {
+		fmt.Printf("%sNo sessions for this directory.%s\n", dim, reset)
 	}
-
-	fmt.Printf("%s✓ Cleared session for: %s%s\n", green, workDir, reset)
 }
 
-// clearSavedSessions removes all saved sessions (local and relay)
-func clearSavedSessions(relayClient *RelayClient) {
-	// Clear local sessions
-	home, err := os.UserHomeDir()
+// clearAllCurrentSessions removes all sessions for the given working directory (alias)
+func clearAllCurrentSessions(workDir string, relayClient *RelayClient) {
+	clearCurrentSession(workDir, relayClient)
+}
+
+// killAllSessions purges all sessions for this PC from the relay
+func killAllSessions(relayClient *RelayClient) {
+	count, err := relayClient.PurgeAllSessions()
 	if err != nil {
-		fmt.Printf("%sError: cannot determine home directory%s\n", red, reset)
+		fmt.Printf("%sError: could not purge sessions: %v%s\n", red, err, reset)
+		return
+	}
+	if count > 0 {
+		fmt.Printf("%s✓ Killed %d session(s).%s\n", green, count, reset)
+	} else {
+		fmt.Printf("%sNo sessions to kill.%s\n", dim, reset)
+	}
+}
+
+// killSessionByID deletes a specific session by ID
+func killSessionByID(id string, relayClient *RelayClient) {
+	sessions, err := relayClient.ListAllSessions()
+	if err != nil {
+		fmt.Printf("%sError: could not query sessions: %v%s\n", red, err, reset)
 		return
 	}
 
-	sessionsDir := filepath.Join(home, ".aipilot", "sessions")
-	entries, err := os.ReadDir(sessionsDir)
-	localCount := 0
-	if err == nil {
-		for _, entry := range entries {
-			if !entry.IsDir() && filepath.Ext(entry.Name()) == ".json" {
-				path := filepath.Join(sessionsDir, entry.Name())
-				if err := os.Remove(path); err == nil {
-					localCount++
-				}
+	for _, s := range sessions {
+		if s.ID == id || (len(id) >= 8 && len(s.ID) >= 8 && s.ID[:8] == id[:8]) {
+			if err := relayClient.DeleteSession(s.ID); err != nil {
+				fmt.Printf("%sError: could not delete session: %v%s\n", red, err, reset)
+				return
 			}
+			fmt.Printf("%s✓ Killed session %s (%s)%s\n", green, s.ID[:8]+"...", s.WorkingDir, reset)
+			return
 		}
 	}
 
-	// Clear relay sessions
-	relayCount := 0
-	if relayClient != nil {
-		count, err := relayClient.PurgeAllSessions()
-		if err == nil {
-			relayCount = count
-		}
-	}
-
-	if localCount > 0 || relayCount > 0 {
-		fmt.Printf("%s✓ Cleared %d local + %d relay session(s).%s\n", green, localCount, relayCount, reset)
-	} else {
-		fmt.Printf("%sNo sessions to clear.%s\n", dim, reset)
-	}
+	fmt.Printf("%sError: session not found: %s%s\n", red, id, reset)
 }

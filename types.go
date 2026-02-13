@@ -140,9 +140,15 @@ func (d *Daemon) setRelayConnected(connected bool) {
 	d.mu.Unlock()
 }
 
-// cleanup closes connections gracefully. Session is preserved for resume on next start.
-// Use --clear-session or --clear-sessions to explicitly delete sessions.
+// cleanup closes connections and deletes the session from the relay.
+// On intentional exit (Ctrl+C, /exit, agent quit), the session is removed.
+// Crash/kill-9 leaves the session dormant (TCP close → relay handles it).
 func (d *Daemon) cleanup() {
+	// Delete session from relay (intentional exit = session gone)
+	if d.relayClient != nil && d.session != "" {
+		_ = d.relayClient.DeleteSession(d.session)
+	}
+
 	// Close WebSocket connection gracefully
 	d.mu.Lock()
 	if d.pingCancel != nil {

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"strings"
 )
 
@@ -126,6 +127,7 @@ type CreateSessionRequest struct {
 	AgentType       string            `json:"agent_type"`
 	WorkingDir      string            `json:"working_dir"`
 	DisplayName     string            `json:"display_name"`      // Short name for display
+	Token           string            `json:"token,omitempty"`   // Session token for E2E encryption
 	EncryptedTokens map[string]string `json:"encrypted_tokens"`  // mobile_id -> encrypted token
 	// SSH info for auto-setup
 	SSHAvailable bool     `json:"ssh_available,omitempty"`
@@ -185,6 +187,7 @@ func (c *RelayClient) CreateSession(agentType, workDir, displayName string, sshI
 		AgentType:       agentType,
 		WorkingDir:      workDir,
 		DisplayName:     displayName,
+		Token:           sessionToken,
 		EncryptedTokens: encryptedTokens,
 	}
 
@@ -333,6 +336,72 @@ func (c *RelayClient) PurgeAllSessions() (int, error) {
 }
 
 // --- Mobile Management API ---
+
+// SessionInfo represents a session returned by the relay for CLI queries
+type SessionInfo struct {
+	ID              string `json:"id"`
+	AgentType       string `json:"agent_type"`
+	WorkingDir      string `json:"working_dir"`
+	DisplayName     string `json:"display_name"`
+	Status          string `json:"status"`
+	Token           string `json:"token,omitempty"`
+	CreatedAt       string `json:"created_at"`
+	BridgeConnected bool   `json:"bridge_connected"`
+}
+
+// ListSessionsByWorkDir returns sessions for a specific working directory
+func (c *RelayClient) ListSessionsByWorkDir(workDir string) ([]SessionInfo, error) {
+	reqURL := c.baseURL + "/api/sessions?for_cli=true&working_dir=" + url.QueryEscape(workDir)
+	httpReq, err := http.NewRequest("GET", reqURL, nil)
+	if err != nil {
+		return nil, err
+	}
+	httpReq.Header.Set("X-PC-ID", c.pcConfig.PCID)
+
+	resp, err := c.httpClient.Do(httpReq)
+	if err != nil {
+		return nil, fmt.Errorf("failed to list sessions: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		respBody, _ := io.ReadAll(resp.Body)
+		return nil, fmt.Errorf("list sessions failed: %s - %s", resp.Status, string(respBody))
+	}
+
+	var sessions []SessionInfo
+	if err := json.NewDecoder(resp.Body).Decode(&sessions); err != nil {
+		return nil, err
+	}
+	return sessions, nil
+}
+
+// ListAllSessions returns all sessions for this PC
+func (c *RelayClient) ListAllSessions() ([]SessionInfo, error) {
+	reqURL := c.baseURL + "/api/sessions?for_cli=true"
+	httpReq, err := http.NewRequest("GET", reqURL, nil)
+	if err != nil {
+		return nil, err
+	}
+	httpReq.Header.Set("X-PC-ID", c.pcConfig.PCID)
+
+	resp, err := c.httpClient.Do(httpReq)
+	if err != nil {
+		return nil, fmt.Errorf("failed to list sessions: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		respBody, _ := io.ReadAll(resp.Body)
+		return nil, fmt.Errorf("list sessions failed: %s - %s", resp.Status, string(respBody))
+	}
+
+	var sessions []SessionInfo
+	if err := json.NewDecoder(resp.Body).Decode(&sessions); err != nil {
+		return nil, err
+	}
+	return sessions, nil
+}
 
 // UnpairMobile removes a paired mobile
 func (c *RelayClient) UnpairMobile(mobileID string) error {

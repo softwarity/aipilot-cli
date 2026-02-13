@@ -11,8 +11,21 @@ import (
 
 // connectToRelay connects to the WebSocket relay
 func (d *Daemon) connectToRelay() {
+	wasConnected := false
 	for {
-		wsURL := d.relay + "/ws/" + d.session + "?role=bridge"
+		// After a successful connection was lost, the relay deleted our session.
+		// Create a new one before reconnecting.
+		if wasConnected {
+			wasConnected = false
+			for {
+				if err := d.recreateSession(); err == nil {
+					break
+				}
+				time.Sleep(RelayConnectDelay)
+			}
+		}
+
+		wsURL := d.relay + "/ws/" + d.session + "?role=bridge&pc_id=" + d.pcConfig.PCID
 		conn, _, err := websocket.DefaultDialer.Dial(wsURL, nil)
 		if err != nil {
 			d.setRelayConnected(false)
@@ -33,6 +46,8 @@ func (d *Daemon) connectToRelay() {
 			time.Sleep(RelayConnectDelay)
 			continue
 		}
+
+		wasConnected = true
 
 		// Cancel any previous ping goroutine
 		d.mu.Lock()
@@ -87,6 +102,32 @@ func (d *Daemon) connectToRelay() {
 
 		time.Sleep(ReconnectDelay)
 	}
+}
+
+// recreateSession creates a new session on the relay after the previous one was deleted.
+// Updates the daemon's session, token, and encryption state.
+func (d *Daemon) recreateSession() error {
+	sshInfo := DetectSSHInfo()
+	displayName := d.workDir
+	if idx := strings.LastIndex(d.workDir, "/"); idx >= 0 {
+		displayName = d.workDir[idx+1:]
+	}
+
+	sessionResp, err := d.relayClient.CreateSession(string(d.agentType), d.workDir, displayName, sshInfo)
+	if err != nil {
+		return err
+	}
+
+	d.mu.Lock()
+	d.session = sessionResp.SessionID
+	d.token = sessionResp.Token
+	d.mu.Unlock()
+
+	if err := d.initEncryption(); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // handleWebSocketMessages processes incoming WebSocket messages

@@ -148,38 +148,49 @@ func (d *Daemon) pollPairingCompletionWithCallback(token string, onComplete func
 	}
 }
 
-// addTokenForMobile encrypts the existing session token for a new mobile
-// and sends it to the relay.
+// addTokenForMobile encrypts session tokens for a new mobile and sends them
+// to the relay for ALL sessions on this PC (not just the current one).
+// Each AddSessionTokenForMobile call triggers a session_token_added notification.
 func (d *Daemon) addTokenForMobile(mobile PairedMobile) bool {
-	d.mu.RLock()
-	sessionID := d.session
-	sessionToken := d.token
-	d.mu.RUnlock()
-
-	if sessionID == "" || sessionToken == "" {
-		return false
-	}
-
 	if mobile.PublicKey == "" {
+		fmt.Printf("%s  no public key for %s%s\n", dim, mobile.ID[:8], reset)
 		return false
 	}
 
-	// Get PC private key for encryption
 	pcPrivateKey, err := GetPrivateKeyFromHex(d.pcConfig.PrivateKey)
 	if err != nil {
+		fmt.Printf("%s  failed to get private key: %v%s\n", red, err, reset)
 		return false
 	}
 
-	// Encrypt existing token for the new mobile
-	encryptedToken, err := EncryptForMobile(sessionToken, mobile.PublicKey, pcPrivateKey)
+	// Get ALL sessions for this PC (includes plaintext tokens via for_cli=true)
+	sessions, err := d.relayClient.ListAllSessions()
 	if err != nil {
+		fmt.Printf("%s  failed to list sessions: %v%s\n", red, err, reset)
 		return false
 	}
 
-	// Add token to existing session on relay
-	if err := d.relayClient.AddSessionTokenForMobile(sessionID, mobile.ID, encryptedToken); err != nil {
-		return false
+	fmt.Printf("%s  found %d sessions for mobile %s%s\n", dim, len(sessions), mobile.ID[:8], reset)
+
+	count := 0
+	for _, sess := range sessions {
+		if sess.Token == "" {
+			fmt.Printf("%s  session %s has no token, skipping%s\n", dim, sess.ID[:8], reset)
+			continue
+		}
+		encrypted, err := EncryptForMobile(sess.Token, mobile.PublicKey, pcPrivateKey)
+		if err != nil {
+			fmt.Printf("%s  encrypt failed for session %s: %v%s\n", red, sess.ID[:8], err, reset)
+			continue
+		}
+		if err := d.relayClient.AddSessionTokenForMobile(sess.ID, mobile.ID, encrypted); err != nil {
+			fmt.Printf("%s  failed to share session %s: %v%s\n", red, sess.ID[:8]+"...", err, reset)
+			continue
+		}
+		fmt.Printf("%s  ✓ shared session %s%s\n", dim, sess.ID[:8], reset)
+		count++
 	}
 
-	return true
+	fmt.Printf("%s  shared %d/%d sessions%s\n", dim, count, len(sessions), reset)
+	return count > 0
 }
