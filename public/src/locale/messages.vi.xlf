@@ -99,6 +99,7 @@
       <trans-unit id="usage.options" datatype="html"><source>Options</source><target>Tùy chọn</target></trans-unit>
       <trans-unit id="usage.commands" datatype="html"><source>Commands</source><target>Lệnh</target></trans-unit>
       <trans-unit id="footer.madeBy" datatype="html"><source>Made by</source><target>Tạo bởi</target></trans-unit>
+      <trans-unit id="footer.privacy" datatype="html"><source>Privacy Policy</source><target>Ch&#237;nh s&#225;ch bảo mật</target></trans-unit>
     </body>
   </file>
 </xliff>

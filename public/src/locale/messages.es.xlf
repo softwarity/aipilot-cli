@@ -403,6 +403,10 @@
         <source>Made by</source>
         <target>Hecho por</target>
       </trans-unit>
+      <trans-unit id="footer.privacy" datatype="html">
+        <source>Privacy Policy</source>
+        <target>Pol&#237;tica de privacidad</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>

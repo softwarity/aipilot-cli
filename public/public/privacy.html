@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Privacy Policy - AIPilot</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="AIPilot Privacy Policy - How we handle your data">
+  <link rel="icon" type="image/svg+xml" href="softwarity.svg">
+  <link rel="canonical" href="https://aipilot.softwarity.io/privacy.html">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <style>
+    :root {
+      --bg-gradient: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      --bg-primary: #161b22;
+      --bg-secondary: #21262d;
+      --text-primary: #e6edf3;
+      --text-secondary: #c9d1d9;
+      --text-muted: #8b949e;
+      --accent-blue: #58a6ff;
+      --accent-green: #238636;
+      --accent-purple: #a371f7;
+      --accent-red: #f85149;
+      --accent-orange: #d97757;
+      --border-color: #30363d;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: Roboto, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg-gradient);
+      background-attachment: fixed;
+      color: var(--text-primary);
+      line-height: 1.7;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 24px;
+    }
+    .card-container {
+      max-width: 860px;
+      width: 100%;
+      background: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 48px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+      margin: 0 auto;
+      align-self: flex-start;
+    }
+    /* Header */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 40px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .logo { height: 48px; }
+    .header-title {
+      font-size: 1.4rem;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+    .header-subtitle {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: #fff;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      background: var(--accent-orange);
+      transition: background 0.2s;
+      white-space: nowrap;
+    }
+    .back-btn:hover {
+      background: #c46648;
+      text-decoration: none;
+    }
+    .back-btn .material-icons { font-size: 18px; }
+    /* Content */
+    .updated {
+      color: var(--text-muted);
+      font-size: 14px;
+      margin-bottom: 32px;
+    }
+    h1 {
+      font-size: 2rem;
+      font-weight: 500;
+      margin-bottom: 8px;
+      color: var(--accent-orange);
+    }
+    h2 {
+      font-size: 1.2rem;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin: 32px 0 14px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    h2 .material-icons {
+      font-size: 20px;
+      color: var(--accent-orange);
+    }
+    h3 {
+      font-size: 1rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      margin: 20px 0 10px;
+    }
+    p, li {
+      color: var(--text-secondary);
+      font-size: 15px;
+      font-weight: 300;
+    }
+    p { margin-bottom: 12px; }
+    ul {
+      padding-left: 24px;
+      margin-bottom: 12px;
+    }
+    li { margin-bottom: 6px; }
+    li::marker { color: var(--accent-orange); }
+    strong { color: var(--text-primary); font-weight: 400; }
+    a { color: var(--accent-blue); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    /* Table */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0 24px;
+      font-size: 14px;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    th, td {
+      padding: 10px 14px;
+      text-align: left;
+      border: 1px solid var(--border-color);
+    }
+    th {
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      font-weight: 500;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    td { color: var(--text-secondary); font-weight: 300; }
+    .check { color: var(--accent-green); font-weight: 400; }
+    .cross { color: var(--accent-red); }
+    /* Footer */
+    .footer {
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border-color);
+      color: var(--text-muted);
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .footer a { color: var(--text-muted); }
+    .footer a:hover { color: var(--accent-orange); }
+    .footer-logo { height: 20px; opacity: 0.5; }
+    /* Responsive */
+    @media (max-width: 700px) {
+      body { padding: 12px; }
+      .card-container { padding: 24px 20px; }
+      h1 { font-size: 1.5rem; }
+      .header { flex-direction: column; gap: 16px; align-items: flex-start; }
+      table { font-size: 13px; }
+      th, td { padding: 8px 10px; }
+      .footer { flex-direction: column; gap: 8px; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+  <div class="card-container">
+    <div class="header">
+      <div class="header-left">
+        <img src="softwarity.svg" alt="AIPilot" class="logo">
+        <div>
+          <div class="header-title">AIPilot</div>
+          <div class="header-subtitle">Privacy Policy</div>
+        </div>
+      </div>
+      <a href="https://aipilot.softwarity.io" class="back-btn">
+        <span class="material-icons">arrow_back</span>
+        Back to site
+      </a>
+    </div>
+
+    <h1>Privacy Policy</h1>
+    <p class="updated">Last updated: February 14, 2026</p>
+
+    <h2><span class="material-icons">info</span> Introduction</h2>
+    <p>AIPilot ("we", "our", or "us") is committed to protecting your privacy. This Privacy Policy explains how the AIPilot mobile application and AIPilot CLI collect, use, and safeguard your information.</p>
+
+    <h2><span class="material-icons">folder_open</span> Information We Collect</h2>
+
+    <h3>Information You Provide</h3>
+    <ul>
+      <li><strong>SSH Connection Details</strong>: Host addresses, ports, and usernames for SSH connections (Pro version only)</li>
+      <li><strong>Agent Configurations</strong>: Names and working directories for your AI agents</li>
+    </ul>
+
+    <h3>Information Collected Automatically</h3>
+    <ul>
+      <li><strong>Voice Input</strong>: Audio captured when you use the voice recognition feature is processed locally on your device and converted to text. We do not store or transmit audio recordings.</li>
+      <li><strong>Camera Access</strong>: Used solely to scan QR codes for CLI connection. Images are processed locally and not stored or transmitted.</li>
+    </ul>
+
+    <h3>Information We Do NOT Collect</h3>
+    <ul>
+      <li>We do not collect personal identification information</li>
+      <li>We do not track your location</li>
+      <li>We do not access your contacts, photos, or files (except when you explicitly choose to upload files in Pro version)</li>
+      <li>We do not use analytics or tracking services</li>
+      <li>We do not store your terminal session content</li>
+    </ul>
+
+    <h2><span class="material-icons">settings</span> How We Use Your Information</h2>
+    <ul>
+      <li><strong>SSH Credentials</strong>: Stored locally on your device using secure storage. Used only to establish connections to your servers.</li>
+      <li><strong>Voice Data</strong>: Converted to text commands on your device using your device's speech recognition. Text is sent to your connected AI agent.</li>
+      <li><strong>QR Code Scanning</strong>: Used only to extract connection information for CLI mode.</li>
+    </ul>
+
+    <h2><span class="material-icons">lock</span> Data Storage and Security</h2>
+
+    <h3>Local Storage</h3>
+    <ul>
+      <li>All sensitive data (SSH private keys, connection configurations) is stored locally on your device using encrypted storage (Keychain on iOS, EncryptedSharedPreferences on Android).</li>
+      <li>Session history is stored locally for your convenience.</li>
+    </ul>
+
+    <h3>Data Transmission</h3>
+    <ul>
+      <li><strong>CLI Mode</strong>: Communication between your mobile device and PC goes through our relay server. The relay only forwards encrypted data and does not store any session content.</li>
+      <li><strong>SSH Mode</strong>: Direct encrypted SSH connection between your device and your server. No data passes through our servers.</li>
+    </ul>
+
+    <h3>What We Store on Our Servers</h3>
+    <p><strong>Nothing.</strong> We do not store any user data, session content, credentials, or personal information on our servers.</p>
+
+    <h2><span class="material-icons">share</span> Third-Party Services</h2>
+    <p>AIPilot uses the following third-party services:</p>
+    <ul>
+      <li><strong>Device Speech Recognition</strong>: Your device's built-in speech-to-text service (Google Speech Services on Android, Apple Speech on iOS). Please refer to their respective privacy policies for information about how voice data is processed.</li>
+    </ul>
+
+    <h2><span class="material-icons">gavel</span> Your Rights</h2>
+    <ul>
+      <li><strong>Delete your data</strong>: All data is stored locally. Uninstalling the app removes all stored data.</li>
+      <li><strong>Access your data</strong>: You can view all stored configurations within the app settings.</li>
+      <li><strong>Control permissions</strong>: You can revoke microphone or camera permissions at any time through your device settings.</li>
+    </ul>
+
+    <h2><span class="material-icons">child_care</span> Children's Privacy</h2>
+    <p>AIPilot is not intended for use by children under 13 years of age. We do not knowingly collect information from children under 13.</p>
+
+    <h2><span class="material-icons">update</span> Changes to This Policy</h2>
+    <p>We may update this Privacy Policy from time to time. We will notify you of any changes by updating the "Last updated" date at the top of this policy.</p>
+
+    <h2><span class="material-icons">table_chart</span> Summary</h2>
+    <table>
+      <thead>
+        <tr><th>Data Type</th><th>Collected</th><th>Stored Locally</th><th>Sent to Our Servers</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Voice / Audio</td><td>Yes (temporary)</td><td><span class="cross">No</span></td><td><span class="cross">No</span></td></tr>
+        <tr><td>Camera / QR</td><td>Yes (temporary)</td><td><span class="cross">No</span></td><td><span class="cross">No</span></td></tr>
+        <tr><td>SSH Credentials</td><td>Yes</td><td><span class="check">Yes (encrypted)</span></td><td><span class="cross">No</span></td></tr>
+        <tr><td>Session Content</td><td><span class="cross">No</span></td><td><span class="cross">No</span></td><td><span class="cross">No</span></td></tr>
+        <tr><td>Personal Info</td><td><span class="cross">No</span></td><td><span class="cross">No</span></td><td><span class="cross">No</span></td></tr>
+        <tr><td>Analytics</td><td><span class="cross">No</span></td><td><span class="cross">No</span></td><td><span class="cross">No</span></td></tr>
+      </tbody>
+    </table>
+
+    <h2><span class="material-icons">email</span> Contact Us</h2>
+    <p>If you have questions about this Privacy Policy, please contact us at:</p>
+    <ul>
+      <li>Email: <a href="mailto:contact@softwarity.io">contact@softwarity.io</a></li>
+      <li>GitHub: <a href="https://github.com/softwarity/aipilot-cli/issues">github.com/softwarity/aipilot-cli/issues</a></li>
+    </ul>
+
+    <div class="footer">
+      <span>&copy; 2026 Softwarity. All rights reserved.</span>
+      <a href="https://www.softwarity.io">
+        <img src="softwarity.svg" alt="Softwarity" class="footer-logo">
+      </a>
+    </div>
+  </div>
+</body>
+</html>

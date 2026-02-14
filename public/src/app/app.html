@@ -6,7 +6,7 @@
     <header class="card-header">
       <div class="header-left">
         <a href="https://www.softwarity.io/" target="_blank" class="logo-link">
-          <img src="https://www.softwarity.io/img/softwarity.svg" alt="Softwarity" class="logo">
+          <img src="../softwarity.svg" alt="Softwarity" class="logo">
         </a>
         <div class="title-block">
           <h1>AIPilot CLI</h1>
@@ -376,8 +376,8 @@
 --workdir &lt;path&gt;    # Working directory
 --agents            # List available agents
 --sessions          # List saved sessions
---clear-session     # Delete current session
---clear-sessions    # Delete all sessions
+--kill-session &lt;id&gt; # Kill a specific session
+--kill-sessions     # Kill all sessions
 --unpair &lt;id&gt;       # Remove paired mobile
 --status            # Show PC and mobile status
 --version           # Show version</code></pre>
@@ -388,9 +388,11 @@
 
     <!-- Card Footer -->
     <footer class="card-footer">
-      <img src="https://www.softwarity.io/img/softwarity.svg" alt="Softwarity" class="footer-logo">
+      <img src="../softwarity.svg" alt="Softwarity" class="footer-logo">
       <span i18n="@@footer.madeBy">Made by</span>
       <a href="https://www.softwarity.io/" target="_blank">Softwarity</a>
+      <span class="footer-separator">|</span>
+      <a href="/privacy.html" class="footer-privacy-link" i18n="@@footer.privacy">Privacy Policy</a>
     </footer>
   </div>
 </main>

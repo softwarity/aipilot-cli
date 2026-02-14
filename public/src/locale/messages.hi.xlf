@@ -99,6 +99,7 @@
       <trans-unit id="usage.options" datatype="html"><source>Options</source><target>विकल्प</target></trans-unit>
       <trans-unit id="usage.commands" datatype="html"><source>Commands</source><target>कमांड</target></trans-unit>
       <trans-unit id="footer.madeBy" datatype="html"><source>Made by</source><target>द्वारा बनाया गया</target></trans-unit>
+      <trans-unit id="footer.privacy" datatype="html"><source>Privacy Policy</source><target>गोपनीयता नीति</target></trans-unit>
     </body>
   </file>
 </xliff>

@@ -99,6 +99,7 @@
       <trans-unit id="usage.options" datatype="html"><source>Options</source><target>Опции</target></trans-unit>
       <trans-unit id="usage.commands" datatype="html"><source>Commands</source><target>Команды</target></trans-unit>
       <trans-unit id="footer.madeBy" datatype="html"><source>Made by</source><target>Создано</target></trans-unit>
+      <trans-unit id="footer.privacy" datatype="html"><source>Privacy Policy</source><target>Политика конфиденциальности</target></trans-unit>
     </body>
   </file>
 </xliff>

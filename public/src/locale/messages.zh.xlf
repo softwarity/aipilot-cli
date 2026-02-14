@@ -99,6 +99,7 @@
       <trans-unit id="usage.options" datatype="html"><source>Options</source><target>选项</target></trans-unit>
       <trans-unit id="usage.commands" datatype="html"><source>Commands</source><target>命令</target></trans-unit>
       <trans-unit id="footer.madeBy" datatype="html"><source>Made by</source><target>制作者</target></trans-unit>
+      <trans-unit id="footer.privacy" datatype="html"><source>Privacy Policy</source><target>隐私政策</target></trans-unit>
     </body>
   </file>
 </xliff>

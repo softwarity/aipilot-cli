@@ -105,6 +105,7 @@
       <trans-unit id="usage.options" datatype="html"><source>Options</source><target>Opcoes</target></trans-unit>
       <trans-unit id="usage.commands" datatype="html"><source>Commands</source><target>Comandos</target></trans-unit>
       <trans-unit id="footer.madeBy" datatype="html"><source>Made by</source><target>Feito por</target></trans-unit>
+      <trans-unit id="footer.privacy" datatype="html"><source>Privacy Policy</source><target>Pol&#237;tica de privacidade</target></trans-unit>
     </body>
   </file>
 </xliff>
