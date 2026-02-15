@@ -29,7 +29,7 @@ type cliFlags struct {
 	killSessions  bool
 	unpairMobile  string
 	showStatus    bool
-	doUpdate      bool
+	configDir     string
 }
 
 // parseFlags parses command-line arguments and returns the flags
@@ -44,6 +44,7 @@ func parseFlags() *cliFlags {
 	killSessions := flag.Bool("kill-sessions", false, "Kill all sessions for this PC")
 	unpairMobile := flag.String("unpair", "", "Unpair a mobile device by ID")
 	showStatus := flag.Bool("status", false, "Show PC status, paired mobiles, and exit")
+	configDir := flag.String("config-dir", "", "Custom config directory (default: ~/.config/aipilot)")
 	doUpdate := flag.Bool("update", false, "Check for updates and install if available")
 	flag.Parse()
 
@@ -67,7 +68,7 @@ func parseFlags() *cliFlags {
 		killSessions:  *killSessions,
 		unpairMobile:  *unpairMobile,
 		showStatus:    *showStatus,
-		doUpdate:      *doUpdate,
+		configDir:     *configDir,
 	}
 }
 
@@ -317,16 +318,10 @@ func startPTYReader(daemon *Daemon) {
 				if err != io.EOF {
 					// Silent
 				}
-				daemon.mu.Lock()
-				daemon.running = false
-				daemon.mu.Unlock()
 				return
 			}
 			if n == 0 {
 				// PTY not available
-				daemon.mu.Lock()
-				daemon.running = false
-				daemon.mu.Unlock()
 				return
 			}
 
@@ -486,6 +481,11 @@ func main() {
 	// Parse flags
 	flags := parseFlags()
 
+	// Set custom config directory if provided
+	if flags.configDir != "" {
+		customConfigDir = flags.configDir
+	}
+
 	// Cleanup leftover .old binary from previous Windows update
 	cleanupOldBinary()
 
@@ -550,8 +550,6 @@ func main() {
 
 	daemon.mu.Lock()
 	daemon.ptmx = ptmx
-	daemon.cmd = cmd
-	daemon.running = true
 	daemon.mu.Unlock()
 
 	// Setup terminal

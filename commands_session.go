@@ -116,16 +116,6 @@ func (d *Daemon) showPairingQRRaw(onComplete func()) {
 		return
 	}
 
-	// Create QR data
-	qrData := PairingQRData{
-		Type:      "pairing",
-		Relay:     d.relay,
-		Token:     pairingResp.Token,
-		PCID:      d.pcConfig.PCID,
-		PCName:    d.pcConfig.PCName,
-		PublicKey: d.pcConfig.PublicKey,
-	}
-
 	// Include session info if we have an active session
 	d.mu.RLock()
 	sessionID := d.session
@@ -133,20 +123,17 @@ func (d *Daemon) showPairingQRRaw(onComplete func()) {
 	agentType := d.agentType
 	d.mu.RUnlock()
 
+	var sessionInfo *SessionQRInfo
 	if sessionID != "" {
-		qrData.SessionID = sessionID
-		qrData.WorkingDir = workDir
-		qrData.AgentType = string(agentType)
-
-		// Add SSH info
-		sshInfo := DetectSSHInfo()
-		if sshInfo != nil && sshInfo.Available {
-			qrData.SSHAvailable = true
-			qrData.SSHPort = sshInfo.Port
-			qrData.Hostname = sshInfo.Hostname
-			qrData.Username = sshInfo.Username
+		sessionInfo = &SessionQRInfo{
+			SessionID: sessionID,
+			WorkDir:   workDir,
+			AgentType: string(agentType),
 		}
 	}
+
+	// Create QR data using shared helper
+	qrData := buildPairingQRData(d.pcConfig, d.relay, pairingResp.Token, sessionInfo)
 
 	qrJSON, err := json.Marshal(qrData)
 	if err != nil {
@@ -200,7 +187,9 @@ func (d *Daemon) pollPairingCompletionRaw(token string, onComplete func()) {
 					PairedAt:  time.Now().Format(time.RFC3339),
 				}
 				d.pcConfig.addPairedMobile(mobile)
-				savePCConfig(d.pcConfig)
+				if err := savePCConfig(d.pcConfig); err != nil {
+					fmt.Printf("%sFailed to save config: %v%s\n", red, err, reset)
+				}
 
 				d.mu.RLock()
 				oldSessionID := d.session

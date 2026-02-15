@@ -2,26 +2,13 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"net"
-	"os"
-	"os/user"
 	"runtime"
 )
 
 // sendCLIInfo sends CLI information to mobile
 func (d *Daemon) sendCLIInfo() {
-	hostname, err := os.Hostname()
-	if err != nil {
-		fmt.Printf("%sWarning: Could not get hostname: %v%s\n", yellow, err, reset)
-		hostname = "unknown"
-	}
-
-	currentUser := "unknown"
-	if u, err := user.Current(); err == nil {
-		currentUser = u.Username
-	}
-
+	// Gather all non-loopback IPv4 addresses for mobile connectivity
 	var ips []string
 	if addrs, err := net.InterfaceAddrs(); err == nil {
 		for _, addr := range addrs {
@@ -33,29 +20,20 @@ func (d *Daemon) sendCLIInfo() {
 		}
 	}
 
-	// Quick SSH check
-	sshPort := DefaultSSHPort
-	sshRunning := false
-	if conn, err := net.DialTimeout("tcp", fmt.Sprintf("127.0.0.1:%d", DefaultSSHPort), SSHQuickCheckTimeout); err == nil {
-		conn.Close()
-		sshRunning = true
-	} else if conn, err := net.DialTimeout("tcp", fmt.Sprintf("127.0.0.1:%d", AlternativeSSHPort), SSHQuickCheckTimeout); err == nil {
-		conn.Close()
-		sshPort = AlternativeSSHPort
-		sshRunning = true
-	}
+	// Use thorough SSH detection (ss/lsof/netstat/config parsing)
+	sshInfo := DetectSSHInfo()
 
 	info := map[string]interface{}{
 		"os":          runtime.GOOS,
 		"arch":        runtime.GOARCH,
-		"hostname":    hostname,
-		"user":        currentUser,
+		"hostname":    sshInfo.Hostname,
+		"user":        sshInfo.Username,
 		"cli_version": Version,
 		"working_dir": d.workDir,
 		"agent":       d.command,
 		"agent_type":  string(d.agentType),
-		"ssh_running": sshRunning,
-		"ssh_port":    sshPort,
+		"ssh_running": sshInfo.Available,
+		"ssh_port":    sshInfo.Port,
 		"ips":         ips,
 	}
 

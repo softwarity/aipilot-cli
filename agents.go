@@ -17,21 +17,19 @@ const (
 
 // AgentInfo contains information about a detected agent
 type AgentInfo struct {
-	Command   string
-	Type      AgentType
-	Version   string
-	Available bool
+	Command string
+	Type    AgentType
+	Version string
 }
 
 // knownAgents lists all known AI terminal agents to detect
 var knownAgents = []struct {
-	command     string
-	agentType   AgentType
-	displayName string
+	command   string
+	agentType AgentType
 }{
-	{"claude", AgentClaude, "Claude Code"},
-	{"gemini", AgentGemini, "Google Gemini CLI"},
-	{"codex", AgentCodex, "OpenAI Codex"},
+	{"claude", AgentClaude},
+	{"gemini", AgentGemini},
+	{"codex", AgentCodex},
 }
 
 func checkCommand(command string) (string, error) {
@@ -85,10 +83,9 @@ func detectAvailableAgents() []AgentInfo {
 		if _, err := exec.LookPath(agent.command); err == nil {
 			version := getAgentVersion(agent.command, agent.agentType)
 			available = append(available, AgentInfo{
-				Command:   agent.command,
-				Type:      agent.agentType,
-				Version:   version,
-				Available: true,
+				Command: agent.command,
+				Type:    agent.agentType,
+				Version: version,
 			})
 		}
 	}

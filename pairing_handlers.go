@@ -3,8 +3,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"os"
-	"path/filepath"
 	"time"
 
 	"github.com/skip2/go-qrcode"
@@ -84,15 +82,8 @@ func handlePairing(config *PCConfig, client *RelayClient, relayURL string) error
 		return fmt.Errorf("failed to initialize pairing: %w", err)
 	}
 
-	// Create QR data
-	qrData := PairingQRData{
-		Type:      "pairing",
-		Relay:     relayURL,
-		Token:     pairingResp.Token,
-		PCID:      config.PCID,
-		PCName:    config.PCName,
-		PublicKey: config.PublicKey,
-	}
+	// Create QR data (no session info during initial pairing)
+	qrData := buildPairingQRData(config, relayURL, pairingResp.Token, nil)
 
 	qrJSON, err := json.Marshal(qrData)
 	if err != nil {
@@ -158,25 +149,51 @@ func handlePairing(config *PCConfig, client *RelayClient, relayURL string) error
 	}
 }
 
-// printQRCodeString prints a QR code from string data
-func printQRCodeString(data string, asImage bool) {
-	if asImage {
-		tmpDir := os.TempDir()
-		qrFile := filepath.Join(tmpDir, fmt.Sprintf("aipilot-pairing-%d.png", time.Now().Unix()))
-		if err := qrcode.WriteFile(data, qrcode.Medium, 300, qrFile); err != nil {
-			fmt.Printf("%sError generating QR code: %v%s\n", red, err, reset)
-			return
-		}
-		fmt.Printf("QR code saved to: %s\n", qrFile)
-		if err := openFile(qrFile); err != nil {
-			fmt.Println("Please open the file manually or use terminal QR:")
-			printQRToTerminal(data)
-		} else {
-			fmt.Println("QR code image opened.")
-		}
-	} else {
-		printQRToTerminal(data)
+// addTokenForMobile encrypts session tokens for a new mobile and sends them
+// to the relay for ALL sessions on this PC (not just the current one).
+// Each AddSessionTokenForMobile call triggers a session_token_added notification.
+func (d *Daemon) addTokenForMobile(mobile PairedMobile) bool {
+	if mobile.PublicKey == "" {
+		fmt.Printf("%s  no public key for %s%s\n", dim, mobile.ID[:8], reset)
+		return false
 	}
+
+	pcPrivateKey, err := GetPrivateKeyFromHex(d.pcConfig.PrivateKey)
+	if err != nil {
+		fmt.Printf("%s  failed to get private key: %v%s\n", red, err, reset)
+		return false
+	}
+
+	// Get ALL sessions for this PC (includes plaintext tokens via for_cli=true)
+	sessions, err := d.relayClient.ListAllSessions()
+	if err != nil {
+		fmt.Printf("%s  failed to list sessions: %v%s\n", red, err, reset)
+		return false
+	}
+
+	fmt.Printf("%s  found %d sessions for mobile %s%s\n", dim, len(sessions), mobile.ID[:8], reset)
+
+	count := 0
+	for _, sess := range sessions {
+		if sess.Token == "" {
+			fmt.Printf("%s  session %s has no token, skipping%s\n", dim, sess.ID[:8], reset)
+			continue
+		}
+		encrypted, err := EncryptForMobile(sess.Token, mobile.PublicKey, pcPrivateKey)
+		if err != nil {
+			fmt.Printf("%s  encrypt failed for session %s: %v%s\n", red, sess.ID[:8], err, reset)
+			continue
+		}
+		if err := d.relayClient.AddSessionTokenForMobile(sess.ID, mobile.ID, encrypted); err != nil {
+			fmt.Printf("%s  failed to share session %s: %v%s\n", red, sess.ID[:8]+"...", err, reset)
+			continue
+		}
+		fmt.Printf("%s  ✓ shared session %s%s\n", dim, sess.ID[:8], reset)
+		count++
+	}
+
+	fmt.Printf("%s  shared %d/%d sessions%s\n", dim, count, len(sessions), reset)
+	return count > 0
 }
 
 // printQRToTerminal prints a QR code to the terminal

@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/base64"
+	"fmt"
 	"strings"
 	"time"
 
@@ -217,7 +218,9 @@ func (d *Daemon) handleWebSocketMessages(conn *websocket.Conn) {
 				}
 				// Update local pcConfig with the new mobile
 				d.pcConfig.addPairedMobile(mobile)
-				savePCConfig(d.pcConfig)
+				if err := savePCConfig(d.pcConfig); err != nil {
+					fmt.Printf("%sFailed to save config: %v%s\n", red, err, reset)
+				}
 				// Add encrypted token for this session
 				d.addTokenForMobile(mobile)
 			}

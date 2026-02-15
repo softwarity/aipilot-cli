@@ -38,8 +38,14 @@ type DirectoryConfig struct {
 // DirectoriesConfig maps directory paths to their config
 type DirectoriesConfig map[string]DirectoryConfig
 
+// customConfigDir overrides the default config directory when set via --config-dir
+var customConfigDir string
+
 // getConfigDir returns the aipilot config directory path
 func getConfigDir() (string, error) {
+	if customConfigDir != "" {
+		return customConfigDir, nil
+	}
 	configDir, err := os.UserConfigDir()
 	if err != nil {
 		// Fallback to home directory
@@ -271,4 +277,41 @@ type PairingQRData struct {
 	SSHPort      int    `json:"sp,omitempty"`
 	Hostname     string `json:"h,omitempty"`
 	Username     string `json:"u,omitempty"`
+}
+
+// SessionQRInfo holds optional session-specific data for the pairing QR code.
+// When non-nil, session info and SSH detection results are included in the QR.
+type SessionQRInfo struct {
+	SessionID string
+	WorkDir   string
+	AgentType string
+}
+
+// buildPairingQRData constructs the PairingQRData struct used for QR code generation.
+// sessionInfo is optional (nil when pairing before a session exists).
+func buildPairingQRData(config *PCConfig, relayURL, pairingToken string, sessionInfo *SessionQRInfo) PairingQRData {
+	qrData := PairingQRData{
+		Type:      "pairing",
+		Relay:     relayURL,
+		Token:     pairingToken,
+		PCID:      config.PCID,
+		PCName:    config.PCName,
+		PublicKey: config.PublicKey,
+	}
+
+	if sessionInfo != nil {
+		qrData.SessionID = sessionInfo.SessionID
+		qrData.WorkingDir = sessionInfo.WorkDir
+		qrData.AgentType = sessionInfo.AgentType
+
+		sshInfo := DetectSSHInfo()
+		if sshInfo != nil && sshInfo.Available {
+			qrData.SSHAvailable = true
+			qrData.SSHPort = sshInfo.Port
+			qrData.Hostname = sshInfo.Hostname
+			qrData.Username = sshInfo.Username
+		}
+	}
+
+	return qrData
 }

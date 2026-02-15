@@ -4,7 +4,6 @@ import (
 	"context"
 	"crypto/cipher"
 	"os"
-	"os/exec"
 	"sync"
 	"time"
 
@@ -59,9 +58,7 @@ type Daemon struct {
 	relayConnected  bool
 
 	// PTY
-	ptmx    *os.File
-	cmd     *exec.Cmd
-	running bool
+	ptmx *os.File
 
 	// Session info
 	session   string
@@ -77,10 +74,6 @@ type Daemon struct {
 
 	// E2E Encryption
 	aesGCM cipher.AEAD
-
-	// Input buffer for command detection (PC stdin)
-	inputBuffer string
-	inputMu     sync.Mutex
 
 	// Mobile input buffer for command detection
 	mobileLineBuf string
