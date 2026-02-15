@@ -218,47 +218,6 @@ Implemente dans `crypto.go`:
 
 ---
 
-## Code mort connu
-
-Les elements suivants sont inutilises et peuvent etre supprimes:
-
-### Constantes (types.go)
-
-```go
-const (
-    clearLine  = "\033[K"     // Non utilise
-    moveUp     = "\033[1A"    // Non utilise
-    moveToCol0 = "\r"         // Non utilise
-)
-```
-
-### Fonctions (types.go)
-
-```go
-func (d *Daemon) isRelayConnected() bool  // Non utilise
-```
-
-### Fonctions (terminal.go)
-
-```go
-func (d *Daemon) forceResize()                    // Non utilise
-func (d *Daemon) writeToPTY(data []byte) (int, error)  // Remplace par sendToPTY
-```
-
-### Fonctions (relay_api.go)
-
-```go
-func (c *RelayClient) ListPairedMobiles() ([]PairedMobile, error)  // Non utilise
-```
-
-### Types (relay_api.go)
-
-```go
-type PairingCompleteRequest struct { ... }  // Utilise cote mobile, pas CLI
-```
-
----
-
 ## Patterns importants
 
 ### PTY I/O
