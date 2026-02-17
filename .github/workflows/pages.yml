@@ -5,6 +5,8 @@ on:
     branches: [main]
     paths:
       - 'public/**'
+      - 'install.sh'
+      - 'install.ps1'
       - '.github/workflows/pages.yml'
   workflow_dispatch:
 
@@ -39,10 +41,12 @@ jobs:
         working-directory: ./public
         run: npm run build:all
 
-      - name: Add redirect and .nojekyll
+      - name: Add redirect, .nojekyll and install scripts
         working-directory: ./public
         run: |
           cp public/* dist/browser/
+          cp ../install.sh dist/browser/
+          cp ../install.ps1 dist/browser/
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
