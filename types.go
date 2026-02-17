@@ -3,10 +3,10 @@ package main
 import (
 	"context"
 	"crypto/cipher"
-	"os"
 	"sync"
 	"time"
 
+	pty "github.com/aymanbagabas/go-pty"
 	"github.com/gorilla/websocket"
 	"golang.org/x/term"
 )
@@ -58,7 +58,7 @@ type Daemon struct {
 	relayConnected  bool
 
 	// PTY
-	ptmx *os.File
+	ptmx pty.Pty
 
 	// Session info
 	session   string

@@ -10,6 +10,7 @@
 #>
 
 $ErrorActionPreference = "Stop"
+trap { Write-Host "`n$_" -ForegroundColor Red; Read-Host "Press Enter to exit"; exit 1 }
 
 $Repo = "softwarity/aipilot-cli"
 $BinaryName = "aipilot-cli.exe"

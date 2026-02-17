@@ -6,7 +6,6 @@ import (
 	"io"
 	"log"
 	"os"
-	"os/exec"
 	"os/signal"
 	"path/filepath"
 	"runtime"
@@ -14,7 +13,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/creack/pty"
+	pty "github.com/aymanbagabas/go-pty"
 	"golang.org/x/term"
 )
 
@@ -280,14 +279,18 @@ func displayHeader(daemon *Daemon, session, command, workDir, agentVersion strin
 }
 
 // startPTY starts the PTY and returns the pty master and command
-func startPTY(command, workDir string) (*os.File, *exec.Cmd) {
+func startPTY(command, workDir string) (pty.Pty, *pty.Cmd) {
 	fmt.Printf("Starting %s...\n", command)
-	cmd := exec.Command(command)
+	ptmx, err := pty.New()
+	if err != nil {
+		log.Fatal("Failed to create PTY:", err)
+	}
+	cmd := ptmx.Command(command)
 	cmd.Dir = workDir
 	cmd.Env = append(os.Environ(), "TERM=xterm-256color")
 
-	ptmx, err := pty.Start(cmd)
-	if err != nil {
+	if err := cmd.Start(); err != nil {
+		ptmx.Close()
 		log.Fatal("Failed to start PTY:", err)
 	}
 	return ptmx, cmd
@@ -450,7 +453,7 @@ func startResizeHandler(daemon *Daemon, resizeChan <-chan os.Signal) {
 }
 
 // waitForTermination waits for either a signal or process exit, then cleans up
-func waitForTermination(sigChan <-chan os.Signal, cmd *exec.Cmd, daemon *Daemon) {
+func waitForTermination(sigChan <-chan os.Signal, cmd *pty.Cmd, daemon *Daemon) {
 	var exitMsg string
 
 	select {
@@ -581,7 +584,7 @@ func main() {
 	waitForTermination(sigChan, cmd, daemon)
 }
 
-func waitForProcess(cmd *exec.Cmd) <-chan error {
+func waitForProcess(cmd *pty.Cmd) <-chan error {
 	ch := make(chan error, 1)
 	go func() {
 		ch <- cmd.Wait()

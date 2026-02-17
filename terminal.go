@@ -2,8 +2,6 @@ package main
 
 import (
 	"time"
-
-	"github.com/creack/pty"
 )
 
 // schedulePCSwitch schedules a debounced switch to PC mode
@@ -120,10 +118,7 @@ func (d *Daemon) resizePTY(rows, cols uint16) error {
 	}
 
 	d.ptyMu.Lock()
-	err := pty.Setsize(ptmx, &pty.Winsize{
-		Cols: cols,
-		Rows: rows,
-	})
+	err := ptmx.Resize(int(cols), int(rows))
 	d.ptyMu.Unlock()
 	return err
 }
