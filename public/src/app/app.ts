@@ -37,4 +37,16 @@ export class App {
     // Chemin relatif: depuis /aipilot-cli/fr/ vers /aipilot-cli/en/
     return `../${lang.code}/`;
   }
+
+  copyToClipboard(text: string, event: Event): void {
+    if (!isPlatformBrowser(this.platformId)) return;
+    const btn = (event.currentTarget as HTMLElement);
+    const icon = btn.querySelector('.material-icons');
+    navigator.clipboard.writeText(text).then(() => {
+      if (icon) {
+        icon.textContent = 'check';
+        setTimeout(() => icon.textContent = 'content_copy', 1500);
+      }
+    });
+  }
 }

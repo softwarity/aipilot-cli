@@ -65,6 +65,39 @@ pre {
   }
 }
 
+.code-block {
+  position: relative;
+
+  .copy-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    padding: 4px;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .material-icons {
+      font-size: 16px;
+      color: var(--text-muted);
+    }
+
+    &:hover {
+      border-color: var(--accent-blue);
+
+      .material-icons { color: var(--accent-blue); }
+    }
+  }
+
+  &:hover .copy-btn { opacity: 1; }
+}
+
 h2 {
   font-size: 1.3rem;
   font-weight: 600;

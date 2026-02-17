@@ -181,10 +181,20 @@
           <p i18n="@@installation.step1.desc">Download and install the CLI on your computer</p>
 
           <h4 i18n="@@installation.linux">Linux / macOS</h4>
-          <pre><code>curl -fsSL https://raw.githubusercontent.com/softwarity/aipilot-cli/main/install.sh | bash</code></pre>
+          <div class="code-block">
+            <pre><code>curl -fsSL https://raw.githubusercontent.com/softwarity/aipilot-cli/main/install.sh | bash</code></pre>
+            <button class="copy-btn" (click)="copyToClipboard('curl -fsSL https://raw.githubusercontent.com/softwarity/aipilot-cli/main/install.sh | bash', $event)">
+              <span class="material-icons">content_copy</span>
+            </button>
+          </div>
 
           <h4 i18n="@@installation.windows">Windows (PowerShell)</h4>
-          <pre><code>irm https://raw.githubusercontent.com/softwarity/aipilot-cli/main/install.ps1 | iex</code></pre>
+          <div class="code-block">
+            <pre><code>irm https://raw.githubusercontent.com/softwarity/aipilot-cli/main/install.ps1 | iex</code></pre>
+            <button class="copy-btn" (click)="copyToClipboard('irm https://raw.githubusercontent.com/softwarity/aipilot-cli/main/install.ps1 | iex', $event)">
+              <span class="material-icons">content_copy</span>
+            </button>
+          </div>
           <p i18n="@@installation.windowsAlt">Or download directly from <a href="https://github.com/softwarity/aipilot-cli/releases" target="_blank">GitHub Releases</a></p>
         </div>
       </div>
