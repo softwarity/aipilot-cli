@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"os/exec"
 	"os/signal"
 	"path/filepath"
 	"runtime"
@@ -281,11 +282,19 @@ func displayHeader(daemon *Daemon, session, command, workDir, agentVersion strin
 // startPTY starts the PTY and returns the pty master and command
 func startPTY(command, workDir string) (pty.Pty, *pty.Cmd) {
 	fmt.Printf("Starting %s...\n", command)
+
+	// Resolve full path before setting cmd.Dir, otherwise on Windows
+	// exec.Command resolves the command relative to cmd.Dir instead of PATH
+	commandPath, err := exec.LookPath(command)
+	if err != nil {
+		log.Fatalf("Failed to find '%s' in PATH: %v", command, err)
+	}
+
 	ptmx, err := pty.New()
 	if err != nil {
 		log.Fatal("Failed to create PTY:", err)
 	}
-	cmd := ptmx.Command(command)
+	cmd := ptmx.Command(commandPath)
 	cmd.Dir = workDir
 	cmd.Env = append(os.Environ(), "TERM=xterm-256color")
 
