@@ -50,6 +50,9 @@ func (d *Daemon) connectToRelay() {
 
 		wasConnected = true
 
+		// Set read deadline: if no message within 3 ping intervals, connection is dead
+		conn.SetReadDeadline(time.Now().Add(PingInterval * 3))
+
 		// Cancel any previous ping goroutine
 		d.mu.Lock()
 		if d.pingCancel != nil {
@@ -81,6 +84,7 @@ func (d *Daemon) connectToRelay() {
 					err := c.WriteJSON(Message{Type: "ping"})
 					d.wsMu.Unlock()
 					if err != nil {
+						c.Close() // Force close to unblock ReadJSON
 						return
 					}
 				}
@@ -105,9 +109,17 @@ func (d *Daemon) connectToRelay() {
 	}
 }
 
-// recreateSession creates a new session on the relay after the previous one was deleted.
-// Updates the daemon's session, token, and encryption state.
+// recreateSession creates a new session on the relay after connection loss.
+// Deletes the old session first to prevent ghost sessions, then creates a new one.
 func (d *Daemon) recreateSession() error {
+	// Clean up old session (best effort - may already be gone via alarm)
+	d.mu.RLock()
+	oldSession := d.session
+	d.mu.RUnlock()
+	if oldSession != "" {
+		d.relayClient.DeleteSession(oldSession)
+	}
+
 	sshInfo := DetectSSHInfo()
 	displayName := d.workDir
 	if idx := strings.LastIndex(d.workDir, "/"); idx >= 0 {
@@ -138,6 +150,8 @@ func (d *Daemon) handleWebSocketMessages(conn *websocket.Conn) {
 		if err := conn.ReadJSON(&msg); err != nil {
 			return
 		}
+		// Reset read deadline on any successful read
+		conn.SetReadDeadline(time.Now().Add(PingInterval * 3))
 
 		switch msg.Type {
 		case "data":
