@@ -173,6 +173,19 @@
   animation: fadeInUp 0.5s ease-out 0.2s both;
 }
 
+.hero-story {
+  max-width: 700px;
+  margin: 0 auto 32px auto;
+  animation: fadeInUp 0.5s ease-out 0.25s both;
+
+  img {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 8px;
+  }
+}
+
 .hero-buttons {
   display: flex;
   justify-content: center;
