@@ -192,9 +192,7 @@ func cleanupOldBinary() {
 	}
 }
 
-// checkUpdateOnStartup checks for updates at startup.
-// Patch: download in background, applied on next launch.
-// Minor/Major: blocking download + restart.
+// checkUpdateOnStartup checks for updates at startup and prompts the user.
 func checkUpdateOnStartup() {
 	current, err := parseSemver(Version)
 	if err != nil {
@@ -231,23 +229,25 @@ func checkUpdateOnStartup() {
 		return
 	}
 
-	if updateType == "patch" {
-		// Non-blocking: download in background, applied on next launch
-		fmt.Printf("%s⬆ %s available, downloading in background...%s\n", dim, latest.String(), reset)
-		go func() {
-			downloadAndReplace(downloadURL, exePath)
-		}()
-	} else {
-		// Blocking: minor/major update
-		fmt.Printf("%s⬆ Update %s → %s available%s\n", cyan, current.String(), latest.String(), reset)
-		fmt.Printf("%s  Updating...%s\n", cyan, reset)
-		if err := downloadAndReplace(downloadURL, exePath); err != nil {
-			fmt.Printf("%s  Update failed: %v%s\n", yellow, err, reset)
-			return
-		}
-		fmt.Printf("%s  ✓ Updated to %s. Restarting...%s\n", green, latest.String(), reset)
-		restartSelf(exePath)
+	fmt.Printf("%s⬆ Update available: %s → %s (%s)%s\n", cyan, current.String(), latest.String(), updateType, reset)
+	fmt.Printf("  Update now? [Y/n] ")
+
+	var answer string
+	fmt.Scanln(&answer)
+	answer = strings.TrimSpace(strings.ToLower(answer))
+
+	if answer == "n" || answer == "no" {
+		fmt.Printf("%s  Skipped.%s\n", dim, reset)
+		return
 	}
+
+	fmt.Printf("%s  Updating...%s\n", cyan, reset)
+	if err := downloadAndReplace(downloadURL, exePath); err != nil {
+		fmt.Printf("%s  Update failed: %v%s\n", yellow, err, reset)
+		return
+	}
+	fmt.Printf("%s  ✓ Updated to %s. Restarting...%s\n", green, latest.String(), reset)
+	restartSelf(exePath)
 }
 
 // forceUpdate performs a blocking update check and install (--update flag)

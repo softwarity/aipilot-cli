@@ -53,6 +53,9 @@ func (d *Daemon) handleControlMessage(msg string) {
 
 	case "file-upload-cancel":
 		d.handleChunkedUploadCancel(args)
+
+	case "mobile-info":
+		d.handleMobileInfo(args)
 	}
 }
 

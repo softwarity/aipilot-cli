@@ -37,6 +37,9 @@ var (
 	RelayURL = "wss://aipilot-relay.softwarity.io"
 )
 
+// MinAppVersion is the minimum mobile app version required by this CLI
+var MinAppVersion = "1.0.0"
+
 // ChunkedUpload tracks a file being uploaded in chunks
 type ChunkedUpload struct {
 	FileName    string
