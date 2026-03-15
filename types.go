@@ -100,6 +100,12 @@ type Daemon struct {
 	// Context for cancelling ping goroutine
 	pingCtx    context.Context
 	pingCancel context.CancelFunc
+
+	// Agent busy/idle detection
+	agentBusy           bool
+	agentIdleTimer      *time.Timer
+	agentStatusBuf      []byte
+	agentStatusInEscape bool
 }
 
 // Message types for WebSocket communication

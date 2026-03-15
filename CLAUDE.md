@@ -45,7 +45,7 @@ make major   # X.0.0
 | Fichier | Role |
 |---------|------|
 | `main.go` | Entry point, parsing flags, demarrage PTY, boucle I/O |
-| `types.go` | Struct `Daemon`, `Message`, constantes ANSI |
+| `types.go` | Struct `Daemon`, `Message`, constantes ANSI, `MinAppVersion` |
 | `constants.go` | Timeouts, buffer sizes, permissions |
 | `agents.go` | Detection agents IA (claude, gemini, codex), selection |
 | `encryption.go` | AES-256-GCM pour chiffrement donnees session |
@@ -59,7 +59,7 @@ make major   # X.0.0
 | `ssh.go` | Detection SSH, installation cles authorized_keys |
 | `commands_session.go` | Commande /qr (affichage QR pairing) |
 | `commands_pairing.go` | Affichage QR pairing depuis daemon |
-| `commands_info.go` | Envoi info CLI au mobile |
+| `commands_info.go` | Envoi info CLI au mobile, handleMobileInfo (version check) |
 | `commands_terminal.go` | Traitement messages controle (resize, file-upload) |
 | `commands_upload.go` | Upload fichiers (simple et chunked) |
 | `utils.go` | Utilitaires (openFile cross-platform) |
@@ -81,6 +81,7 @@ Les messages de controle passent par le canal data avec prefix `\x00CTRL:`.
 | `file-upload-ack` | `file-upload-ack:uploadId:chunkIndex` | Confirmation chunk recu |
 | `file-upload-result` | `file-upload-result:success\|error:path\|msg` | Resultat upload |
 | `ssh-setup-result` | `ssh-setup-result:success\|error:message` | Resultat installation cle SSH |
+| `update-required` | `update-required:{"min_app_version":"X.Y.Z","cli_version":"...","message":"..."}` | Demande au mobile de se mettre a jour |
 
 ### Recus (Mobile -> CLI)
 
@@ -93,6 +94,7 @@ Les messages de controle passent par le canal data avec prefix `\x00CTRL:`.
 | `file-upload-start` | `file-upload-start:uploadId:filename:totalChunks:totalSize` | Debut upload chunked |
 | `file-upload-chunk` | `file-upload-chunk:uploadId:chunkIndex:dataBase64` | Chunk upload |
 | `file-upload-cancel` | `file-upload-cancel:uploadId` | Annule upload chunked |
+| `mobile-info` | `mobile-info:{"app_version":"X.Y.Z"}` | Version mobile, CLI compare avec `MinAppVersion` |
 
 ---
 

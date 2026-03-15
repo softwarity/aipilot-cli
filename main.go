@@ -238,6 +238,9 @@ func createDaemon(session, token, relay, command, workDir string, agentType Agen
 		log.Fatal("Failed to initialize encryption:", err)
 	}
 
+	// Initialize agent busy/idle detection
+	daemon.initAgentStatus()
+
 	return daemon
 }
 
@@ -337,6 +340,7 @@ func startPTYReader(daemon *Daemon) {
 				return
 			}
 
+			daemon.scanAgentStatus(buf[:n])
 			os.Stdout.Write(buf[:n])
 			daemon.sendToMobile(buf[:n])
 		}
