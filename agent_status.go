@@ -16,6 +16,15 @@ const (
 	agentStatusBufSize = 256
 )
 
+// ANSI escape sequence parser states
+const (
+	escNone   = 0 // Normal text
+	escStart  = 1 // Just saw ESC (0x1b)
+	escCSI    = 2 // In CSI sequence: ESC [ ... letter
+	escOSC    = 3 // In OSC sequence: ESC ] ... (BEL or ST)
+	escOSCESC = 4 // In OSC, saw ESC (awaiting \ for ST terminator)
+)
+
 // busyPattern is the lowercase pattern to detect in PTY output
 var busyPattern = []byte("esc to ")
 
@@ -27,32 +36,73 @@ func (d *Daemon) initAgentStatus() {
 // scanAgentStatus scans PTY output for the busy pattern.
 // Called from startPTYReader on every read — must be fast.
 func (d *Daemon) scanAgentStatus(data []byte) {
-	// Append printable chars (lowercased) to rolling buffer, skip ANSI sequences
-	inEscape := d.agentStatusInEscape
+	// Skip PTY scanning when receiving status via hook socket
+	if d.agentStatusViaSocket {
+		return
+	}
+
+	state := d.agentEscState
 	buf := d.agentStatusBuf
 
 	for _, b := range data {
-		if inEscape {
-			// Inside ANSI escape: wait for terminating letter
+		switch state {
+		case escNone:
+			if b == 0x1b {
+				state = escStart
+				continue
+			}
+			// Only keep printable ASCII, lowercase on the fly
+			if b >= 0x20 && b <= 0x7e {
+				if b >= 'A' && b <= 'Z' {
+					b += 0x20
+				}
+				buf = append(buf, b)
+			}
+
+		case escStart:
+			// Byte right after ESC determines the sequence type
+			if b == '[' {
+				state = escCSI
+			} else if b == ']' {
+				state = escOSC
+			} else {
+				// Two-byte escape (e.g. ESC c, ESC M) — done
+				state = escNone
+			}
+
+		case escCSI:
+			// CSI: ESC [ (params) letter — letter terminates
 			if (b >= 'A' && b <= 'Z') || (b >= 'a' && b <= 'z') {
-				inEscape = false
+				state = escNone
 			}
-			continue
-		}
-		if b == 0x1b {
-			inEscape = true
-			continue
-		}
-		// Only keep printable ASCII
-		if b >= 0x20 && b <= 0x7e {
-			// Lowercase on the fly
-			if b >= 'A' && b <= 'Z' {
-				b += 0x20
+			// else: parameters (digits, ;, ?, etc.) — keep consuming
+
+		case escOSC:
+			// OSC: ESC ] ... terminated by BEL (0x07) or ST (ESC \)
+			if b == 0x07 {
+				state = escNone
+			} else if b == 0x1b {
+				state = escOSCESC
 			}
-			buf = append(buf, b)
+			// else: OSC content — keep consuming
+
+		case escOSCESC:
+			// Inside OSC, saw ESC — if next is \, it's ST (end of OSC)
+			if b == '\\' {
+				state = escNone
+			} else {
+				// Not ST — treat as new escape sequence
+				if b == '[' {
+					state = escCSI
+				} else if b == ']' {
+					state = escOSC
+				} else {
+					state = escNone
+				}
+			}
 		}
 	}
-	d.agentStatusInEscape = inEscape
+	d.agentEscState = state
 
 	// Trim buffer to max size (keep tail)
 	if len(buf) > agentStatusBufSize {

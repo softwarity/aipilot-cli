@@ -27,6 +27,7 @@ type cliFlags struct {
 	listSessions  bool
 	killSession   string
 	killSessions  bool
+	agentEvent    bool
 	unpairMobile  string
 	showStatus    bool
 	configDir     string
@@ -42,6 +43,7 @@ func parseFlags() *cliFlags {
 	listSessions := flag.Bool("sessions", false, "List saved sessions and exit")
 	killSession := flag.String("kill-session", "", "Kill a specific session by ID")
 	killSessions := flag.Bool("kill-sessions", false, "Kill all sessions for this PC")
+	agentEvent := flag.Bool("agent-event", false, "Receive agent event from stdin and forward to socket")
 	unpairMobile := flag.String("unpair", "", "Unpair a mobile device by ID")
 	showStatus := flag.Bool("status", false, "Show PC status, paired mobiles, and exit")
 	configDir := flag.String("config-dir", "", "Custom config directory (default: ~/.config/aipilot)")
@@ -58,6 +60,11 @@ func parseFlags() *cliFlags {
 		os.Exit(0)
 	}
 
+	if *agentEvent {
+		agentEventMain()
+		os.Exit(0)
+	}
+
 	return &cliFlags{
 		agent:         *agent,
 		selectAgent:   *selectAgent,
@@ -66,6 +73,7 @@ func parseFlags() *cliFlags {
 		listSessions:  *listSessions,
 		killSession:   *killSession,
 		killSessions:  *killSessions,
+		agentEvent:    *agentEvent,
 		unpairMobile:  *unpairMobile,
 		showStatus:    *showStatus,
 		configDir:     *configDir,
@@ -282,8 +290,9 @@ func displayHeader(daemon *Daemon, session, command, workDir, agentVersion strin
 	fmt.Println()
 }
 
-// startPTY starts the PTY and returns the pty master and command
-func startPTY(command, workDir string) (pty.Pty, *pty.Cmd) {
+// startPTY starts the PTY and returns the pty master and command.
+// socketPath is set as AIPILOT_HOOK_SOCKET env var for the agent process.
+func startPTY(command, workDir, socketPath string) (pty.Pty, *pty.Cmd) {
 	fmt.Printf("Starting %s...\n", command)
 
 	// Resolve full path before setting cmd.Dir, otherwise on Windows
@@ -299,7 +308,10 @@ func startPTY(command, workDir string) (pty.Pty, *pty.Cmd) {
 	}
 	cmd := ptmx.Command(commandPath)
 	cmd.Dir = workDir
-	cmd.Env = append(os.Environ(), "TERM=xterm-256color")
+	cmd.Env = append(os.Environ(),
+		"TERM=xterm-256color",
+		"AIPILOT_HOOK_SOCKET="+socketPath,
+	)
 
 	if err := cmd.Start(); err != nil {
 		ptmx.Close()
@@ -560,8 +572,16 @@ func main() {
 	// Display header and session info
 	displayHeader(daemon, session, selectedCommand, workDir, agentVersion)
 
-	// Start PTY
-	ptmx, cmd := startPTY(selectedCommand, workDir)
+	// Auto-install hooks for agents that support them
+	if agentType == AgentClaude {
+		ensureClaudeHooksInstalled()
+	}
+
+	// Start hook socket and PTY
+	socketPath := filepath.Join(os.TempDir(), "aipilot-"+session+".sock")
+	daemon.startHookSocket(socketPath)
+
+	ptmx, cmd := startPTY(selectedCommand, workDir, socketPath)
 	defer ptmx.Close()
 
 	daemon.mu.Lock()

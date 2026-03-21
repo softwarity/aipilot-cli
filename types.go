@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"crypto/cipher"
+	"net"
 	"sync"
 	"time"
 
@@ -102,10 +103,15 @@ type Daemon struct {
 	pingCancel context.CancelFunc
 
 	// Agent busy/idle detection
-	agentBusy           bool
-	agentIdleTimer      *time.Timer
-	agentStatusBuf      []byte
-	agentStatusInEscape bool
+	agentBusy            bool
+	agentIdleTimer       *time.Timer
+	agentStatusBuf       []byte
+	agentEscState        int // 0=normal, 1=ESC seen, 2=CSI, 3=OSC, 4=OSC+ESC (awaiting \)
+	agentStatusViaSocket bool // true when hook socket is active — disables PTY scan
+
+	// Hook socket for receiving events from agent hooks
+	hookSocketListener net.Listener
+	hookSocketPath     string
 }
 
 // Message types for WebSocket communication
@@ -146,6 +152,9 @@ func (d *Daemon) setRelayConnected(connected bool) {
 // On intentional exit (Ctrl+C, /exit, agent quit), the session is removed.
 // On crash, relay webSocketClose handles cleanup.
 func (d *Daemon) cleanup() {
+	// Close hook socket
+	d.stopHookSocket()
+
 	// Delete session from relay (intentional exit = session gone)
 	if d.relayClient != nil && d.session != "" {
 		_ = d.relayClient.DeleteSession(d.session)
