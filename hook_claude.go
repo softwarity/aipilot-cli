@@ -24,7 +24,7 @@ func claudeSettingsPath() string {
 const hookCommand = "aipilot-cli --agent-event"
 
 // claudeHookEvents lists the Claude Code events we want to hook into
-var claudeHookEvents = []string{"UserPromptSubmit", "Stop", "StopFailure"}
+var claudeHookEvents = []string{"UserPromptSubmit", "Stop", "StopFailure", "Notification"}
 
 // ensureClaudeHooksInstalled reads ~/.claude/settings.json and adds
 // aipilot hook entries for agent status detection if not already present.

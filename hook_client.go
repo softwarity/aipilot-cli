@@ -62,7 +62,7 @@ func mapHookEvent(eventName string) *HookMessage {
 	switch eventName {
 	case "UserPromptSubmit":
 		return newAgentStatusMessage("busy")
-	case "Stop", "StopFailure":
+	case "Stop", "StopFailure", "Notification":
 		return newAgentStatusMessage("idle")
 	default:
 		return nil
