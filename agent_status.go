@@ -129,6 +129,7 @@ func (d *Daemon) scanAgentStatus(data []byte) {
 			d.agentIdleTimer = time.AfterFunc(AgentIdleDebounce, func() {
 				d.agentBusy = false
 				d.agentIdleTimer = nil
+				d.agentStatusBuf = d.agentStatusBuf[:0]
 				d.sendControlMessage("agent-status:idle")
 			})
 		}
