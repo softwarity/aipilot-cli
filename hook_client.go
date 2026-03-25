@@ -25,16 +25,17 @@ func agentEventMain() {
 		os.Exit(0)
 	}
 
-	// Extract hook_event_name from the payload
+	// Extract hook_event_name and notification_type from the payload
 	var payload struct {
-		HookEventName string `json:"hook_event_name"`
+		HookEventName    string `json:"hook_event_name"`
+		NotificationType string `json:"notification_type"`
 	}
 	if err := json.Unmarshal(input, &payload); err != nil {
 		os.Exit(0)
 	}
 
 	// Map agent-specific event to generic hook message
-	msg := mapHookEvent(payload.HookEventName)
+	msg := mapHookEvent(payload.HookEventName, payload.NotificationType)
 	if msg == nil {
 		// Unknown or unhandled event — ignore
 		os.Exit(0)
@@ -58,12 +59,22 @@ func agentEventMain() {
 
 // mapHookEvent maps a hook event name to a generic HookMessage.
 // Currently supports Claude Code events. Add other agents here.
-func mapHookEvent(eventName string) *HookMessage {
+func mapHookEvent(eventName string, notificationType string) *HookMessage {
 	switch eventName {
-	case "UserPromptSubmit":
+	// Busy: agent is actively working
+	case "UserPromptSubmit", "PreToolUse":
 		return newAgentStatusMessage("busy")
-	case "Stop", "StopFailure", "Notification":
+	// Idle: agent finished or waiting for user input
+	case "Stop", "StopFailure", "PermissionRequest", "TaskCompleted":
 		return newAgentStatusMessage("idle")
+	case "Notification":
+		switch notificationType {
+		case "idle_prompt", "permission_prompt", "elicitation_dialog":
+			return newAgentStatusMessage("idle")
+		default:
+			// auth_success or unknown — no state change
+			return nil
+		}
 	default:
 		return nil
 	}
