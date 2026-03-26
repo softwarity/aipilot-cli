@@ -1,6 +1,8 @@
 package main
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -126,7 +128,67 @@ func getExecutablePath() (string, error) {
 	return filepath.EvalSymlinks(exe)
 }
 
-func downloadAndReplace(downloadURL, exePath string) error {
+func findChecksumsURL(release *githubRelease) string {
+	for _, asset := range release.Assets {
+		if asset.Name == "checksums.txt" {
+			return asset.BrowserDownloadURL
+		}
+	}
+	return ""
+}
+
+func verifyChecksum(filePath string, release *githubRelease) error {
+	checksumsURL := findChecksumsURL(release)
+	if checksumsURL == "" {
+		fmt.Printf("%s  Warning: No checksums.txt in release, skipping verification%s\n", yellow, reset)
+		return nil
+	}
+
+	client := &http.Client{Timeout: 10 * time.Second}
+	resp, err := client.Get(checksumsURL)
+	if err != nil {
+		return fmt.Errorf("failed to download checksums: %w", err)
+	}
+	defer resp.Body.Close()
+
+	checksumsData, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return fmt.Errorf("failed to read checksums: %w", err)
+	}
+
+	// Parse checksums.txt (format: "sha256  filename")
+	suffix := getAssetSuffix()
+	var expectedHash string
+	for _, line := range strings.Split(string(checksumsData), "\n") {
+		parts := strings.Fields(line)
+		if len(parts) == 2 && strings.HasSuffix(parts[1], suffix) {
+			expectedHash = parts[0]
+			break
+		}
+	}
+	if expectedHash == "" {
+		return fmt.Errorf("no checksum found for %s in checksums.txt", suffix)
+	}
+
+	f, err := os.Open(filePath)
+	if err != nil {
+		return fmt.Errorf("cannot open file for checksum: %w", err)
+	}
+	defer f.Close()
+
+	h := sha256.New()
+	if _, err := io.Copy(h, f); err != nil {
+		return fmt.Errorf("failed to compute checksum: %w", err)
+	}
+	actualHash := hex.EncodeToString(h.Sum(nil))
+
+	if actualHash != expectedHash {
+		return fmt.Errorf("checksum mismatch: expected %s, got %s", expectedHash, actualHash)
+	}
+	return nil
+}
+
+func downloadAndReplace(downloadURL, exePath string, release *githubRelease) error {
 	resp, err := http.Get(downloadURL)
 	if err != nil {
 		return fmt.Errorf("download failed: %w", err)
@@ -155,6 +217,14 @@ func downloadAndReplace(downloadURL, exePath string) error {
 	if err := os.Chmod(tmpPath, 0755); err != nil {
 		os.Remove(tmpPath)
 		return err
+	}
+
+	// Verify checksum before replacing
+	if release != nil {
+		if err := verifyChecksum(tmpPath, release); err != nil {
+			os.Remove(tmpPath)
+			return fmt.Errorf("checksum verification failed: %w", err)
+		}
 	}
 
 	// Replace the binary
@@ -242,7 +312,7 @@ func checkUpdateOnStartup() {
 	}
 
 	fmt.Printf("%s  Updating...%s\n", cyan, reset)
-	if err := downloadAndReplace(downloadURL, exePath); err != nil {
+	if err := downloadAndReplace(downloadURL, exePath, release); err != nil {
 		fmt.Printf("%s  Update failed: %v%s\n", yellow, err, reset)
 		return
 	}
@@ -292,7 +362,7 @@ func forceUpdate() {
 	}
 
 	fmt.Printf("Updating %s → %s...\n", current.String(), latest.String())
-	if err := downloadAndReplace(downloadURL, exePath); err != nil {
+	if err := downloadAndReplace(downloadURL, exePath, release); err != nil {
 		fmt.Printf("%sFailed to update: %v%s\n", red, err, reset)
 		return
 	}

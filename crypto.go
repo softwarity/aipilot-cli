@@ -23,7 +23,11 @@ func GenerateX25519KeyPair() (privateKey, publicKey [32]byte, err error) {
 	}
 
 	// Derive public key from private key
-	curve25519.ScalarBaseMult(&publicKey, &privateKey)
+	pub, err := curve25519.X25519(privateKey[:], curve25519.Basepoint)
+	if err != nil {
+		return privateKey, publicKey, fmt.Errorf("failed to derive public key: %w", err)
+	}
+	copy(publicKey[:], pub)
 	return privateKey, publicKey, nil
 }
 

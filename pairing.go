@@ -21,12 +21,13 @@ type PairedMobile struct {
 
 // PCConfig represents the PC's identity and paired devices
 type PCConfig struct {
-	PCID         string         `json:"pc_id"`
-	PCName       string         `json:"pc_name"`
-	PrivateKey   string         `json:"private_key"`
-	PublicKey    string         `json:"public_key"`
+	PCID          string         `json:"pc_id"`
+	PCName        string         `json:"pc_name"`
+	PrivateKey    string         `json:"private_key"`
+	PublicKey     string         `json:"public_key"`
+	Secret        string         `json:"secret,omitempty"`
 	PairedMobiles []PairedMobile `json:"paired_mobiles"`
-	CreatedAt    string         `json:"created_at"`
+	CreatedAt     string         `json:"created_at"`
 }
 
 // DirectoryConfig represents remembered agent choice per directory

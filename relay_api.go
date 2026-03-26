@@ -32,6 +32,14 @@ func NewRelayClient(relayURL string, pcConfig *PCConfig) *RelayClient {
 	}
 }
 
+// setPCHeaders sets X-PC-ID and Authorization headers on a request
+func (c *RelayClient) setPCHeaders(req *http.Request) {
+	req.Header.Set("X-PC-ID", c.pcConfig.PCID)
+	if c.pcConfig.Secret != "" {
+		req.Header.Set("Authorization", "Bearer "+c.pcConfig.Secret)
+	}
+}
+
 // --- Pairing API ---
 
 // PairingInitRequest is the request body for POST /api/pairing/init
@@ -45,6 +53,7 @@ type PairingInitRequest struct {
 type PairingInitResponse struct {
 	Token     string `json:"token"`
 	ExpiresAt string `json:"expires_at"`
+	Secret    string `json:"secret,omitempty"`
 }
 
 // InitPairing initiates a pairing request and returns a token
@@ -81,6 +90,12 @@ func (c *RelayClient) InitPairing() (*PairingInitResponse, error) {
 	var result PairingInitResponse
 	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
 		return nil, err
+	}
+
+	// Save secret if provided by relay (first registration or re-registration)
+	if result.Secret != "" && c.pcConfig.Secret == "" {
+		c.pcConfig.Secret = result.Secret
+		savePCConfig(c.pcConfig)
 	}
 
 	return &result, nil
@@ -209,7 +224,7 @@ func (c *RelayClient) CreateSession(agentType, workDir, displayName string, sshI
 		return nil, err
 	}
 	httpReq.Header.Set("Content-Type", "application/json")
-	httpReq.Header.Set("X-PC-ID", c.pcConfig.PCID)
+	c.setPCHeaders(httpReq)
 
 	resp, err := c.httpClient.Do(httpReq)
 	if err != nil {
@@ -252,7 +267,7 @@ func (c *RelayClient) AddSessionTokenForMobile(sessionID, mobileID, encryptedTok
 		return err
 	}
 	httpReq.Header.Set("Content-Type", "application/json")
-	httpReq.Header.Set("X-PC-ID", c.pcConfig.PCID)
+	c.setPCHeaders(httpReq)
 
 	resp, err := c.httpClient.Do(httpReq)
 	if err != nil {
@@ -277,12 +292,7 @@ func (c *RelayClient) DeleteSession(sessionID string) error {
 	if err != nil {
 		return err
 	}
-	httpReq.Header.Set("X-PC-ID", c.pcConfig.PCID)
-	// NOTE: No signature auth implemented. Could sign requests with PC's X25519 private key
-	// and verify on relay with stored public key. Not critical because:
-	// - PC-ID is a random UUID, hard to guess
-	// - Sessions are ephemeral
-	// - Session tokens are E2E encrypted
+	c.setPCHeaders(httpReq)
 
 	resp, err := c.httpClient.Do(httpReq)
 	if err != nil {
@@ -307,7 +317,7 @@ func (c *RelayClient) PurgeAllSessions() (int, error) {
 	if err != nil {
 		return 0, err
 	}
-	httpReq.Header.Set("X-PC-ID", c.pcConfig.PCID)
+	c.setPCHeaders(httpReq)
 
 	resp, err := c.httpClient.Do(httpReq)
 	if err != nil {
@@ -354,7 +364,7 @@ func (c *RelayClient) ListAllSessions() ([]SessionInfo, error) {
 	if err != nil {
 		return nil, err
 	}
-	httpReq.Header.Set("X-PC-ID", c.pcConfig.PCID)
+	c.setPCHeaders(httpReq)
 
 	resp, err := c.httpClient.Do(httpReq)
 	if err != nil {
@@ -380,7 +390,7 @@ func (c *RelayClient) UnpairMobile(mobileID string) error {
 	if err != nil {
 		return err
 	}
-	httpReq.Header.Set("X-PC-ID", c.pcConfig.PCID)
+	c.setPCHeaders(httpReq)
 
 	resp, err := c.httpClient.Do(httpReq)
 	if err != nil {

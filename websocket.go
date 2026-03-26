@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"encoding/base64"
 	"fmt"
 	"strings"
 	"time"
@@ -158,11 +157,8 @@ func (d *Daemon) handleWebSocketMessages(conn *websocket.Conn) {
 			// Data from mobile -> PTY (decrypt first)
 			data, err := d.decrypt(msg.Payload)
 			if err != nil {
-				// Try unencrypted fallback for backwards compatibility
-				data, err = base64.StdEncoding.DecodeString(msg.Payload)
-				if err != nil {
-					continue
-				}
+				fmt.Printf("%sDecryption failed, dropping message: %v%s\n", red, err, reset)
+				continue
 			}
 
 			// If we receive data, mobile is definitely connected
@@ -253,11 +249,13 @@ func (d *Daemon) sendToMobile(data []byte) {
 	d.mu.RUnlock()
 
 	if connected && conn != nil {
-		// Encrypt data before sending
+		if d.aesGCM == nil {
+			return // Encryption not initialized yet
+		}
 		encrypted, err := d.encrypt(data)
 		if err != nil {
-			// Fallback to unencrypted if encryption fails
-			encrypted = base64.StdEncoding.EncodeToString(data)
+			fmt.Printf("%sEncryption failed, dropping message: %v%s\n", red, err, reset)
+			return
 		}
 
 		msg := Message{
@@ -265,8 +263,11 @@ func (d *Daemon) sendToMobile(data []byte) {
 			Payload: encrypted,
 		}
 		d.wsMu.Lock()
-		conn.WriteJSON(msg)
+		err = conn.WriteJSON(msg)
 		d.wsMu.Unlock()
+		if err != nil {
+			fmt.Printf("%sWebSocket write error: %v%s\n", red, err, reset)
+		}
 	}
 }
 
@@ -279,13 +280,16 @@ func (d *Daemon) sendControlMessage(msg string) {
 	d.mu.RUnlock()
 
 	if connected && conn != nil {
+		if d.aesGCM == nil {
+			return // Encryption not initialized yet
+		}
 		// Build control message: \x00CTRL:msg
 		ctrlData := append([]byte{0x00}, []byte("CTRL:"+msg)...)
 
-		// Encrypt
 		encrypted, err := d.encrypt(ctrlData)
 		if err != nil {
-			encrypted = base64.StdEncoding.EncodeToString(ctrlData)
+			fmt.Printf("%sControl message encryption failed: %v%s\n", red, err, reset)
+			return
 		}
 
 		wsMsg := Message{
@@ -293,7 +297,10 @@ func (d *Daemon) sendControlMessage(msg string) {
 			Payload: encrypted,
 		}
 		d.wsMu.Lock()
-		conn.WriteJSON(wsMsg)
+		err = conn.WriteJSON(wsMsg)
 		d.wsMu.Unlock()
+		if err != nil {
+			fmt.Printf("%sWebSocket control write error: %v%s\n", red, err, reset)
+		}
 	}
 }

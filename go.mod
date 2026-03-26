@@ -1,18 +1,18 @@
 module github.com/softwarity/aipilot-cli
 
-go 1.20
+go 1.25.0
 
 require (
 	github.com/aymanbagabas/go-pty v0.2.2
 	github.com/google/uuid v1.6.0
 	github.com/gorilla/websocket v1.5.3
 	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e
-	golang.org/x/crypto v0.17.0
-	golang.org/x/term v0.27.0
+	golang.org/x/crypto v0.49.0
+	golang.org/x/term v0.41.0
 )
 
 require (
 	github.com/creack/pty v1.1.21 // indirect
 	github.com/u-root/u-root v0.11.0 // indirect
-	golang.org/x/sys v0.28.0 // indirect
+	golang.org/x/sys v0.42.0 // indirect
 )
