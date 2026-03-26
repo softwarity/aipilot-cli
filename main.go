@@ -390,6 +390,9 @@ func startStdinReader(daemon *Daemon, oldState *term.State) {
 
 			char := b[0]
 
+			// Any local input means user is on PC
+			daemon.schedulePCSwitch()
+
 			// Track escape sequences
 			if char == 0x1b { // ESC
 				lineBuf = ""
@@ -408,7 +411,6 @@ func startStdinReader(daemon *Daemon, oldState *term.State) {
 			if char >= 32 && char < 127 {
 				lineBuf += string(char)
 				daemon.sendToPTY(b)
-				daemon.schedulePCSwitch()
 				continue
 			}
 
