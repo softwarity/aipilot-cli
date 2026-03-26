@@ -24,7 +24,7 @@ The relay simply acts as a bridge between your PC and phone. Your terminal data 
 
 ## What is AIPilot?
 
-AIPilot transforms your smartphone into a **voice remote control** for AI coding agents like Claude Code.
+AIPilot transforms your smartphone into a **voice remote control** for AI coding agents (Claude Code, Gemini CLI, Codex).
 
 - **Voice Input**: Talk to your AI agent instead of typing
 - **Hands-free Coding**: Keep coding from your couch, standing desk, or anywhere in the room
@@ -104,17 +104,29 @@ go build -o aipilot-cli .
 ## Usage
 
 ```bash
-# Default: runs 'claude' in current directory
+# Default: auto-detects or prompts for agent selection
 aipilot-cli
+
+# Specify agent to run
+aipilot-cli --agent claude
+aipilot-cli --agent gemini
+aipilot-cli --agent codex
 
 # Specify working directory
 aipilot-cli --workdir /path/to/project
 
-# Custom command
-aipilot-cli --command bash
+# List available agents
+aipilot-cli --agents
 
-# Custom relay (self-hosted)
-aipilot-cli --relay wss://your-relay.example.com/ws
+# Force agent re-selection (ignore saved preference)
+aipilot-cli --select
+
+# Manage sessions
+aipilot-cli --sessions         # List saved sessions
+aipilot-cli --kill-sessions    # Kill all sessions
+
+# Check for updates
+aipilot-cli --update
 ```
 
 ## Mobile App Features
@@ -123,7 +135,7 @@ The AIPilot mobile app provides:
 
 - **Voice Recognition**: Dictate commands instead of typing
 - **Multi-sessions**: Manage multiple projects simultaneously
-- **Full Terminal**: Access all Claude commands (`/compact`, `/resume`, `/clear`...)
+- **Full Terminal**: Access all agent commands
 - **File Sharing**: Share photos and documents with your agent
 - **Session History**: Quickly reconnect to previous sessions
 - **SSH Mode**: Connect directly to remote servers (Pro feature)
