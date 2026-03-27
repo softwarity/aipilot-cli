@@ -292,7 +292,9 @@ func displayHeader(daemon *Daemon, session, command, workDir, agentVersion strin
 
 // startPTY starts the PTY and returns the pty master and command.
 // socketPath is set as AIPILOT_HOOK_SOCKET env var for the agent process.
-func startPTY(command, workDir, socketPath string) (pty.Pty, *pty.Cmd) {
+// stdinFd is used to get the current terminal size and apply it to the PTY
+// before starting the command, so the agent initializes with the correct dimensions.
+func startPTY(command, workDir, socketPath string, stdinFd int) (pty.Pty, *pty.Cmd) {
 	fmt.Printf("Starting %s...\n", command)
 
 	// Resolve full path before setting cmd.Dir, otherwise on Windows
@@ -306,6 +308,15 @@ func startPTY(command, workDir, socketPath string) (pty.Pty, *pty.Cmd) {
 	if err != nil {
 		log.Fatal("Failed to create PTY:", err)
 	}
+
+	// Set PTY size BEFORE starting the command so the agent
+	// initializes its UI with the correct terminal dimensions.
+	if term.IsTerminal(stdinFd) {
+		if width, height, err := term.GetSize(stdinFd); err == nil && width > 0 && height > 0 {
+			ptmx.Resize(width, height)
+		}
+	}
+
 	cmd := ptmx.Command(commandPath)
 	cmd.Dir = workDir
 	cmd.Env = append(os.Environ(),
@@ -583,7 +594,7 @@ func main() {
 	socketPath := filepath.Join(os.TempDir(), "aipilot-"+session+".sock")
 	daemon.startHookSocket(socketPath)
 
-	ptmx, cmd := startPTY(selectedCommand, workDir, socketPath)
+	ptmx, cmd := startPTY(selectedCommand, workDir, socketPath, daemon.stdinFd)
 	defer ptmx.Close()
 
 	daemon.mu.Lock()
