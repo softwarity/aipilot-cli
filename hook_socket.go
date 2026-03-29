@@ -3,7 +3,6 @@ package main
 import (
 	"bufio"
 	"encoding/json"
-	"fmt"
 	"net"
 	"os"
 	"sync"
@@ -29,7 +28,7 @@ func (d *Daemon) startHookSocket(socketPath string) {
 
 	listener, err := net.Listen("unix", socketPath)
 	if err != nil {
-		fmt.Printf("%s[hook] Failed to create socket %s: %v%s\n", dim, socketPath, err, reset)
+		// Socket creation failed — logged silently to avoid PTY corruption
 		return
 	}
 
@@ -37,8 +36,6 @@ func (d *Daemon) startHookSocket(socketPath string) {
 	d.hookSocketListener = listener
 	d.hookSocketPath = socketPath
 	d.mu.Unlock()
-
-	fmt.Printf("%s[hook] Listening on %s%s\n", dim, socketPath, reset)
 
 	go d.hookSocketAcceptLoop(listener)
 }
@@ -73,7 +70,6 @@ func (d *Daemon) hookSocketHandleConn(conn net.Conn) {
 
 		var msg HookMessage
 		if err := json.Unmarshal(line, &msg); err != nil {
-			fmt.Printf("%s[hook] Invalid JSON: %v%s\n", dim, err, reset)
 			continue
 		}
 
@@ -87,7 +83,7 @@ func (d *Daemon) handleHookMessage(msg HookMessage) {
 	case "agent_status":
 		d.handleHookAgentStatus(msg.Data)
 	default:
-		fmt.Printf("%s[hook] Unknown event: %s%s\n", dim, msg.Event, reset)
+		// Unknown event — ignore silently
 	}
 }
 
@@ -95,7 +91,7 @@ func (d *Daemon) handleHookMessage(msg HookMessage) {
 func (d *Daemon) handleHookAgentStatus(data json.RawMessage) {
 	var status AgentStatusData
 	if err := json.Unmarshal(data, &status); err != nil {
-		fmt.Printf("%s[hook] Invalid agent_status data: %v%s\n", dim, err, reset)
+		// Invalid agent_status data — ignore
 		return
 	}
 
@@ -111,13 +107,11 @@ func (d *Daemon) handleHookAgentStatus(data json.RawMessage) {
 		if !d.agentBusy {
 			d.agentBusy = true
 			d.sendControlMessage("agent-status:busy")
-			fmt.Printf("%s[hook] Agent status: busy%s\n", dim, reset)
 		}
 	case "idle":
 		if d.agentBusy {
 			d.agentBusy = false
 			d.sendControlMessage("agent-status:idle")
-			fmt.Printf("%s[hook] Agent status: idle%s\n", dim, reset)
 		}
 	}
 }

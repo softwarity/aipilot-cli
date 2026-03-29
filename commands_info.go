@@ -52,11 +52,8 @@ func (d *Daemon) handleMobileInfo(args string) {
 		AppVersion string `json:"app_version"`
 	}
 	if err := json.Unmarshal([]byte(args), &info); err != nil {
-		fmt.Printf("%s[mobile-info] Invalid JSON: %v%s\n", dim, err, reset)
 		return
 	}
-
-	fmt.Printf("%s[mobile-info] App version: %s%s\n", dim, info.AppVersion, reset)
 
 	appVer, err := parseSemver(info.AppVersion)
 	if err != nil {

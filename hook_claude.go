@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"os"
 	"path/filepath"
 )
@@ -45,7 +44,7 @@ func ensureClaudeHooksInstalled() {
 	// Read existing settings
 	settings, err := readClaudeSettings(settingsPath)
 	if err != nil {
-		fmt.Printf("%s[hook] Cannot read Claude settings: %v%s\n", dim, err, reset)
+		// Cannot read settings — skip hook installation
 		return
 	}
 
@@ -69,11 +68,11 @@ func ensureClaudeHooksInstalled() {
 
 	// Write back
 	if err := writeClaudeSettings(settingsPath, settings); err != nil {
-		fmt.Printf("%s[hook] Cannot write Claude settings: %v%s\n", dim, err, reset)
+		// Cannot write settings — skip
 		return
 	}
 
-	fmt.Printf("%s[hook] Installed aipilot hooks in %s%s\n", dim, settingsPath, reset)
+	// Hooks installed successfully
 }
 
 // addClaudeHookIfMissing adds an aipilot hook entry to the given event array
