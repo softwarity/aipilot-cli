@@ -11,20 +11,7 @@ import (
 
 // connectToRelay connects to the WebSocket relay
 func (d *Daemon) connectToRelay() {
-	wasConnected := false
 	for {
-		// After a successful connection was lost, the relay deleted our session.
-		// Create a new one before reconnecting.
-		if wasConnected {
-			wasConnected = false
-			for {
-				if err := d.recreateSession(); err == nil {
-					break
-				}
-				time.Sleep(RelayConnectDelay)
-			}
-		}
-
 		wsURL := d.relay + "/ws/" + d.session + "?role=bridge&pc_id=" + d.pcConfig.PCID
 		conn, _, err := websocket.DefaultDialer.Dial(wsURL, nil)
 		if err != nil {
@@ -41,13 +28,23 @@ func (d *Daemon) connectToRelay() {
 			continue
 		}
 
+		// If relay rejects (session expired/cleaned up), recreate session
+		if response.Type == "error" {
+			conn.Close()
+			for {
+				if err := d.recreateSession(); err == nil {
+					break
+				}
+				time.Sleep(RelayConnectDelay)
+			}
+			continue
+		}
+
 		if response.Type != "registered" {
 			conn.Close()
 			time.Sleep(RelayConnectDelay)
 			continue
 		}
-
-		wasConnected = true
 
 		// Set read deadline: if no message within 3 ping intervals, connection is dead
 		conn.SetReadDeadline(time.Now().Add(PingInterval * 3))
