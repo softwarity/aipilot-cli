@@ -28,21 +28,19 @@ func (d *Daemon) connectToRelay() {
 			continue
 		}
 
-		// If relay rejects (session expired/cleaned up), recreate session
-		if response.Type == "error" {
-			conn.Close()
-			for {
-				if err := d.recreateSession(); err == nil {
-					break
-				}
-				time.Sleep(RelayConnectDelay)
-			}
-			continue
-		}
-
 		if response.Type != "registered" {
 			conn.Close()
-			time.Sleep(RelayConnectDelay)
+			// If session expired on relay, recreate
+			if response.Type == "error" {
+				for {
+					if err := d.recreateSession(); err == nil {
+						break
+					}
+					time.Sleep(RelayConnectDelay)
+				}
+			} else {
+				time.Sleep(RelayConnectDelay)
+			}
 			continue
 		}
 
