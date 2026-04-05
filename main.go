@@ -450,6 +450,11 @@ func startStdinReader(daemon *Daemon, oldState *term.State) {
 				continue
 			}
 
+			// Ctrl+Z - ignore (agents suspend themselves which breaks our PTY wrapper)
+			if char == 0x1a {
+				continue
+			}
+
 			// Ctrl+C or Ctrl+U - reset lineBuf
 			if char == 3 || char == 0x15 {
 				lineBuf = ""
