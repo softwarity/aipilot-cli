@@ -73,6 +73,9 @@ jobs:
       - name: List artifacts
         run: ls -la dist/
 
+      - name: Generate checksums
+        run: cd dist && sha256sum aipilot-cli-* > checksums.txt && cat checksums.txt
+
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
