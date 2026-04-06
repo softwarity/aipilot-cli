@@ -100,53 +100,33 @@ func handlePairing(config *PCConfig, client *RelayClient, relayURL string) error
 	fmt.Println()
 	fmt.Printf("%sWaiting for mobile to scan...%s\n", dim, reset)
 
-	// Poll for pairing completion
-	timeout := time.After(PairingTimeout)
-	ticker := time.NewTicker(PairingPollInterval)
-	defer ticker.Stop()
-
-	for {
-		select {
-		case <-timeout:
-			fmt.Printf("\n%sPairing timed out. Type /qr to retry.%s\n", red, reset)
-			return nil
-		case <-ticker.C:
-			status, err := client.CheckPairingStatus(pairingResp.Token)
-			if err != nil {
-				// Silently retry on errors
-				continue
-			}
-
-			switch status.Status {
-			case "completed":
-				// Pairing successful!
-				mobile := PairedMobile{
-					ID:        status.MobileID,
-					Name:      status.MobileName,
-					PublicKey: status.PublicKey,
-					PairedAt:  time.Now().Format(time.RFC3339),
-				}
-				config.addPairedMobile(mobile)
-				if err := savePCConfig(config); err != nil {
-					return fmt.Errorf("failed to save config: %w", err)
-				}
-
-				fmt.Printf("\n%s✓ Paired: %s%s\n\n", green, mobile.Name, reset)
-				return nil
-
-			case "expired":
-				fmt.Printf("\n%sPairing token expired. Type /qr to retry.%s\n", red, reset)
-				return nil
-
-			case "pending":
-				// Still waiting, continue polling
-
-			default:
-				// Unknown status, log and continue
-				fmt.Printf("%sUnknown pairing status: %s%s\n", yellow, status.Status, reset)
-			}
-		}
+	// Wait for pairing completion via WebSocket (replaces HTTP polling)
+	status, err := client.WaitPairingViaWebSocket(pairingResp.Token, PairingTimeout)
+	if err != nil {
+		fmt.Printf("\n%sPairing error: %v. Type /qr to retry.%s\n", red, err, reset)
+		return nil
 	}
+
+	switch status.Status {
+	case "completed":
+		mobile := PairedMobile{
+			ID:        status.MobileID,
+			Name:      status.MobileName,
+			PublicKey: status.PublicKey,
+			PairedAt:  time.Now().Format(time.RFC3339),
+		}
+		config.addPairedMobile(mobile)
+		if err := savePCConfig(config); err != nil {
+			return fmt.Errorf("failed to save config: %w", err)
+		}
+
+		fmt.Printf("\n%s✓ Paired: %s%s\n\n", green, mobile.Name, reset)
+	case "expired":
+		fmt.Printf("\n%sPairing token expired. Type /qr to retry.%s\n", red, reset)
+	default:
+		fmt.Printf("%sUnknown pairing status: %s%s\n", yellow, status.Status, reset)
+	}
+	return nil
 }
 
 // addTokenForMobile encrypts session tokens for a new mobile and sends them

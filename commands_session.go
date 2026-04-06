@@ -156,68 +156,56 @@ func (d *Daemon) showPairingQRRaw(onComplete func()) {
 	printRaw("  Expires: %s\n", pairingResp.ExpiresAt)
 
 	// Start background polling for pairing completion
-	go d.pollPairingCompletionRaw(pairingResp.Token, onComplete)
+	go d.waitPairingCompletionRaw(pairingResp.Token, onComplete)
 }
 
-// pollPairingCompletionRaw polls for pairing completion with raw mode output
-func (d *Daemon) pollPairingCompletionRaw(token string, onComplete func()) {
-	ticker := time.NewTicker(PairingPollInterval)
-	defer ticker.Stop()
-	timeout := time.After(PairingTimeout)
+// waitPairingCompletionRaw waits for pairing completion via WebSocket with raw mode output
+func (d *Daemon) waitPairingCompletionRaw(token string, onComplete func()) {
+	status, err := d.relayClient.WaitPairingViaWebSocket(token, PairingTimeout)
+	if err != nil {
+		return // Silently fail
+	}
 
-	for {
-		select {
-		case <-timeout:
-			return // Silently timeout
-		case <-ticker.C:
-			status, err := d.relayClient.CheckPairingStatus(token)
-			if err != nil {
-				continue
-			}
+	switch status.Status {
+	case "completed":
+		existingMobile := d.pcConfig.getPairedMobile(status.MobileID)
+		samePublicKey := existingMobile != nil && existingMobile.PublicKey == status.PublicKey
 
-			switch status.Status {
-			case "completed":
-				existingMobile := d.pcConfig.getPairedMobile(status.MobileID)
-				samePublicKey := existingMobile != nil && existingMobile.PublicKey == status.PublicKey
-
-				mobile := PairedMobile{
-					ID:        status.MobileID,
-					Name:      status.MobileName,
-					PublicKey: status.PublicKey,
-					PairedAt:  time.Now().Format(time.RFC3339),
-				}
-				d.pcConfig.addPairedMobile(mobile)
-				if err := savePCConfig(d.pcConfig); err != nil {
-					fmt.Printf("%sFailed to save config: %v%s\n", red, err, reset)
-				}
-
-				d.mu.RLock()
-				oldSessionID := d.session
-				d.mu.RUnlock()
-
-				tokenShared := false
-				if oldSessionID != "" && !samePublicKey {
-					tokenShared = d.addTokenForMobile(mobile)
-				}
-
-				// Single line notification
-				if samePublicKey {
-					printRaw("\n%s✓ Paired: %s (session unchanged)%s\n", green, mobile.Name, reset)
-				} else if tokenShared {
-					printRaw("\n%s✓ Paired: %s (session shared)%s\n", green, mobile.Name, reset)
-				} else {
-					printRaw("\n%s✓ Paired: %s%s\n", green, mobile.Name, reset)
-				}
-
-				if onComplete != nil {
-					onComplete()
-				}
-				return
-
-			case "expired":
-				return
-			}
+		mobile := PairedMobile{
+			ID:        status.MobileID,
+			Name:      status.MobileName,
+			PublicKey: status.PublicKey,
+			PairedAt:  time.Now().Format(time.RFC3339),
 		}
+		d.pcConfig.addPairedMobile(mobile)
+		if err := savePCConfig(d.pcConfig); err != nil {
+			fmt.Printf("%sFailed to save config: %v%s\n", red, err, reset)
+		}
+
+		d.mu.RLock()
+		oldSessionID := d.session
+		d.mu.RUnlock()
+
+		tokenShared := false
+		if oldSessionID != "" && !samePublicKey {
+			tokenShared = d.addTokenForMobile(mobile)
+		}
+
+		// Single line notification
+		if samePublicKey {
+			printRaw("\n%s✓ Paired: %s (session unchanged)%s\n", green, mobile.Name, reset)
+		} else if tokenShared {
+			printRaw("\n%s✓ Paired: %s (session shared)%s\n", green, mobile.Name, reset)
+		} else {
+			printRaw("\n%s✓ Paired: %s%s\n", green, mobile.Name, reset)
+		}
+
+		if onComplete != nil {
+			onComplete()
+		}
+
+	case "expired":
+		return
 	}
 }
 

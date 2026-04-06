@@ -7,6 +7,9 @@ import (
 	"io"
 	"net/http"
 	"strings"
+	"time"
+
+	"github.com/gorilla/websocket"
 )
 
 // RelayClient handles API calls to the relay server
@@ -109,7 +112,7 @@ type PairingStatusResponse struct {
 	PublicKey  string `json:"public_key,omitempty"`
 }
 
-// CheckPairingStatus checks if a pairing has been completed
+// CheckPairingStatus checks if a pairing has been completed (HTTP polling - kept for fallback)
 func (c *RelayClient) CheckPairingStatus(token string) (*PairingStatusResponse, error) {
 	resp, err := c.httpClient.Get(c.baseURL + "/api/pairing/status?token=" + token)
 	if err != nil {
@@ -131,6 +134,87 @@ func (c *RelayClient) CheckPairingStatus(token string) (*PairingStatusResponse, 
 	}
 
 	return &result, nil
+}
+
+// WaitPairingViaWebSocket connects to the relay WebSocket and waits for pairing completion.
+// This replaces HTTP polling (~150 requests per pairing → 1 WebSocket connection).
+// Returns the pairing result or an error. Falls back to HTTP polling on WS failure.
+func (c *RelayClient) WaitPairingViaWebSocket(token string, timeout time.Duration) (*PairingStatusResponse, error) {
+	// Build WebSocket URL from HTTP base URL
+	wsURL := c.baseURL
+	wsURL = strings.Replace(wsURL, "https://", "wss://", 1)
+	wsURL = strings.Replace(wsURL, "http://", "ws://", 1)
+	wsURL += "/ws/pairing/" + token
+
+	conn, _, err := websocket.DefaultDialer.Dial(wsURL, nil)
+	if err != nil {
+		// Fallback to HTTP polling
+		return c.pollPairingStatus(token, timeout)
+	}
+	defer conn.Close()
+
+	// Set read deadline for timeout
+	conn.SetReadDeadline(time.Now().Add(timeout))
+
+	// Start ping goroutine to keep connection alive
+	done := make(chan struct{})
+	defer close(done)
+	go func() {
+		ticker := time.NewTicker(PingInterval)
+		defer ticker.Stop()
+		for {
+			select {
+			case <-done:
+				return
+			case <-ticker.C:
+				conn.WriteJSON(map[string]string{"type": "ping"})
+			}
+		}
+	}()
+
+	for {
+		_, message, err := conn.ReadMessage()
+		if err != nil {
+			return nil, fmt.Errorf("pairing WebSocket error: %w", err)
+		}
+
+		var result PairingStatusResponse
+		if err := json.Unmarshal(message, &result); err != nil {
+			continue // Ignore non-JSON messages (e.g. pong)
+		}
+
+		switch result.Status {
+		case "completed":
+			return &result, nil
+		case "expired":
+			return &result, nil
+		case "":
+			// Ignore messages without status (e.g. pong)
+			continue
+		}
+	}
+}
+
+// pollPairingStatus is the HTTP polling fallback for pairing status
+func (c *RelayClient) pollPairingStatus(token string, timeout time.Duration) (*PairingStatusResponse, error) {
+	timeoutCh := time.After(timeout)
+	ticker := time.NewTicker(PairingPollInterval)
+	defer ticker.Stop()
+
+	for {
+		select {
+		case <-timeoutCh:
+			return &PairingStatusResponse{Status: "expired"}, nil
+		case <-ticker.C:
+			status, err := c.CheckPairingStatus(token)
+			if err != nil {
+				continue
+			}
+			if status.Status != "pending" {
+				return status, nil
+			}
+		}
+	}
 }
 
 // --- Session API ---
