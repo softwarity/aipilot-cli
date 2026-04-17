@@ -19,27 +19,6 @@
       <trans-unit id="features.ssh.desc" datatype="html"><source>Connect via SSH for remote server access</source><target>रिमोट सर्वर एक्सेस के लिए SSH द्वारा कनेक्ट करें</target></trans-unit>
       <trans-unit id="features.multisession.title" datatype="html"><source>Multi-session</source><target>मल्टी-सेशन</target></trans-unit>
       <trans-unit id="features.multisession.desc" datatype="html"><source>Manage multiple terminal sessions simultaneously</source><target>एक साथ कई टर्मिनल सेशन प्रबंधित करें</target></trans-unit>
-      <trans-unit id="pricing.title" datatype="html"><source>Free vs Pro</source><target>मुफ्त vs प्रो</target></trans-unit>
-      <trans-unit id="pricing.intro" datatype="html"><source>AIPilot is available in two versions. The free version lets you get started, while Pro unlocks the full potential.</source><target>AIPilot दो संस्करणों में उपलब्ध है। मुफ्त संस्करण आपको शुरू करने देता है, जबकि प्रो पूरी क्षमता को अनलॉक करता है।</target></trans-unit>
-      <trans-unit id="pricing.free.title" datatype="html"><source>Free</source><target>मुफ्त</target></trans-unit>
-      <trans-unit id="pricing.free.price" datatype="html"><source>$0</source><target>₹0</target></trans-unit>
-      <trans-unit id="pricing.free.feature1" datatype="html"><source>1 paired PC</source><target>1 पेयर्ड PC</target></trans-unit>
-      <trans-unit id="pricing.free.feature2" datatype="html"><source>1 CLI session</source><target>1 CLI सेशन</target></trans-unit>
-      <trans-unit id="pricing.free.feature3" datatype="html"><source>Real-time terminal control</source><target>रीयल-टाइम टर्मिनल नियंत्रण</target></trans-unit>
-      <trans-unit id="pricing.free.feature4" datatype="html"><source>E2E encryption</source><target>E2E एन्क्रिप्शन</target></trans-unit>
-      <trans-unit id="pricing.free.limit1" datatype="html"><source>No SSH connections</source><target>SSH कनेक्शन नहीं</target></trans-unit>
-      <trans-unit id="pricing.free.limit2" datatype="html"><source>No file/image upload</source><target>फाइल/इमेज अपलोड नहीं</target></trans-unit>
-      <trans-unit id="pricing.free.limit3" datatype="html"><source>No agent configuration</source><target>एजेंट कॉन्फ़िगरेशन नहीं</target></trans-unit>
-      <trans-unit id="pricing.free.cta" datatype="html"><source>Download Free</source><target>मुफ्त डाउनलोड</target></trans-unit>
-      <trans-unit id="pricing.pro.title" datatype="html"><source>Pro</source><target>प्रो</target></trans-unit>
-      <trans-unit id="pricing.pro.price" datatype="html"><source>One-time</source><target>एक बार भुगतान</target></trans-unit>
-      <trans-unit id="pricing.pro.feature1" datatype="html"><source>Unlimited PCs</source><target>असीमित PC</target></trans-unit>
-      <trans-unit id="pricing.pro.feature2" datatype="html"><source>Unlimited CLI sessions</source><target>असीमित CLI सेशन</target></trans-unit>
-      <trans-unit id="pricing.pro.feature3" datatype="html"><source>Real-time terminal control</source><target>रीयल-टाइम टर्मिनल नियंत्रण</target></trans-unit>
-      <trans-unit id="pricing.pro.feature4" datatype="html"><source>E2E encryption</source><target>E2E एन्क्रिप्शन</target></trans-unit>
-      <trans-unit id="pricing.pro.feature5" datatype="html"><source>SSH connections</source><target>SSH कनेक्शन</target></trans-unit>
-      <trans-unit id="pricing.pro.feature6" datatype="html"><source>File &amp; image upload</source><target>फाइल और इमेज अपलोड</target></trans-unit>
-      <trans-unit id="pricing.pro.cta" datatype="html"><source>Get Pro</source><target>प्रो प्राप्त करें</target></trans-unit>
       <trans-unit id="installation.title" datatype="html"><source>Installation</source><target>इंस्टॉलेशन</target></trans-unit>
       <trans-unit id="installation.step1.title" datatype="html"><source>Install the CLI</source><target>CLI इंस्टॉल करें</target></trans-unit>
       <trans-unit id="installation.step1.desc" datatype="html"><source>Download and install the CLI on your computer</source><target>अपने कंप्यूटर पर CLI डाउनलोड और इंस्टॉल करें</target></trans-unit>
@@ -51,8 +30,6 @@
       <trans-unit id="installation.prerequisites.comingSoon" datatype="html"><source>Coming soon</source><target>जल्द आ रहा है</target></trans-unit>
       <trans-unit id="installation.step2.title" datatype="html"><source>Install the Mobile App</source><target>मोबाइल ऐप इंस्टॉल करें</target></trans-unit>
       <trans-unit id="installation.step2.desc" datatype="html"><source>Get AIPilot from Google Play or App Store</source><target>Google Play या App Store से AIPilot प्राप्त करें</target></trans-unit>
-      <trans-unit id="installation.free" datatype="html"><source>Free</source><target>मुफ्त</target></trans-unit>
-      <trans-unit id="installation.pro" datatype="html"><source>Pro</source><target>प्रो</target></trans-unit>
       <trans-unit id="doc.welcomeScreen" datatype="html"><source>When you open the app for the first time, you'll see the welcome screen:</source><target>जब आप पहली बार ऐप खोलते हैं, तो वेलकम स्क्रीन दिखाई देगी:</target></trans-unit>
       <trans-unit id="installation.step3.title" datatype="html"><source>First Launch &amp; Pairing</source><target>पहला लॉन्च और पेयरिंग</target></trans-unit>
       <trans-unit id="installation.step3.desc" datatype="html"><source>Navigate to your project directory and launch the CLI with your preferred agent:</source><target>अपने प्रोजेक्ट डायरेक्टरी में जाएं और अपने पसंदीदा एजेंट के साथ CLI लॉन्च करें:</target></trans-unit>

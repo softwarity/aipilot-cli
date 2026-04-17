@@ -19,27 +19,6 @@
       <trans-unit id="features.ssh.desc" datatype="html"><source>Connect via SSH for remote server access</source><target>SSH経由でリモートサーバーに接続</target></trans-unit>
       <trans-unit id="features.multisession.title" datatype="html"><source>Multi-session</source><target>マルチセッション</target></trans-unit>
       <trans-unit id="features.multisession.desc" datatype="html"><source>Manage multiple terminal sessions simultaneously</source><target>複数のターミナルセッションを同時に管理</target></trans-unit>
-      <trans-unit id="pricing.title" datatype="html"><source>Free vs Pro</source><target>無料版 vs プロ版</target></trans-unit>
-      <trans-unit id="pricing.intro" datatype="html"><source>AIPilot is available in two versions. The free version lets you get started, while Pro unlocks the full potential.</source><target>AIPilotは2つのバージョンがあります。無料版で始められ、プロ版で全機能を解放。</target></trans-unit>
-      <trans-unit id="pricing.free.title" datatype="html"><source>Free</source><target>無料</target></trans-unit>
-      <trans-unit id="pricing.free.price" datatype="html"><source>$0</source><target>¥0</target></trans-unit>
-      <trans-unit id="pricing.free.feature1" datatype="html"><source>1 paired PC</source><target>1台のペアリングPC</target></trans-unit>
-      <trans-unit id="pricing.free.feature2" datatype="html"><source>1 CLI session</source><target>1つのCLIセッション</target></trans-unit>
-      <trans-unit id="pricing.free.feature3" datatype="html"><source>Real-time terminal control</source><target>リアルタイムターミナル制御</target></trans-unit>
-      <trans-unit id="pricing.free.feature4" datatype="html"><source>E2E encryption</source><target>E2E暗号化</target></trans-unit>
-      <trans-unit id="pricing.free.limit1" datatype="html"><source>No SSH connections</source><target>SSH接続なし</target></trans-unit>
-      <trans-unit id="pricing.free.limit2" datatype="html"><source>No file/image upload</source><target>ファイル/画像アップロードなし</target></trans-unit>
-      <trans-unit id="pricing.free.limit3" datatype="html"><source>No agent configuration</source><target>エージェント設定なし</target></trans-unit>
-      <trans-unit id="pricing.free.cta" datatype="html"><source>Download Free</source><target>無料ダウンロード</target></trans-unit>
-      <trans-unit id="pricing.pro.title" datatype="html"><source>Pro</source><target>プロ</target></trans-unit>
-      <trans-unit id="pricing.pro.price" datatype="html"><source>One-time</source><target>買い切り</target></trans-unit>
-      <trans-unit id="pricing.pro.feature1" datatype="html"><source>Unlimited PCs</source><target>無制限のPC</target></trans-unit>
-      <trans-unit id="pricing.pro.feature2" datatype="html"><source>Unlimited CLI sessions</source><target>無制限のCLIセッション</target></trans-unit>
-      <trans-unit id="pricing.pro.feature3" datatype="html"><source>Real-time terminal control</source><target>リアルタイムターミナル制御</target></trans-unit>
-      <trans-unit id="pricing.pro.feature4" datatype="html"><source>E2E encryption</source><target>E2E暗号化</target></trans-unit>
-      <trans-unit id="pricing.pro.feature5" datatype="html"><source>SSH connections</source><target>SSH接続</target></trans-unit>
-      <trans-unit id="pricing.pro.feature6" datatype="html"><source>File &amp; image upload</source><target>ファイルと画像のアップロード</target></trans-unit>
-      <trans-unit id="pricing.pro.cta" datatype="html"><source>Get Pro</source><target>プロを取得</target></trans-unit>
       <trans-unit id="installation.title" datatype="html"><source>Installation</source><target>インストール</target></trans-unit>
       <trans-unit id="installation.step1.title" datatype="html"><source>Install the CLI</source><target>CLIをインストール</target></trans-unit>
       <trans-unit id="installation.step1.desc" datatype="html"><source>Download and install the CLI on your computer</source><target>コンピューターにCLIをダウンロードしてインストール</target></trans-unit>
@@ -51,8 +30,6 @@
       <trans-unit id="installation.prerequisites.comingSoon" datatype="html"><source>Coming soon</source><target>近日公開</target></trans-unit>
       <trans-unit id="installation.step2.title" datatype="html"><source>Install the Mobile App</source><target>モバイルアプリをインストール</target></trans-unit>
       <trans-unit id="installation.step2.desc" datatype="html"><source>Get AIPilot from Google Play or App Store</source><target>Google PlayまたはApp StoreからAIPilotを入手</target></trans-unit>
-      <trans-unit id="installation.free" datatype="html"><source>Free</source><target>無料</target></trans-unit>
-      <trans-unit id="installation.pro" datatype="html"><source>Pro</source><target>プロ</target></trans-unit>
       <trans-unit id="doc.welcomeScreen" datatype="html"><source>When you open the app for the first time, you'll see the welcome screen:</source><target>初めてアプリを開くと、ウェルカム画面が表示されます:</target></trans-unit>
       <trans-unit id="installation.step3.title" datatype="html"><source>First Launch &amp; Pairing</source><target>初回起動とペアリング</target></trans-unit>
       <trans-unit id="installation.step3.desc" datatype="html"><source>Navigate to your project directory and launch the CLI with your preferred agent:</source><target>プロジェクトディレクトリに移動し、お好みのエージェントでCLIを起動してください:</target></trans-unit>

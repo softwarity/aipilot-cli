@@ -19,27 +19,6 @@
       <trans-unit id="features.ssh.desc" datatype="html"><source>Connect via SSH for remote server access</source><target>Kết nối SSH để truy cập máy chủ từ xa</target></trans-unit>
       <trans-unit id="features.multisession.title" datatype="html"><source>Multi-session</source><target>Đa Phiên</target></trans-unit>
       <trans-unit id="features.multisession.desc" datatype="html"><source>Manage multiple terminal sessions simultaneously</source><target>Quản lý nhiều phiên terminal cùng lúc</target></trans-unit>
-      <trans-unit id="pricing.title" datatype="html"><source>Free vs Pro</source><target>Miễn phí vs Pro</target></trans-unit>
-      <trans-unit id="pricing.intro" datatype="html"><source>AIPilot is available in two versions. The free version lets you get started, while Pro unlocks the full potential.</source><target>AIPilot có hai phiên bản. Phiên bản miễn phí để bắt đầu, Pro mở khóa toàn bộ tiềm năng.</target></trans-unit>
-      <trans-unit id="pricing.free.title" datatype="html"><source>Free</source><target>Miễn phí</target></trans-unit>
-      <trans-unit id="pricing.free.price" datatype="html"><source>$0</source><target>$0</target></trans-unit>
-      <trans-unit id="pricing.free.feature1" datatype="html"><source>1 paired PC</source><target>1 PC ghép nối</target></trans-unit>
-      <trans-unit id="pricing.free.feature2" datatype="html"><source>1 CLI session</source><target>1 phiên CLI</target></trans-unit>
-      <trans-unit id="pricing.free.feature3" datatype="html"><source>Real-time terminal control</source><target>Điều khiển terminal thời gian thực</target></trans-unit>
-      <trans-unit id="pricing.free.feature4" datatype="html"><source>E2E encryption</source><target>Mã hóa E2E</target></trans-unit>
-      <trans-unit id="pricing.free.limit1" datatype="html"><source>No SSH connections</source><target>Không có kết nối SSH</target></trans-unit>
-      <trans-unit id="pricing.free.limit2" datatype="html"><source>No file/image upload</source><target>Không tải lên tệp/hình ảnh</target></trans-unit>
-      <trans-unit id="pricing.free.limit3" datatype="html"><source>No agent configuration</source><target>Không cấu hình agent</target></trans-unit>
-      <trans-unit id="pricing.free.cta" datatype="html"><source>Download Free</source><target>Tải Miễn phí</target></trans-unit>
-      <trans-unit id="pricing.pro.title" datatype="html"><source>Pro</source><target>Pro</target></trans-unit>
-      <trans-unit id="pricing.pro.price" datatype="html"><source>One-time</source><target>Một lần</target></trans-unit>
-      <trans-unit id="pricing.pro.feature1" datatype="html"><source>Unlimited PCs</source><target>Không giới hạn PC</target></trans-unit>
-      <trans-unit id="pricing.pro.feature2" datatype="html"><source>Unlimited CLI sessions</source><target>Không giới hạn phiên CLI</target></trans-unit>
-      <trans-unit id="pricing.pro.feature3" datatype="html"><source>Real-time terminal control</source><target>Điều khiển terminal thời gian thực</target></trans-unit>
-      <trans-unit id="pricing.pro.feature4" datatype="html"><source>E2E encryption</source><target>Mã hóa E2E</target></trans-unit>
-      <trans-unit id="pricing.pro.feature5" datatype="html"><source>SSH connections</source><target>Kết nối SSH</target></trans-unit>
-      <trans-unit id="pricing.pro.feature6" datatype="html"><source>File &amp; image upload</source><target>Tải lên tệp và hình ảnh</target></trans-unit>
-      <trans-unit id="pricing.pro.cta" datatype="html"><source>Get Pro</source><target>Mua Pro</target></trans-unit>
       <trans-unit id="installation.title" datatype="html"><source>Installation</source><target>Cài Đặt</target></trans-unit>
       <trans-unit id="installation.step1.title" datatype="html"><source>Install the CLI</source><target>Cài Đặt CLI</target></trans-unit>
       <trans-unit id="installation.step1.desc" datatype="html"><source>Download and install the CLI on your computer</source><target>Tải và cài đặt CLI trên máy tính</target></trans-unit>
@@ -51,8 +30,6 @@
       <trans-unit id="installation.prerequisites.comingSoon" datatype="html"><source>Coming soon</source><target>Sap ra mat</target></trans-unit>
       <trans-unit id="installation.step2.title" datatype="html"><source>Install the Mobile App</source><target>Cài Đặt Ứng Dụng</target></trans-unit>
       <trans-unit id="installation.step2.desc" datatype="html"><source>Get AIPilot from Google Play or App Store</source><target>Tải AIPilot từ Google Play hoặc App Store</target></trans-unit>
-      <trans-unit id="installation.free" datatype="html"><source>Free</source><target>Miễn phí</target></trans-unit>
-      <trans-unit id="installation.pro" datatype="html"><source>Pro</source><target>Pro</target></trans-unit>
       <trans-unit id="doc.welcomeScreen" datatype="html"><source>When you open the app for the first time, you'll see the welcome screen:</source><target>Khi bạn mở ứng dụng lần đầu tiên, bạn sẽ thấy màn hình chào mừng:</target></trans-unit>
       <trans-unit id="installation.step3.title" datatype="html"><source>First Launch &amp; Pairing</source><target>Lan Khoi Dong Dau va Ghep Noi</target></trans-unit>
       <trans-unit id="installation.step3.desc" datatype="html"><source>Navigate to your project directory and launch the CLI with your preferred agent:</source><target>Di chuyen den thu muc du an va khoi dong CLI voi agent uu thich:</target></trans-unit>

@@ -19,27 +19,6 @@
       <trans-unit id="features.ssh.desc" datatype="html"><source>Connect via SSH for remote server access</source><target>通过SSH连接远程服务器</target></trans-unit>
       <trans-unit id="features.multisession.title" datatype="html"><source>Multi-session</source><target>多会话</target></trans-unit>
       <trans-unit id="features.multisession.desc" datatype="html"><source>Manage multiple terminal sessions simultaneously</source><target>同时管理多个终端会话</target></trans-unit>
-      <trans-unit id="pricing.title" datatype="html"><source>Free vs Pro</source><target>免费版 vs 专业版</target></trans-unit>
-      <trans-unit id="pricing.intro" datatype="html"><source>AIPilot is available in two versions. The free version lets you get started, while Pro unlocks the full potential.</source><target>AIPilot有两个版本。免费版让您入门,专业版解锁全部潜力。</target></trans-unit>
-      <trans-unit id="pricing.free.title" datatype="html"><source>Free</source><target>免费</target></trans-unit>
-      <trans-unit id="pricing.free.price" datatype="html"><source>$0</source><target>¥0</target></trans-unit>
-      <trans-unit id="pricing.free.feature1" datatype="html"><source>1 paired PC</source><target>1台配对电脑</target></trans-unit>
-      <trans-unit id="pricing.free.feature2" datatype="html"><source>1 CLI session</source><target>1个CLI会话</target></trans-unit>
-      <trans-unit id="pricing.free.feature3" datatype="html"><source>Real-time terminal control</source><target>实时终端控制</target></trans-unit>
-      <trans-unit id="pricing.free.feature4" datatype="html"><source>E2E encryption</source><target>端到端加密</target></trans-unit>
-      <trans-unit id="pricing.free.limit1" datatype="html"><source>No SSH connections</source><target>无SSH连接</target></trans-unit>
-      <trans-unit id="pricing.free.limit2" datatype="html"><source>No file/image upload</source><target>无文件/图片上传</target></trans-unit>
-      <trans-unit id="pricing.free.limit3" datatype="html"><source>No agent configuration</source><target>无代理配置</target></trans-unit>
-      <trans-unit id="pricing.free.cta" datatype="html"><source>Download Free</source><target>免费下载</target></trans-unit>
-      <trans-unit id="pricing.pro.title" datatype="html"><source>Pro</source><target>专业版</target></trans-unit>
-      <trans-unit id="pricing.pro.price" datatype="html"><source>One-time</source><target>一次性付款</target></trans-unit>
-      <trans-unit id="pricing.pro.feature1" datatype="html"><source>Unlimited PCs</source><target>无限电脑</target></trans-unit>
-      <trans-unit id="pricing.pro.feature2" datatype="html"><source>Unlimited CLI sessions</source><target>无限CLI会话</target></trans-unit>
-      <trans-unit id="pricing.pro.feature3" datatype="html"><source>Real-time terminal control</source><target>实时终端控制</target></trans-unit>
-      <trans-unit id="pricing.pro.feature4" datatype="html"><source>E2E encryption</source><target>端到端加密</target></trans-unit>
-      <trans-unit id="pricing.pro.feature5" datatype="html"><source>SSH connections</source><target>SSH连接</target></trans-unit>
-      <trans-unit id="pricing.pro.feature6" datatype="html"><source>File &amp; image upload</source><target>文件和图片上传</target></trans-unit>
-      <trans-unit id="pricing.pro.cta" datatype="html"><source>Get Pro</source><target>获取专业版</target></trans-unit>
       <trans-unit id="installation.title" datatype="html"><source>Installation</source><target>安装</target></trans-unit>
       <trans-unit id="installation.step1.title" datatype="html"><source>Install the CLI</source><target>安装CLI</target></trans-unit>
       <trans-unit id="installation.step1.desc" datatype="html"><source>Download and install the CLI on your computer</source><target>在您的电脑上下载并安装CLI</target></trans-unit>
@@ -51,8 +30,6 @@
       <trans-unit id="installation.prerequisites.comingSoon" datatype="html"><source>Coming soon</source><target>即将推出</target></trans-unit>
       <trans-unit id="installation.step2.title" datatype="html"><source>Install the Mobile App</source><target>安装手机应用</target></trans-unit>
       <trans-unit id="installation.step2.desc" datatype="html"><source>Get AIPilot from Google Play or App Store</source><target>从Google Play或App Store获取AIPilot</target></trans-unit>
-      <trans-unit id="installation.free" datatype="html"><source>Free</source><target>免费</target></trans-unit>
-      <trans-unit id="installation.pro" datatype="html"><source>Pro</source><target>专业版</target></trans-unit>
       <trans-unit id="doc.welcomeScreen" datatype="html"><source>When you open the app for the first time, you'll see the welcome screen:</source><target>首次打开应用时,您会看到欢迎屏幕:</target></trans-unit>
       <trans-unit id="installation.step3.title" datatype="html"><source>First Launch &amp; Pairing</source><target>首次启动和配对</target></trans-unit>
       <trans-unit id="installation.step3.desc" datatype="html"><source>Navigate to your project directory and launch the CLI with your preferred agent:</source><target>导航到您的项目目录并使用您喜欢的代理启动CLI:</target></trans-unit>

@@ -74,92 +74,6 @@
         <target>Gerez plusieurs sessions terminal simultanement</target>
       </trans-unit>
 
-      <!-- Pricing -->
-      <trans-unit id="pricing.title" datatype="html">
-        <source>Free vs Pro</source>
-        <target>Gratuit vs Pro</target>
-      </trans-unit>
-      <trans-unit id="pricing.intro" datatype="html">
-        <source>AIPilot is available in two versions. The free version lets you get started, while Pro unlocks the full potential.</source>
-        <target>AIPilot est disponible en deux versions. La version gratuite vous permet de demarrer, tandis que Pro deverrouille tout le potentiel.</target>
-      </trans-unit>
-      <trans-unit id="pricing.free.title" datatype="html">
-        <source>Free</source>
-        <target>Gratuit</target>
-      </trans-unit>
-      <trans-unit id="pricing.free.price" datatype="html">
-        <source>$0</source>
-        <target>0€</target>
-      </trans-unit>
-      <trans-unit id="pricing.free.feature1" datatype="html">
-        <source>1 paired PC</source>
-        <target>1 PC appaire</target>
-      </trans-unit>
-      <trans-unit id="pricing.free.feature2" datatype="html">
-        <source>1 CLI session</source>
-        <target>1 session CLI</target>
-      </trans-unit>
-      <trans-unit id="pricing.free.feature3" datatype="html">
-        <source>Real-time terminal control</source>
-        <target>Controle terminal en temps reel</target>
-      </trans-unit>
-      <trans-unit id="pricing.free.feature4" datatype="html">
-        <source>E2E encryption</source>
-        <target>Chiffrement E2E</target>
-      </trans-unit>
-      <trans-unit id="pricing.free.limit1" datatype="html">
-        <source>No SSH connections</source>
-        <target>Pas de connexions SSH</target>
-      </trans-unit>
-      <trans-unit id="pricing.free.limit2" datatype="html">
-        <source>No file/image upload</source>
-        <target>Pas d'upload fichiers/images</target>
-      </trans-unit>
-      <trans-unit id="pricing.free.limit3" datatype="html">
-        <source>No agent configuration</source>
-        <target>Pas de configuration agent</target>
-      </trans-unit>
-      <trans-unit id="pricing.free.cta" datatype="html">
-        <source>Download Free</source>
-        <target>Telecharger Gratuit</target>
-      </trans-unit>
-      <trans-unit id="pricing.pro.title" datatype="html">
-        <source>Pro</source>
-        <target>Pro</target>
-      </trans-unit>
-      <trans-unit id="pricing.pro.price" datatype="html">
-        <source>One-time</source>
-        <target>Achat unique</target>
-      </trans-unit>
-      <trans-unit id="pricing.pro.feature1" datatype="html">
-        <source>Unlimited PCs</source>
-        <target>PCs illimites</target>
-      </trans-unit>
-      <trans-unit id="pricing.pro.feature2" datatype="html">
-        <source>Unlimited CLI sessions</source>
-        <target>Sessions CLI illimitees</target>
-      </trans-unit>
-      <trans-unit id="pricing.pro.feature3" datatype="html">
-        <source>Real-time terminal control</source>
-        <target>Controle terminal en temps reel</target>
-      </trans-unit>
-      <trans-unit id="pricing.pro.feature4" datatype="html">
-        <source>E2E encryption</source>
-        <target>Chiffrement E2E</target>
-      </trans-unit>
-      <trans-unit id="pricing.pro.feature5" datatype="html">
-        <source>SSH connections</source>
-        <target>Connexions SSH</target>
-      </trans-unit>
-      <trans-unit id="pricing.pro.feature6" datatype="html">
-        <source>File &amp; image upload</source>
-        <target>Upload fichiers et images</target>
-      </trans-unit>
-      <trans-unit id="pricing.pro.cta" datatype="html">
-        <source>Get Pro</source>
-        <target>Obtenir Pro</target>
-      </trans-unit>
-
       <!-- Installation -->
       <trans-unit id="installation.title" datatype="html">
         <source>Installation</source>
@@ -204,14 +118,6 @@
       <trans-unit id="installation.step2.desc" datatype="html">
         <source>Get AIPilot from Google Play or App Store</source>
         <target>Obtenez AIPilot sur Google Play ou App Store</target>
-      </trans-unit>
-      <trans-unit id="installation.free" datatype="html">
-        <source>Free</source>
-        <target>Gratuit</target>
-      </trans-unit>
-      <trans-unit id="installation.pro" datatype="html">
-        <source>Pro</source>
-        <target>Pro</target>
       </trans-unit>
       <trans-unit id="doc.welcomeScreen" datatype="html">
         <source>When you open the app for the first time, you'll see the welcome screen:</source>

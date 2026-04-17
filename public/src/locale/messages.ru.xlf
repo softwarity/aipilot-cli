@@ -19,27 +19,6 @@
       <trans-unit id="features.ssh.desc" datatype="html"><source>Connect via SSH for remote server access</source><target>Подключение по SSH для доступа к удалённым серверам</target></trans-unit>
       <trans-unit id="features.multisession.title" datatype="html"><source>Multi-session</source><target>Мульти-сессия</target></trans-unit>
       <trans-unit id="features.multisession.desc" datatype="html"><source>Manage multiple terminal sessions simultaneously</source><target>Управляйте несколькими сессиями терминала одновременно</target></trans-unit>
-      <trans-unit id="pricing.title" datatype="html"><source>Free vs Pro</source><target>Бесплатно vs Pro</target></trans-unit>
-      <trans-unit id="pricing.intro" datatype="html"><source>AIPilot is available in two versions. The free version lets you get started, while Pro unlocks the full potential.</source><target>AIPilot доступен в двух версиях. Бесплатная версия для начала, Pro открывает полный потенциал.</target></trans-unit>
-      <trans-unit id="pricing.free.title" datatype="html"><source>Free</source><target>Бесплатно</target></trans-unit>
-      <trans-unit id="pricing.free.price" datatype="html"><source>$0</source><target>$0</target></trans-unit>
-      <trans-unit id="pricing.free.feature1" datatype="html"><source>1 paired PC</source><target>1 сопряжённый ПК</target></trans-unit>
-      <trans-unit id="pricing.free.feature2" datatype="html"><source>1 CLI session</source><target>1 CLI сессия</target></trans-unit>
-      <trans-unit id="pricing.free.feature3" datatype="html"><source>Real-time terminal control</source><target>Управление терминалом в реальном времени</target></trans-unit>
-      <trans-unit id="pricing.free.feature4" datatype="html"><source>E2E encryption</source><target>E2E шифрование</target></trans-unit>
-      <trans-unit id="pricing.free.limit1" datatype="html"><source>No SSH connections</source><target>Без SSH подключений</target></trans-unit>
-      <trans-unit id="pricing.free.limit2" datatype="html"><source>No file/image upload</source><target>Без загрузки файлов/изображений</target></trans-unit>
-      <trans-unit id="pricing.free.limit3" datatype="html"><source>No agent configuration</source><target>Без конфигурации агента</target></trans-unit>
-      <trans-unit id="pricing.free.cta" datatype="html"><source>Download Free</source><target>Скачать бесплатно</target></trans-unit>
-      <trans-unit id="pricing.pro.title" datatype="html"><source>Pro</source><target>Pro</target></trans-unit>
-      <trans-unit id="pricing.pro.price" datatype="html"><source>One-time</source><target>Единоразово</target></trans-unit>
-      <trans-unit id="pricing.pro.feature1" datatype="html"><source>Unlimited PCs</source><target>Неограниченно ПК</target></trans-unit>
-      <trans-unit id="pricing.pro.feature2" datatype="html"><source>Unlimited CLI sessions</source><target>Неограниченно CLI сессий</target></trans-unit>
-      <trans-unit id="pricing.pro.feature3" datatype="html"><source>Real-time terminal control</source><target>Управление терминалом в реальном времени</target></trans-unit>
-      <trans-unit id="pricing.pro.feature4" datatype="html"><source>E2E encryption</source><target>E2E шифрование</target></trans-unit>
-      <trans-unit id="pricing.pro.feature5" datatype="html"><source>SSH connections</source><target>SSH подключения</target></trans-unit>
-      <trans-unit id="pricing.pro.feature6" datatype="html"><source>File &amp; image upload</source><target>Загрузка файлов и изображений</target></trans-unit>
-      <trans-unit id="pricing.pro.cta" datatype="html"><source>Get Pro</source><target>Получить Pro</target></trans-unit>
       <trans-unit id="installation.title" datatype="html"><source>Installation</source><target>Установка</target></trans-unit>
       <trans-unit id="installation.step1.title" datatype="html"><source>Install the CLI</source><target>Установить CLI</target></trans-unit>
       <trans-unit id="installation.step1.desc" datatype="html"><source>Download and install the CLI on your computer</source><target>Скачайте и установите CLI на ваш компьютер</target></trans-unit>
@@ -51,8 +30,6 @@
       <trans-unit id="installation.prerequisites.comingSoon" datatype="html"><source>Coming soon</source><target>Скоро</target></trans-unit>
       <trans-unit id="installation.step2.title" datatype="html"><source>Install the Mobile App</source><target>Установить мобильное приложение</target></trans-unit>
       <trans-unit id="installation.step2.desc" datatype="html"><source>Get AIPilot from Google Play or App Store</source><target>Получите AIPilot из Google Play или App Store</target></trans-unit>
-      <trans-unit id="installation.free" datatype="html"><source>Free</source><target>Бесплатно</target></trans-unit>
-      <trans-unit id="installation.pro" datatype="html"><source>Pro</source><target>Pro</target></trans-unit>
       <trans-unit id="doc.welcomeScreen" datatype="html"><source>When you open the app for the first time, you'll see the welcome screen:</source><target>Когда вы открываете приложение впервые, вы увидите экран приветствия:</target></trans-unit>
       <trans-unit id="installation.step3.title" datatype="html"><source>First Launch &amp; Pairing</source><target>Первый запуск и сопряжение</target></trans-unit>
       <trans-unit id="installation.step3.desc" datatype="html"><source>Navigate to your project directory and launch the CLI with your preferred agent:</source><target>Перейдите в директорию проекта и запустите CLI с предпочитаемым агентом:</target></trans-unit>
